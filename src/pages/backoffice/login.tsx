@@ -134,7 +134,7 @@ const Login = () => {
 
               <Button
                 component={RouterLink}
-                href={"/register"}
+                href={"/backoffice/register"}
                 sx={{ mt: 1, fontSize: "12px" }}
                 size={"small"}
               >
