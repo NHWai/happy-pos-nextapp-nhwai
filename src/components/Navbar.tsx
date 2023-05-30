@@ -22,9 +22,11 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import Divider from "@mui/material/Divider";
 import { AccountCircle } from "@mui/icons-material";
 import { Menu, MenuItem } from "@mui/material";
-import { getAccessToken, getLocationId } from "@/config";
+import { getLocationId } from "@/config";
+import { useSession, signIn, signOut } from "next-auth/react";
 
 export default function Navbar() {
+  const { data: session } = useSession();
   const router = useRouter();
   let { pathname } = router;
   const [isOpen, setIsOpen] = useState(false);
@@ -37,12 +39,6 @@ export default function Navbar() {
 
   const handleClose = () => {
     setAnchorEl(null);
-  };
-
-  const handleLogOut = () => {
-    localStorage.removeItem("exp");
-    localStorage.removeItem("token");
-    router.push("/logout");
   };
 
   const drawerItems = [
@@ -133,9 +129,9 @@ export default function Navbar() {
             {pageLabel}
           </Typography>
           {pathname !== "/login" &&
-            (!getAccessToken() ? (
-              <Button component={RouterLink} href={"/login"} color="inherit">
-                Login
+            (!session ? (
+              <Button onClick={() => signIn()} color="inherit">
+                Sign In
               </Button>
             ) : (
               <div>
@@ -163,7 +159,7 @@ export default function Navbar() {
                   open={Boolean(anchorEl)}
                   onClose={handleClose}
                 >
-                  <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+                  <MenuItem onClick={() => signOut()}>SignOut</MenuItem>
                 </Menu>
               </div>
             ))}

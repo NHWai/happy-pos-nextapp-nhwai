@@ -1,33 +1,26 @@
-import { useRouter } from "next/router";
 import { MainLayout } from "./MainLayout";
 import Navbar from "./Navbar";
 import Box from "@mui/material/Box";
-import { getAccessToken } from "@/config";
+import { useSession } from "next-auth/react";
 
 interface Props {
   children: React.ReactNode;
 }
 
 const PageLayout = ({ children }: Props) => {
-  const isLoggedIn =
-    getAccessToken() && Number(localStorage.getItem("exp")) > Date.now();
+  // const { data: session } = useSession();
 
-  const router = useRouter();
-  if (typeof window !== "undefined") {
-    if (isLoggedIn) {
-      return (
-        <MainLayout>
-          <Navbar />
-          <Box sx={{ paddingX: "1.5rem" }}>{children}</Box>
-        </MainLayout>
-      );
-    } else {
-      router.push("/backoffice/login");
-      return <></>;
-    }
-  } else {
-    return <></>;
-  }
+  return (
+    <MainLayout>
+      <Navbar />
+      {children}
+      {/* {session ? (
+        <Box sx={{ paddingX: "1.5rem" }}>{children}</Box>
+      ) : (
+        <h1>Please SignIn</h1>
+      )} */}
+    </MainLayout>
+  );
 };
 
 export default PageLayout;
