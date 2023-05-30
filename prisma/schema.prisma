@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -46,7 +43,7 @@ model discount {
 model locations {
   id              Int               @id @default(autoincrement())
   name            String
-  address         String?
+  address         String
   companies_id    Int
   companies       companies         @relation(fields: [companies_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   menus_locations menus_locations[]
@@ -95,10 +92,10 @@ model menus_menu_categories {
 }
 
 model users {
-  id           Int        @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   name         String
   email        String
   password     String
-  companies_id Int?
-  companies    companies? @relation(fields: [companies_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  companies_id Int
+  companies    companies @relation(fields: [companies_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
