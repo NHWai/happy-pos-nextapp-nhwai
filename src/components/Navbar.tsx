@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -112,25 +112,31 @@ export default function Navbar() {
     <Box sx={{ flexGrow: 1, backgroundColor: "primary" }}>
       <AppBar color="primary" position="static">
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={toggleDrawer(true)}
-          >
-            <MenuIcon />
-          </IconButton>
+          {session && (
+            <IconButton
+              size="large"
+              edge="start"
+              color="inherit"
+              aria-label="menu"
+              sx={{ mr: 2 }}
+              onClick={toggleDrawer(true)}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Drawer anchor="left" open={isOpen} onClose={toggleDrawer(false)}>
             {list()}
           </Drawer>
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {pageLabel}
+            {session ? pageLabel : "Happy Pos Login Page"}
           </Typography>
+
           {pathname !== "/login" &&
             (!session ? (
-              <Button onClick={() => signIn()} color="inherit">
+              <Button
+                onClick={() => signIn("google", { callbackUrl: "/backoffice" })}
+                color="inherit"
+              >
                 Sign In
               </Button>
             ) : (
