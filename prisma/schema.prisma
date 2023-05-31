@@ -98,4 +98,10 @@ model users {
   password     String
   companies_id Int
   companies    companies @relation(fields: [companies_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role         Role      @default(user)
+}
+
+enum Role {
+  user
+  admin
 }
