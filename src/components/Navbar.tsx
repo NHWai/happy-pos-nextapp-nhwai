@@ -85,7 +85,11 @@ export default function Navbar() {
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}
-                href={"/" + item.link + "?location=" + locationId}
+                href={`/backoffice/${item.link}${
+                  router.query.location
+                    ? `?location=${router.query.location}`
+                    : ""
+                }`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
@@ -97,7 +101,11 @@ export default function Navbar() {
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}
-                href={"/" + item.link + "?location=" + locationId}
+                href={`/backoffice/${item.link}${
+                  router.query.location
+                    ? `?location=${router.query.location}`
+                    : ""
+                }`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
