@@ -85,11 +85,7 @@ export default function Navbar() {
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}
-                href={`/backoffice/${item.link}${
-                  router.query.location
-                    ? `?location=${router.query.location}`
-                    : ""
-                }`}
+                href={`/backoffice/${item.link}`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
@@ -101,11 +97,7 @@ export default function Navbar() {
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}
-                href={`/backoffice/${item.link}${
-                  router.query.location
-                    ? `?location=${router.query.location}`
-                    : ""
-                }`}
+                href={`/backoffice/${item.link}`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
                 <ListItemText primary={item.label} />
@@ -173,7 +165,14 @@ export default function Navbar() {
                   open={Boolean(anchorEl)}
                   onClose={handleClose}
                 >
-                  <MenuItem onClick={() => signOut()}>SignOut</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      signOut();
+                      localStorage.removeItem("companyId");
+                    }}
+                  >
+                    SignOut
+                  </MenuItem>
                 </Menu>
               </div>
             ))}

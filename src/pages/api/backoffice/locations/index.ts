@@ -14,7 +14,7 @@ export default async function handler(
     //check session
     let query = req.query;
     const companyId = Number(query.companyId);
-    console.log({ companyId });
+
     const locations = await prisma.locations.findMany({
       where: { companies_id: companyId },
     });

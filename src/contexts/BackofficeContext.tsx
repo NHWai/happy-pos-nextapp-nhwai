@@ -62,15 +62,16 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       }
     };
 
-    const companyIdFromLocalStorgae = Number(localStorage.getItem("companyId"));
-    if (companyIdFromLocalStorgae) {
-      setCompany({
-        ...company,
-        id: companyIdFromLocalStorgae,
-      });
-    } else if (company.id === 0) {
-      fetchCompany();
-    }
+    // const companyIdFromLocalStorgae = Number(localStorage.getItem("companyId"));
+    // if (companyIdFromLocalStorgae) {
+    //   setCompany({
+    //     ...company,
+    //     id: companyIdFromLocalStorgae,
+    //   });
+    // } else if (company.id === 0) {
+    localStorage.removeItem("companyId");
+    fetchCompany();
+    // }
   }, []);
 
   return (
