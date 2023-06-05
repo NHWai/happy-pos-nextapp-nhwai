@@ -1,4 +1,6 @@
-import React, { useState } from "react";
+import PageLayout from "@/components/PageLayout";
+import { RouteLayout } from "@/components/RouteLayout";
+import BackOfficeContext from "@/contexts/BackofficeContext";
 import {
   Box,
   Button,
@@ -13,78 +15,28 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { config } from "@/config/config";
-import { MenuCategory } from "../../typing/types";
-import { RouteLayout } from "../../components/RouteLayout";
-import PageLayout from "@/components/PageLayout";
-import { useRouter } from "next/router";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import Modal from "@mui/joy/Modal";
-import { ModalClose, ModalDialog } from "@mui/joy";
-import BackOfficeContext from "@/contexts/BackofficeContext";
+import { useRouter } from "next/router";
+import { Menu } from "../../typing/types";
+import React from "react";
+import { Modal, ModalClose, ModalDialog } from "@mui/joy";
 
-const MenuCategories = () => {
+const Menus = () => {
   const { locations } = React.useContext(BackOfficeContext);
-  const [menuCategoriesList, setMenuCategoriesList] = React.useState<
-    MenuCategory[]
-  >([]);
   const [open, setOpen] = React.useState<boolean>(false);
   const [userSelectlocation, setUserSelectlocation] = React.useState("");
   const { query, push } = useRouter();
-  const [newMenuCategory, setNewMenuCategory] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [menusList, setMenusList] = React.useState<Menu[]>([]);
+  //   const [newMenu, setNewMenu] = React.useState<Menu>({
+  //     name: "",
+  //     price: "",
+
+  //   });
+  const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     locations.length === 0 && push("/backoffice/setting");
   }, []);
-
-  React.useEffect(() => {
-    userSelectlocation && getMenuCategoriesByLocationId(userSelectlocation);
-  }, [userSelectlocation]);
-
-  const getMenuCategoriesByLocationId = async (locationId: string) => {
-    const url = `${config.baseurl}/backoffice/menu-categories?location=${locationId}`;
-
-    try {
-      const response = await fetch(url);
-      if (response.ok) {
-        const data = await response.json();
-        setMenuCategoriesList(data);
-      } else {
-        const data = await response.json();
-        throw new Error(data.message);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const createMenuCategory = async () => {
-    const body = {
-      name: newMenuCategory,
-      locationId: userSelectlocation,
-    };
-    try {
-      const response = await fetch(
-        `${config.baseurl}/backoffice/menu-categories/create`,
-        {
-          method: "POST",
-          body: JSON.stringify(body),
-        }
-      );
-      if (response.status === 200) {
-        const data = await response.json();
-        setMenuCategoriesList(data);
-        setNewMenuCategory("");
-        setOpen(false);
-        setIsLoading(false);
-      } else {
-        throw new Error("Failed to create a new menu-category");
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
 
   const handleChange = (event: SelectChangeEvent) => {
     //setting the location value in query params
@@ -97,9 +49,8 @@ const MenuCategories = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-    userSelectlocation && createMenuCategory();
-    //creat newMenuCategories
+    console.log(e.target);
+    // const formData = new FormData(e.target);
   };
 
   return (
@@ -126,9 +77,8 @@ const MenuCategories = () => {
             </Select>
           </FormControl>
         </Box>
-
         <Typography mt={3} mb={2} variant="h4">
-          MenuCategories
+          Menus
         </Typography>
         <Stack
           sx={{ maxWidth: "600px", mx: "auto" }}
@@ -138,12 +88,12 @@ const MenuCategories = () => {
         >
           {!userSelectlocation ? (
             <div>Choose Location First</div>
-          ) : menuCategoriesList.length > 0 ? (
+          ) : menusList.length > 0 ? (
             <>
               <IconButton onClick={() => setOpen(true)}>
                 <AddCircleOutlineIcon />
               </IconButton>
-              {menuCategoriesList?.map((item) => (
+              {menusList?.map((item) => (
                 <Chip
                   key={item.name}
                   label={item.name}
@@ -152,7 +102,11 @@ const MenuCategories = () => {
               ))}
             </>
           ) : (
-            <div>Loading</div>
+            <div>
+              <IconButton onClick={() => setOpen(true)}>
+                <AddCircleOutlineIcon />
+              </IconButton>
+            </div>
           )}
         </Stack>
         <Modal
@@ -167,7 +121,7 @@ const MenuCategories = () => {
           <ModalDialog layout="center" size="lg">
             <ModalClose />
             <Typography my={2} align="center" variant="h5">
-              Create MenuCategory
+              Create Menu
             </Typography>
             <Box
               onSubmit={handleSubmit}
@@ -179,15 +133,33 @@ const MenuCategories = () => {
                 alignItems: "center",
                 gap: 2,
               }}
+              encType="multipart/form-data"
+              method="POST"
             >
               <TextField
                 variant="standard"
                 label="name"
-                name="newMenuCategory"
-                value={newMenuCategory}
-                onChange={(e) => setNewMenuCategory(e.target.value)}
+                name="name"
                 autoComplete="off"
                 required
+              />
+              <TextField
+                variant="standard"
+                label="price"
+                name="price"
+                autoComplete="off"
+                required
+                type="number"
+              />
+
+              <input
+                style={{
+                  display: "block",
+                  border: "1px solid red",
+                }}
+                name="assetUrl"
+                type="file"
+                accept="image/png, image/jpeg"
               />
               <Button
                 disabled={isLoading}
@@ -205,4 +177,4 @@ const MenuCategories = () => {
   );
 };
 
-export default MenuCategories;
+export default Menus;
