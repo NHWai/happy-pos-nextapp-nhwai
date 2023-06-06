@@ -25,11 +25,13 @@ model addons {
 }
 
 model companies {
-  id        Int         @id @default(autoincrement())
-  name      String
-  address   String      @default("Default address")
-  locations locations[]
-  users     users[]
+  id              Int               @id @default(autoincrement())
+  name            String
+  address         String            @default("Default address")
+  locations       locations[]
+  users           users[]
+  menu_categories menu_categories[]
+  menus           menus[]
 }
 
 model discount {
@@ -53,7 +55,11 @@ model locations {
 model menu_categories {
   id                              Int                               @id @default(autoincrement())
   name                            String
+  companies_id                    Int
+  companies                       companies                         @relation(fields: [companies_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   menus_menu_categories_locations menus_menu_categories_locations[]
+
+  @@unique(fields: [name, companies_id], name: "menuCategoryCompany")
 }
 
 model menus {
@@ -62,8 +68,12 @@ model menus {
   price                           Int
   asset_url                       String?
   description                     String?
+  companies_id                    Int
+  companies                       companies                         @relation(fields: [companies_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   menus_addon_categories          menus_addon_categories[]
   menus_menu_categories_locations menus_menu_categories_locations[]
+
+  @@unique(fields: [name, companies_id], name: "menuCompany")
 }
 
 model menus_addon_categories {
@@ -94,12 +104,12 @@ model menus_menu_categories_locations {
   menus_id           Int?
   menu_categories_id Int
   locations_id       Int
-  is_available       Boolean         @default(true)  
+  is_available       Boolean         @default(true)
   menu_categories    menu_categories @relation(fields: [menu_categories_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "menus_menu_categories_locations_menu_categories_id_fkey")
   menus              menus?          @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "menus_menu_categories_locations_menus_id_fkey")
   locations          locations       @relation(fields: [locations_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "menus_menu_categories_locations_locations_id_fkey")
 
-  @@unique(fields: [menu_categories_id, locations_id], name: "menuCategoriesLocations")
+  @@unique(fields: [menu_categories_id, locations_id, menus_id], name: "menusMenuCategoriesLocations")
 }
 
 model table {
