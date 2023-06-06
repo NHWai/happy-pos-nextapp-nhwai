@@ -9,15 +9,12 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const session = await getServerSession(req, res, authOptions);
-  console.log("session", session);
 
   if (session && session?.user?.email) {
     //check session
     const userDB = await prisma.users.findFirst({
       where: { email: session.user.email },
     });
-
-    console.log("userDB", userDB);
 
     if (userDB === null) {
       //If users is null, create a company_id & create a user and return company_id
@@ -28,7 +25,7 @@ export default async function handler(
         },
       });
 
-      const user = await prisma.users.create({
+      await prisma.users.create({
         data: {
           name: session.user.name as string,
           email: session.user.email,

@@ -4,6 +4,9 @@ interface Config {
   clientId: string;
   clientSecret: string;
   nextAuthSecret: string;
+  accessKeyId: string;
+  secretKeyId: string;
+  digitalOceanEndPoint: string;
 }
 
 export const config: Config = {
@@ -12,4 +15,7 @@ export const config: Config = {
   clientId: process.env.GOOGLE_CLIENT_ID || "",
   clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
   nextAuthSecret: process.env.NEXTAUTH_SECRET || "",
+  accessKeyId: process.env.ACCESS_KEY_ID || "",
+  secretKeyId: process.env.SECRET_ACCESS_KEY || "",
+  digitalOceanEndPoint: process.env.DG_ENDPOINT || "",
 };

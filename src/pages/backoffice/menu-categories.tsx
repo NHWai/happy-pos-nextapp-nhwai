@@ -24,10 +24,12 @@ import { ModalClose, ModalDialog } from "@mui/joy";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 
 const MenuCategories = () => {
-  const { locations } = React.useContext(BackOfficeContext);
-  const [menuCategoriesList, setMenuCategoriesList] = React.useState<
-    MenuCategory[]
-  >([]);
+  const {
+    locations,
+    getMenuCategoriesByLocationId,
+    menuCategories,
+    setMenuCategories,
+  } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [userSelectlocation, setUserSelectlocation] = React.useState("");
   const { query, push } = useRouter();
@@ -41,23 +43,6 @@ const MenuCategories = () => {
   React.useEffect(() => {
     userSelectlocation && getMenuCategoriesByLocationId(userSelectlocation);
   }, [userSelectlocation]);
-
-  const getMenuCategoriesByLocationId = async (locationId: string) => {
-    const url = `${config.baseurl}/backoffice/menu-categories?location=${locationId}`;
-
-    try {
-      const response = await fetch(url);
-      if (response.ok) {
-        const data = await response.json();
-        setMenuCategoriesList(data);
-      } else {
-        const data = await response.json();
-        throw new Error(data.message);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   const createMenuCategory = async () => {
     const body = {
@@ -74,7 +59,7 @@ const MenuCategories = () => {
       );
       if (response.status === 200) {
         const data = await response.json();
-        setMenuCategoriesList(data);
+        setMenuCategories((pre) => [...pre, data]);
         setNewMenuCategory("");
         setOpen(false);
         setIsLoading(false);
@@ -98,8 +83,8 @@ const MenuCategories = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    userSelectlocation && createMenuCategory();
     //creat newMenuCategories
+    userSelectlocation && createMenuCategory();
   };
 
   return (
@@ -138,12 +123,12 @@ const MenuCategories = () => {
         >
           {!userSelectlocation ? (
             <div>Choose Location First</div>
-          ) : menuCategoriesList.length > 0 ? (
+          ) : menuCategories.length > 0 ? (
             <>
               <IconButton onClick={() => setOpen(true)}>
                 <AddCircleOutlineIcon />
               </IconButton>
-              {menuCategoriesList?.map((item) => (
+              {menuCategories?.map((item) => (
                 <Chip
                   key={item.name}
                   label={item.name}
@@ -152,7 +137,12 @@ const MenuCategories = () => {
               ))}
             </>
           ) : (
-            <div>Loading</div>
+            <>
+              <IconButton onClick={() => setOpen(true)}>
+                <AddCircleOutlineIcon />
+              </IconButton>
+              <div>No Menu Categories</div>
+            </>
           )}
         </Stack>
         <Modal

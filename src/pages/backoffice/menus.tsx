@@ -20,23 +20,64 @@ import { useRouter } from "next/router";
 import { Menu } from "../../typing/types";
 import React from "react";
 import { Modal, ModalClose, ModalDialog } from "@mui/joy";
+import { config } from "@/config/config";
+
+// interface MyFormData extends FormData {
+//   name: string;
+//   price: string;
+//   menuCategoryId: string;
+//   locationId: string;
+//   menuImg: File;
+// }
 
 const Menus = () => {
-  const { locations } = React.useContext(BackOfficeContext);
+  const {
+    locations,
+    menuCategories,
+    getMenuCategoriesByLocationId,
+    getMenusByLocationsId,
+    setMenus,
+    menus,
+  } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [userSelectlocation, setUserSelectlocation] = React.useState("");
+  const [userSelectMenuCategory, setUserSelectMenuCategory] =
+    React.useState("");
   const { query, push } = useRouter();
-  const [menusList, setMenusList] = React.useState<Menu[]>([]);
-  //   const [newMenu, setNewMenu] = React.useState<Menu>({
-  //     name: "",
-  //     price: "",
-
-  //   });
   const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
     locations.length === 0 && push("/backoffice/setting");
   }, []);
+
+  React.useEffect(() => {
+    if (userSelectlocation) {
+      getMenuCategoriesByLocationId(userSelectlocation);
+      getMenusByLocationsId(userSelectlocation);
+    }
+  }, [userSelectlocation]);
+
+  const createMenu = async (formData: FormData) => {
+    try {
+      const response = await fetch(
+        `${config.baseurl}/backoffice/menus/create`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+      if (response.status === 201) {
+        const data = await response.json();
+        console.log(data);
+        setMenus((pre) => [...pre, data]);
+        setOpen(false);
+      } else {
+        throw new Error("Failed to create a new menu-category");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleChange = (event: SelectChangeEvent) => {
     //setting the location value in query params
@@ -47,10 +88,18 @@ const Menus = () => {
     setUserSelectlocation(event.target.value as string);
   };
 
+  const handleSelectMenuCategory = (event: SelectChangeEvent) => {
+    setUserSelectMenuCategory(event.target.value as string);
+  };
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(e.target);
-    // const formData = new FormData(e.target);
+    const formData = new FormData(e.target as HTMLFormElement);
+    formData.append("locationId", userSelectlocation);
+    // formData.forEach((el) => {
+    //   console.log(el);
+    // });
+    createMenu(formData);
   };
 
   return (
@@ -88,12 +137,12 @@ const Menus = () => {
         >
           {!userSelectlocation ? (
             <div>Choose Location First</div>
-          ) : menusList.length > 0 ? (
+          ) : menus.length > 0 ? (
             <>
               <IconButton onClick={() => setOpen(true)}>
                 <AddCircleOutlineIcon />
               </IconButton>
-              {menusList?.map((item) => (
+              {menus?.map((item) => (
                 <Chip
                   key={item.name}
                   label={item.name}
@@ -134,7 +183,6 @@ const Menus = () => {
                 gap: 2,
               }}
               encType="multipart/form-data"
-              method="POST"
             >
               <TextField
                 variant="standard"
@@ -157,10 +205,26 @@ const Menus = () => {
                   display: "block",
                   border: "1px solid red",
                 }}
-                name="assetUrl"
+                name="menuImg"
                 type="file"
                 accept="image/png, image/jpeg"
               />
+              <FormControl fullWidth>
+                <InputLabel id="select-menuCategory">Menu Category</InputLabel>
+                <Select
+                  name="menuCategoryId"
+                  labelId="select-menuCategory"
+                  value={userSelectMenuCategory}
+                  label="menu-category"
+                  onChange={handleSelectMenuCategory}
+                >
+                  {menuCategories?.map((el) => (
+                    <MenuItem key={el.id} value={el.id}>
+                      {el.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
               <Button
                 disabled={isLoading}
                 variant="contained"

@@ -26,18 +26,7 @@ export default async function handler(
         locations_id: data.locationId,
       },
     });
-
-    const menusCategoriesIds = (
-      await prisma.menus_menu_categories_locations.findMany({
-        where: { locations_id: data.locationId },
-      })
-    ).map((el) => el.menu_categories_id);
-
-    const menuCategories = await prisma.menu_categories.findMany({
-      where: { id: { in: menusCategoriesIds } },
-    });
-
-    res.status(200).json(menuCategories);
+    res.status(200).json(newMenuCategory);
   } else {
     res.status(401).end();
   }

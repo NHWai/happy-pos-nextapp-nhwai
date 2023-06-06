@@ -15,21 +15,22 @@ export default async function handler(
     const query = req.query;
     const locationId = Number(query.location);
 
-    const menuCategoriesLocationsMenus =
+    const menusLocationsMenus =
       await prisma.menus_menu_categories_locations.findMany({
         where: { locations_id: locationId },
       });
 
     //return the related menuCategories
-    const menuCategoryIds = menuCategoriesLocationsMenus.map(
-      (item) => item.menu_categories_id
-    );
-    const menuCategories = await prisma.menu_categories.findMany({
+    const menuIds = menusLocationsMenus
+      .map((item) => item.menus_id)
+      .filter((item) => item);
+    console.log({ menuIds });
+    const menus = await prisma.menus.findMany({
       where: {
-        id: { in: menuCategoryIds },
+        id: { in: menuIds as number[] },
       },
     });
-    res.status(200).json(menuCategories);
+    res.status(200).json(menus);
     //return the array of menuCategories
   } else {
     res.status(401).end();

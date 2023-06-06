@@ -11,8 +11,12 @@ import {
 import { createContext, ReactNode, useEffect, useState } from "react";
 
 interface BackOfficeContextType {
-  // menus: Menu[];
-  // menuCategories: MenuCategory[];
+  menus: Menu[];
+  setMenus: React.Dispatch<React.SetStateAction<Menu[]>>;
+  getMenusByLocationsId: (locationId: string) => void;
+  menuCategories: MenuCategory[];
+  getMenuCategoriesByLocationId: (locationId: string) => void;
+  setMenuCategories: React.Dispatch<React.SetStateAction<MenuCategory[]>>;
   // addons: Addon[];
   // addonCategories: AddonCategory[];
   locations: Location[];
@@ -23,8 +27,12 @@ interface BackOfficeContextType {
 
 //
 const BackOfficeContext = createContext<BackOfficeContextType>({
-  // menus: [],
-  // menuCategories: [],
+  menus: [],
+  setMenus: () => {},
+  getMenusByLocationsId: (locationId) => {},
+  menuCategories: [],
+  getMenuCategoriesByLocationId: (locationId) => {},
+  setMenuCategories: () => {},
   // addons: [],
   // addonCategories: [],
   locations: [],
@@ -45,37 +53,76 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
   });
 
   const [locations, setLocations] = useState<Location[]>([]);
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+
+  const [menus, setMenus] = useState<Menu[]>([]);
 
   useEffect(() => {
-    const fetchCompany = async () => {
-      try {
-        const response = await fetch(`${config.baseurl}/backoffice/companies`);
-        const data = await response.json();
-        if (response.status === 200 || 201) {
-          localStorage.setItem("companyId", data.id);
-          setCompany(data);
-        } else {
-          throw new Error("Fail to fetch company id");
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    };
-
-    // const companyIdFromLocalStorgae = Number(localStorage.getItem("companyId"));
-    // if (companyIdFromLocalStorgae) {
-    //   setCompany({
-    //     ...company,
-    //     id: companyIdFromLocalStorgae,
-    //   });
-    // } else if (company.id === 0) {
     localStorage.removeItem("companyId");
     fetchCompany();
-    // }
   }, []);
 
+  const fetchCompany = async () => {
+    try {
+      const response = await fetch(`${config.baseurl}/backoffice/companies`);
+      const data = await response.json();
+      if (response.status === 200 || 201) {
+        localStorage.setItem("companyId", data.id);
+        setCompany(data);
+      } else {
+        throw new Error("Fail to fetch company id");
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getMenuCategoriesByLocationId = async (locationId: string) => {
+    const url = `${config.baseurl}/backoffice/menu-categories?location=${locationId}`;
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setMenuCategories(data);
+      } else {
+        const data = await response.json();
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getMenusByLocationsId = async (locationId: string) => {
+    const url = `${config.baseurl}/backoffice/menus?location=${locationId}`;
+    try {
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        setMenus(data);
+      } else {
+        const data = await response.json();
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <BackOfficeContext.Provider value={{ company, locations, setLocations }}>
+    <BackOfficeContext.Provider
+      value={{
+        menus,
+        setMenus,
+        getMenusByLocationsId,
+        company,
+        locations,
+        setLocations,
+        menuCategories,
+        setMenuCategories,
+        getMenuCategoriesByLocationId,
+      }}
+    >
       {children}
     </BackOfficeContext.Provider>
   );
