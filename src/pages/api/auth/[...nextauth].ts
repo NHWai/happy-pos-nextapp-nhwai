@@ -12,6 +12,7 @@ export const authOptions = {
     // ...add more providers here
   ],
   secret: config.nextAuthSecret,
+
   pages: {
     signIn: "/auth/signin",
     // signOut: "/auth/signout",

@@ -10,14 +10,12 @@ export default async function handler(
 ) {
   const session = await getServerSession(req, res, authOptions);
 
+  //check session
   if (session && session?.user?.email) {
-    //check session
-    const userDB = await prisma.users.findFirst({
-      where: { email: session.user.email },
-    });
+    const companyName = req.body;
 
-    if (userDB === null) {
-      //If users is null, create a company_id & create a user and return company_id
+    if (companyName === "newOne") {
+      //so create a new one
       const company = await prisma.companies.create({
         data: {
           name: `${session.user.name} company`,
@@ -35,14 +33,31 @@ export default async function handler(
       });
 
       return res.status(201).json(company);
-    } else {
-      //get related data of user and company_id
+    }
 
-      const company = await prisma.companies.findFirst({
-        where: { id: userDB.companies_id },
+    //get company_id
+    const companyDB = await prisma.companies.findFirst({
+      where: {
+        name: companyName,
+      },
+    });
+
+    if (companyDB) {
+      //if company exists,check user
+      const userDB = await prisma.users.findFirst({
+        where: {
+          AND: [{ email: session.user.email }, { companies_id: companyDB.id }],
+        },
       });
 
-      res.status(200).json(company);
+      //company name and username not matched
+      if (!userDB) {
+        return res.status(401).end();
+      }
+
+      return res.status(200).json(companyDB);
+    } else {
+      res.status(401).end();
     }
   } else {
     res.status(401).end();

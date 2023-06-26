@@ -3,6 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
+import { json } from "stream/consumers";
 
 export default async function handler(
   req: NextApiRequest,
@@ -10,16 +11,12 @@ export default async function handler(
 ) {
   const session = await getServerSession(req, res, authOptions);
 
-  if (session && session?.user?.email) {
-    //check session
-    const query = req.query;
+  if (session?.user?.name && session.user.email) {
+    const companyId = Number(req.query.companyId);
 
-    const companyId = Number(query.companyId);
+    if (!companyId) return res.send(404);
 
-    if (!companyId) {
-      return res.end(404);
-    }
-
+    //fetching menus
     const menus = await prisma.menus.findMany({
       where: {
         companies_id: companyId,
@@ -52,10 +49,42 @@ export default async function handler(
         .map((item) => JSON.parse(item)),
     }));
 
-    res.status(200).json(menusArr);
-    // res.send(200);
-    //return the array of menuCategories
+    // fetching menu-categories
+    const menuCategories = await prisma.menu_categories.findMany({
+      where: {
+        companies_id: companyId,
+      },
+    });
+
+    //fetching locations
+    const locations = await prisma.locations.findMany({
+      where: { companies_id: companyId },
+    });
+
+    // if (locations.length === 0) {
+    //   //create a location with given company_id
+
+    //   const newLocation = await prisma.locations.create({
+    //     data: {
+    //       name: "default location",
+    //       address: "default address",
+    //       companies_id: companyId,
+    //     },
+    //   });
+    //   res.status(200).json([newLocation]);
+    // } else {
+    //   // if location exits return the info of that location
+    //   res.status(200).json(locations);
+    // }
+
+    const response = {
+      menus: menusArr,
+      menuCategories,
+      locations,
+    };
+    console.log("request from frontend");
+    res.status(200).json(response);
   } else {
-    res.status(401).end();
+    return res.status(404).end();
   }
 }

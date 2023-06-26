@@ -1,5 +1,6 @@
 interface Config {
   baseurl: string;
+  orderAppUrl: string;
   secretJwt: string;
   clientId: string;
   clientSecret: string;
@@ -11,6 +12,7 @@ interface Config {
 
 export const config: Config = {
   baseurl: process.env.NEXT_PUBLIC_BASE_URL || "",
+  orderAppUrl: process.env.NEXT_PUBLIC_ORDER_APP_URL || "",
   secretJwt: process.env.SECRET_JWT || "",
   clientId: process.env.GOOGLE_CLIENT_ID || "",
   clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",

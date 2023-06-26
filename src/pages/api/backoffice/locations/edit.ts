@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -12,20 +13,20 @@ export default async function handler(
     //if session exists
     const data = JSON.parse(req.body);
 
-    //create menu-category
-    const newMenuCategory = await prisma.menu_categories.create({
+    //update location
+    const updatedLocation = await prisma.locations.update({
+      where: { id: data.id },
       data: {
         name: data.name,
+        address: data.address,
         companies_id: data.companyId,
       },
     });
 
-    if (!newMenuCategory) {
-      return res.status(500).end();
-    }
+    if (!updatedLocation) return res.status(500).end();
 
-    return res.status(201).json(newMenuCategory);
+    res.status(200).json(updatedLocation);
   } else {
-    return res.status(401).end();
+    res.status(401).end();
   }
 }

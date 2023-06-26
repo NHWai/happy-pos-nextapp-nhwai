@@ -13,22 +13,19 @@ export default async function handler(
   if (session && session?.user?.email) {
     //check session
     const query = req.query;
-    const locationId = Number(query.location);
 
-    const menuCategoriesLocationsMenus =
-      await prisma.menus_menu_categories_locations.findMany({
-        where: { locations_id: locationId },
-      });
+    const companyId = Number(query.company);
 
-    //return the related menuCategories
-    const menuCategoryIds = menuCategoriesLocationsMenus.map(
-      (item) => item.menu_categories_id
-    );
+    if (!companyId) {
+      return res.end(404);
+    }
+
     const menuCategories = await prisma.menu_categories.findMany({
       where: {
-        id: { in: menuCategoryIds },
+        companies_id: companyId,
       },
     });
+
     res.status(200).json(menuCategories);
     //return the array of menuCategories
   } else {

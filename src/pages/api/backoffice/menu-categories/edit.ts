@@ -10,21 +10,21 @@ export default async function handler(
 
   if (session && session?.user?.email) {
     //if session exists
-    const data = JSON.parse(req.body);
+    const reqdata = JSON.parse(req.body);
 
-    //create menu-category
-    const newMenuCategory = await prisma.menu_categories.create({
+    //update menu-category
+    const updatedMenuCategory = await prisma.menu_categories.update({
+      where: { id: reqdata.id },
       data: {
-        name: data.name,
-        companies_id: data.companyId,
+        name: reqdata.name,
       },
     });
 
-    if (!newMenuCategory) {
+    if (!updatedMenuCategory) {
       return res.status(500).end();
     }
 
-    return res.status(201).json(newMenuCategory);
+    return res.status(200).json(updatedMenuCategory);
   } else {
     return res.status(401).end();
   }

@@ -3,13 +3,21 @@ interface BaseType {
   name: string;
 }
 
+export type Status = "idle" | "loading" | "failed";
+
 export interface Menu extends BaseType {
   price: number;
   asset_url?: string;
   description?: string;
+  menuCategoryArr: {
+    id: number;
+  }[];
+  locationArr: { is_available: boolean; id: number }[];
 }
 
-export interface MenuCategory extends BaseType {}
+export interface MenuCategory extends BaseType {
+  companies_id?: number;
+}
 
 export interface Addon extends BaseType {
   price: number;
@@ -22,7 +30,7 @@ export interface AddonCategory extends BaseType {
 }
 
 export interface Location extends BaseType {
-  address?: string;
+  address: string;
   companies_id?: number;
 }
 
@@ -35,4 +43,22 @@ export interface MenusMenuCategoriesLocations {
 
 export interface Company extends BaseType {
   address: string;
+  error: string;
+}
+
+export interface ContextType {
+  status: Status;
+  error: string;
+}
+
+export interface LocationsType extends ContextType {
+  items: Location[];
+}
+
+export interface MenuCategoriesType extends ContextType {
+  items: MenuCategory[];
+}
+
+export interface MenusType extends ContextType {
+  items: Menu[];
 }

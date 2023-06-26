@@ -11,13 +11,12 @@ import {
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { config } from "@/config/config";
 import PageLayout from "@/components/PageLayout";
-import { useRouter } from "next/router";
-import { Modal, ModalClose, ModalDialog } from "@mui/joy";
+import Modal from "@/components/ModalBox";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { RouteLayout } from "@/components/RouteLayout";
 
 const Setting = () => {
-  const { locations, setLocations, company } =
+  const { locations, setLocations, getLocationsByCompanyId, company } =
     React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [newLocation, setNewLocation] = useState({
@@ -26,29 +25,11 @@ const Setting = () => {
   });
 
   React.useEffect(() => {
-    locations.length === 0 &&
-      company.id !== 0 &&
-      getLocations(
-        `${config.baseurl}/backoffice/locations?companyId=${company.id}`
-      );
-  }, [company.id]);
-
-  const getLocations = async (url: string) => {
-    try {
-      const response = await fetch(url, {
-        method: "GET",
-      });
-
-      if (response.status === 200) {
-        const data = await response.json();
-        setLocations(data);
-      } else {
-        throw new Error(await response.json());
-      }
-    } catch (err) {
-      console.log(err);
+    if (locations.items.length === 0 && company.id !== 0) {
+      setLocations((pre) => ({ ...pre, status: "loading" }));
+      getLocationsByCompanyId(company.id);
     }
-  };
+  }, [company.id]);
 
   const createLocations = async () => {
     const body = {
@@ -66,7 +47,12 @@ const Setting = () => {
 
       if (response.status === 200) {
         const data = await response.json();
-        setLocations(data);
+        setLocations((pre) => ({
+          ...pre,
+          items: data,
+          status: "idle",
+          error: "",
+        }));
         setNewLocation({
           name: "",
           address: "",
@@ -88,7 +74,10 @@ const Setting = () => {
 
   const handleNewLocationSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    company.id && createLocations();
+    if (company.id) {
+      setLocations((pre) => ({ ...pre, status: "loading" }));
+      createLocations();
+    }
   };
 
   return (
@@ -103,12 +92,14 @@ const Setting = () => {
           direction="row"
           spacing={2}
         >
-          {locations.length > 0 ? (
+          {locations.status === "loading" ? (
+            <div>Loading...</div>
+          ) : locations.items.length > 0 ? (
             <>
               <IconButton onClick={() => setOpen(true)}>
                 <AddCircleOutlineIcon />
               </IconButton>
-              {locations?.map((item) => (
+              {locations.items?.map((item) => (
                 <Chip
                   key={item.name}
                   label={item.name}
@@ -117,62 +108,44 @@ const Setting = () => {
               ))}
             </>
           ) : (
-            <div>Loading...</div>
+            <div>No Locations Found</div>
           )}
         </Stack>
 
-        <Modal
-          open={open}
-          onClose={() => setOpen(false)}
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ModalDialog layout="center" size="lg">
-            <ModalClose />
-            <Typography my={2} align="center" variant="h5">
-              Create Location
-            </Typography>
-            <Box
-              onSubmit={handleNewLocationSubmit}
-              component="form"
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignItems: "center",
-                gap: 2,
-              }}
-            >
-              <TextField
-                variant="standard"
-                label="name"
-                name="name"
-                value={newLocation.name}
-                onChange={handleNewLocationChange}
-                autoComplete="off"
-                required
-              />
-              <TextField
-                variant="standard"
-                label="address"
-                name="address"
-                value={newLocation.address}
-                onChange={handleNewLocationChange}
-                autoComplete="off"
-                required
-              />
-              <Button
-                variant="contained"
-                type="submit"
-                sx={{ alignSelf: "end" }}
-              >
-                Submit
-              </Button>
-            </Box>
-          </ModalDialog>
+        <Modal setOpen={setOpen} open={open} heading="Create Location">
+          <Box
+            onSubmit={handleNewLocationSubmit}
+            component="form"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 2,
+            }}
+          >
+            <TextField
+              variant="standard"
+              label="name"
+              name="name"
+              value={newLocation.name}
+              onChange={handleNewLocationChange}
+              autoComplete="off"
+              required
+            />
+            <TextField
+              variant="standard"
+              label="address"
+              name="address"
+              value={newLocation.address}
+              onChange={handleNewLocationChange}
+              autoComplete="off"
+              required
+            />
+            <Button variant="contained" type="submit" sx={{ alignSelf: "end" }}>
+              Submit
+            </Button>
+          </Box>
         </Modal>
       </RouteLayout>
     </PageLayout>

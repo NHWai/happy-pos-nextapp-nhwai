@@ -10,18 +10,29 @@ export default async function handler(
 
   if (session && session?.user?.email) {
     //if session exists
-    const data = JSON.parse(req.body);
 
-    //create location
-    const newLocation = await prisma.locations.create({
-      data: {
-        name: data.name,
-        address: data.address,
-        companies_id: data.companyId,
-      },
+    const id = Number(req.query.id);
+
+    if (!id) {
+      return res.status(400).end();
+    }
+
+    //delete menus and menu categories
+
+    await prisma.menus_menu_categories_locations.deleteMany({
+      where: { menu_categories_id: id },
     });
 
-    res.status(201).json(newLocation);
+    //delete location
+    const delMenuCatgory = await prisma.menu_categories.delete({
+      where: { id },
+      select: {
+        id: true,
+      },
+    });
+    if (!delMenuCatgory.id) return res.status(500).end();
+
+    res.status(200).end();
   } else {
     res.status(401).end();
   }

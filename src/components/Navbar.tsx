@@ -19,6 +19,7 @@ import ClassIcon from "@mui/icons-material/Class";
 import LocalDiningIcon from "@mui/icons-material/LocalDining";
 import LunchDiningIcon from "@mui/icons-material/LunchDining";
 import SettingsIcon from "@mui/icons-material/Settings";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import Divider from "@mui/material/Divider";
 import { AccountCircle } from "@mui/icons-material";
 import { Menu, MenuItem } from "@mui/material";
@@ -54,11 +55,16 @@ export default function Navbar() {
       icon: <ClassIcon />,
       link: "addon-categories",
     },
+    {
+      label: "Locations",
+      icon: <LocationOnIcon />,
+      link: "locations",
+    },
     { label: "Setting", icon: <SettingsIcon />, link: "setting" },
   ];
   const pageLabel =
     drawerItems[drawerItems.findIndex((el) => el.link === pathname.slice(1))]
-      ?.label || "Home";
+      ?.label || "HappyPos";
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -81,7 +87,7 @@ export default function Navbar() {
         sx={{ width: "250" }}
       >
         <List>
-          {drawerItems.slice(0, 4).map((item) => (
+          {drawerItems.slice(0, 5).map((item) => (
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}
@@ -112,7 +118,7 @@ export default function Navbar() {
     <Box sx={{ flexGrow: 1, backgroundColor: "primary" }}>
       <AppBar color="primary" position="static">
         <Toolbar>
-          {session && (
+          {session && pathname !== "/backoffice/company" && (
             <IconButton
               size="large"
               edge="start"
@@ -134,7 +140,9 @@ export default function Navbar() {
           {pathname !== "/login" &&
             (!session ? (
               <Button
-                onClick={() => signIn("google", { callbackUrl: "/backoffice" })}
+                onClick={() =>
+                  signIn("google", { callbackUrl: "/backoffice/" })
+                }
                 color="inherit"
               >
                 Sign In
@@ -168,7 +176,7 @@ export default function Navbar() {
                   <MenuItem
                     onClick={() => {
                       signOut();
-                      localStorage.removeItem("companyId");
+                      localStorage.removeItem("company");
                     }}
                   >
                     SignOut
