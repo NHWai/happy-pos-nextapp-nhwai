@@ -30,10 +30,7 @@ const MenuCategories = () => {
   const [userSelectlocation, setUserSelectlocation] = React.useState<
     string | null
   >("");
-  const [currMenuCategory, setCurrMenuCategory] = useState<{
-    id: number;
-    name: string;
-  }>({ id: 0, name: "" });
+  const [currMenuCategory, setCurrMenuCategory] = useState({ id: 0, name: "" });
 
   function showMenus(currId: number) {
     return app.menus
@@ -50,7 +47,7 @@ const MenuCategories = () => {
 
   const createMenuCategory = async () => {
     const body = {
-      name: currMenuCategory,
+      name: currMenuCategory.name,
       companyId: company.id,
     };
     try {
@@ -63,7 +60,6 @@ const MenuCategories = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setApp((pre) => ({
           ...pre,
           menuCategories: [...pre.menuCategories, data],
@@ -71,7 +67,7 @@ const MenuCategories = () => {
           error: "",
         }));
         setCurrMenuCategory({ id: 0, name: "" });
-        setOpenConfirmation(false);
+        setOpen(false);
       } else {
         throw new Error("Failed to create a new menu-category");
       }
@@ -253,9 +249,7 @@ const MenuCategories = () => {
         <ModalBox
           open={open}
           setOpen={setOpen}
-          heading={`${
-            !currMenuCategory.name ? "Create" : "Edit"
-          } Menu Category`}
+          heading={`${!currMenuCategory.id ? "Create" : "Edit"} Menu Category`}
         >
           <Box
             onSubmit={handleSubmit}

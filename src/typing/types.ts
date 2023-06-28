@@ -26,7 +26,7 @@ export interface Addon extends BaseType {
 }
 
 export interface AddonCategory extends BaseType {
-  isRequired: boolean;
+  is_required: boolean;
 }
 
 export interface Location extends BaseType {

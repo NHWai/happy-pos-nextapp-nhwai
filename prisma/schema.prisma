@@ -11,6 +11,7 @@ model addon_categories {
   id                     Int                      @id @default(autoincrement())
   name                   String
   is_required            Boolean?                 @default(false)
+  companies_id           Int
   addons                 addons[]
   menus_addon_categories menus_addon_categories[]
 }
@@ -20,6 +21,7 @@ model addons {
   name                String
   price               Int
   is_available        Boolean?         @default(true)
+  companies_id        Int
   addon_categories_id Int
   addon_categories    addon_categories @relation(fields: [addon_categories_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }

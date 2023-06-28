@@ -90,6 +90,7 @@ export default async function handler(
     const response = {
       menus: menusArr,
       menuCategories,
+      addonCategories,
       locations,
       tables,
     };

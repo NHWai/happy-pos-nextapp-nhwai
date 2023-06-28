@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import {
-  Autocomplete,
   Box,
   Button,
   Chip,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   Stack,
   TextField,
   Typography,
@@ -22,19 +16,22 @@ import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 
+const initialAddonCategory = {
+  id: 0,
+  name: "",
+  is_required: false,
+};
+
 const MenuCategories = () => {
   const { company, app, setApp } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
-  const [userSelectlocation, setUserSelectlocation] = React.useState<
-    string | null
-  >("");
-  const [currMenuCategory, setCurrMenuCategory] = useState<{
-    id: number;
-    name: string;
-  }>({ id: 0, name: "" });
 
+  const [currAddonCategory, setCurrAddonCategory] =
+    useState(initialAddonCategory);
+
+  //to change menuCategoryArr to addonCategoryArr
   function showMenus(currId: number) {
     return app.menus
       .filter((item) => item.menuCategoryArr.find((el) => el.id === currId))
@@ -48,14 +45,15 @@ const MenuCategories = () => {
     }
   }, [app.error]);
 
-  const createMenuCategory = async () => {
+  const createAddonCategory = async () => {
     const body = {
-      name: currMenuCategory,
+      name: currAddonCategory.name,
+      is_required: currAddonCategory.is_required,
       companyId: company.id,
     };
     try {
       const response = await fetch(
-        `${config.baseurl}/backoffice/menu-categories/create`,
+        `${config.baseurl}/backoffice/addon-categories/create`,
         {
           method: "POST",
           body: JSON.stringify(body),
@@ -63,53 +61,13 @@ const MenuCategories = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setApp((pre) => ({
           ...pre,
-          menuCategories: [...pre.menuCategories, data],
+          addonCategories: [...pre.addonCategories, data],
           status: "idle",
           error: "",
         }));
-        setCurrMenuCategory({ id: 0, name: "" });
-        setOpenConfirmation(false);
-      } else {
-        throw new Error("Failed to create a new menu-category");
-      }
-    } catch (error) {
-      setApp((pre) => ({
-        ...pre,
-        status: "failed",
-        error: error as string,
-      }));
-    }
-  };
-
-  const updateMenuCategory = async () => {
-    const body = {
-      id: currMenuCategory.id,
-      name: currMenuCategory.name,
-      companyId: company.id,
-    };
-    try {
-      const response = await fetch(
-        `${config.baseurl}/backoffice/menu-categories/edit`,
-        {
-          method: "PUT",
-          body: JSON.stringify(body),
-        }
-      );
-      if (response.ok) {
-        const data = await response.json();
-        console.log(data);
-        setApp((pre) => ({
-          ...pre,
-          menuCategories: pre.menuCategories.map((item) =>
-            item.id === currMenuCategory.id ? data : item
-          ),
-          status: "idle",
-          error: "",
-        }));
-        setCurrMenuCategory({ id: 0, name: "" });
+        setCurrAddonCategory(initialAddonCategory);
         setOpen(false);
       } else {
         throw new Error("Failed to create a new menu-category");
@@ -123,19 +81,54 @@ const MenuCategories = () => {
     }
   };
 
-  // const handleChange = (event: string | null) => {
-  //   //set search params of location
-  //   setUserSelectlocation(event as string);
-  // };
+  const updateAddonCategory = async () => {
+    const body = {
+      id: currAddonCategory.id,
+      name: currAddonCategory.name,
+      is_required: currAddonCategory.is_required,
+      companyId: company.id,
+    };
+    try {
+      const response = await fetch(
+        `${config.baseurl}/backoffice/addon-categories/edit`,
+        {
+          method: "PUT",
+          body: JSON.stringify(body),
+        }
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setApp((pre) => ({
+          ...pre,
+          addonCategories: pre.addonCategories.map((item) =>
+            item.id === currAddonCategory.id ? data : item
+          ),
+          status: "idle",
+          error: "",
+        }));
+        setCurrAddonCategory(initialAddonCategory);
+        setOpen(false);
+      } else {
+        throw new Error("Failed to create a new menu-category");
+      }
+    } catch (error) {
+      setApp((pre) => ({
+        ...pre,
+        status: "failed",
+        error: error as string,
+      }));
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     setApp((pre) => ({ ...pre, status: "loading" }));
-    if (!currMenuCategory.id) {
-      //creat newMenuCategories
-      company.id && createMenuCategory();
+    if (!currAddonCategory.id) {
+      //creat newAddonCategories
+      company.id && createAddonCategory();
     } else {
-      updateMenuCategory();
+      updateAddonCategory();
     }
   };
 
@@ -143,7 +136,7 @@ const MenuCategories = () => {
     setApp((pre) => ({ ...pre, status: "loading" }));
     try {
       const response = await fetch(
-        `${config.baseurl}/backoffice/menu-categories/delete?id=${id}`,
+        `${config.baseurl}/backoffice/addon-categories/delete?id=${id}`,
         {
           method: "DELETE",
         }
@@ -151,18 +144,17 @@ const MenuCategories = () => {
       if (response.ok) {
         setApp((pre) => ({
           ...pre,
-          menuCategories: pre.menuCategories.filter(
+          addonCategories: pre.addonCategories.filter(
             (menuCategory) => menuCategory.id !== id
           ),
           status: "idle",
         }));
-        setCurrMenuCategory({
-          id: 0,
-          name: "",
-        });
+        setCurrAddonCategory(initialAddonCategory);
         setOpenConfirmation(false);
       } else {
-        throw new Error("Failed to delete current menu category");
+        throw new Error(
+          `Failed to delete current menu category \n Status Code: ${response.status}`
+        );
       }
     } catch (error) {
       setApp((pre) => ({
@@ -177,7 +169,7 @@ const MenuCategories = () => {
     <PageLayout>
       <RouteLayout>
         <Typography mt={3} mb={2} variant="h4">
-          MenuCategories
+          Addon Categories
         </Typography>
 
         <Stack
@@ -194,14 +186,14 @@ const MenuCategories = () => {
           <IconButton
             onClick={() => {
               setOpen(true);
-              setCurrMenuCategory({ id: 0, name: "" });
+              setCurrAddonCategory(initialAddonCategory);
             }}
           >
             <AddCircleOutlineIcon />
           </IconButton>
-          {!userSelectlocation && app.menuCategories?.length > 0 ? (
+          {app.menuCategories?.length > 0 ? (
             <>
-              {app.menuCategories?.map((item) => (
+              {app.addonCategories?.map((item) => (
                 <Chip
                   key={item?.id}
                   sx={{
@@ -218,14 +210,19 @@ const MenuCategories = () => {
                   style={{ cursor: "pointer" }}
                   onDelete={() => {
                     setOpenConfirmation(true);
-                    setCurrMenuCategory({
+                    setCurrAddonCategory({
                       id: item.id,
                       name: item.name,
+                      is_required: item.is_required,
                     });
                   }}
                   onClick={() => {
                     setOpen(true);
-                    setCurrMenuCategory({ id: item.id, name: item.name });
+                    setCurrAddonCategory({
+                      id: item.id,
+                      name: item.name,
+                      is_required: item.is_required,
+                    });
                   }}
                 />
               ))}
@@ -239,8 +236,8 @@ const MenuCategories = () => {
           open={open}
           setOpen={setOpen}
           heading={`${
-            !currMenuCategory.name ? "Create" : "Edit"
-          } Menu Category`}
+            !currAddonCategory.id ? "Create" : "Edit"
+          } Addon Category`}
         >
           <Box
             onSubmit={handleSubmit}
@@ -258,14 +255,32 @@ const MenuCategories = () => {
               variant="standard"
               label="name"
               name="newMenuCategory"
-              value={currMenuCategory.name}
+              value={currAddonCategory.name}
               onChange={(e) =>
-                setCurrMenuCategory((pre) => ({ ...pre, name: e.target.value }))
+                setCurrAddonCategory((pre) => ({
+                  ...pre,
+                  name: e.target.value,
+                }))
               }
               autoComplete="off"
               required
             />
-            <Stack
+
+            <label>
+              <input
+                name="is_required"
+                checked={currAddonCategory.is_required}
+                type="checkbox"
+                onChange={(e) =>
+                  setCurrAddonCategory((pre) => ({
+                    ...pre,
+                    is_required: e.target.checked,
+                  }))
+                }
+              />{" "}
+              is_required
+            </label>
+            {/* <Stack
               sx={{ width: "75%" }}
               direction={"row"}
               justifyContent={"space-around"}
@@ -276,9 +291,9 @@ const MenuCategories = () => {
                 Menus :
               </Typography>
               <Typography width={"50%"} variant="caption">
-                {showMenus(currMenuCategory.id).join(", ")}
+                {showMenus(currAddonCategory.id).join(", ")}
               </Typography>
-            </Stack>
+            </Stack> */}
             <Button
               disabled={app.status === "loading"}
               variant="contained"
@@ -290,7 +305,7 @@ const MenuCategories = () => {
           </Box>
         </ModalBox>
         <ConfirmationBox
-          handleDelete={() => handleDelete(currMenuCategory.id)}
+          handleDelete={() => handleDelete(currAddonCategory.id)}
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           heading="Are you sure to delete this because this might delete related menus?"
