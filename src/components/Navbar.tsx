@@ -60,6 +60,11 @@ export default function Navbar() {
       icon: <LocationOnIcon />,
       link: "locations",
     },
+    {
+      label: "Tables",
+      icon: <LocationOnIcon />,
+      link: "tables",
+    },
     { label: "Setting", icon: <SettingsIcon />, link: "setting" },
   ];
   const pageLabel =
@@ -87,7 +92,7 @@ export default function Navbar() {
         sx={{ width: "250" }}
       >
         <List>
-          {drawerItems.slice(0, 5).map((item) => (
+          {drawerItems.slice(0, 6).map((item) => (
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}

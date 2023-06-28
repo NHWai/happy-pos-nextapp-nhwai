@@ -61,6 +61,16 @@ export default async function handler(
       where: { companies_id: companyId },
     });
 
+    //fetching tables
+    const tables = await prisma.tables.findMany({
+      where: { locations_id: { in: locations.map((item) => item.id) } },
+    });
+
+    //fetching addonCategories
+    const addonCategories = await prisma.addon_categories.findMany({
+      where: { companies_id: companyId },
+    });
+
     // if (locations.length === 0) {
     //   //create a location with given company_id
 
@@ -81,6 +91,7 @@ export default async function handler(
       menus: menusArr,
       menuCategories,
       locations,
+      tables,
     };
     console.log("request from frontend");
     res.status(200).json(response);

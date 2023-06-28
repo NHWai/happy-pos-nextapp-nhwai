@@ -49,7 +49,7 @@ model locations {
   companies_id                    Int
   companies                       companies                         @relation(fields: [companies_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   menus_menu_categories_locations menus_menu_categories_locations[]
-  table                           table[]
+  table                           tables[]
 }
 
 model menu_categories {
@@ -112,7 +112,7 @@ model menus_menu_categories_locations {
   @@unique(fields: [menu_categories_id, locations_id, menus_id], name: "menusMenuCategoriesLocations")
 }
 
-model table {
+model tables {
   id           Int       @id @default(autoincrement())
   name         String
   locations_id Int

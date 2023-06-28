@@ -34,6 +34,11 @@ export interface Location extends BaseType {
   companies_id?: number;
 }
 
+export interface Table extends BaseType {
+  assetUrl: string;
+  locations_id: number;
+}
+
 export interface MenusMenuCategoriesLocations {
   id: number;
   menus_id?: number;
