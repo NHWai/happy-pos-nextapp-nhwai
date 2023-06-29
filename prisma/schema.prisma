@@ -20,7 +20,7 @@ model addons {
   id                  Int              @id @default(autoincrement())
   name                String
   price               Int
-  is_available        Boolean?         @default(true)
+  is_available        Boolean          @default(true)
   companies_id        Int
   addon_categories_id Int
   addon_categories    addon_categories @relation(fields: [addon_categories_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
