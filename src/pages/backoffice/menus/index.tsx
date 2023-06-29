@@ -16,7 +16,7 @@ import React from "react";
 import { config } from "@/config/config";
 import ModalBox from "@/components/ModalBox";
 import Link from "next/link";
-import { Location } from "@/typing/types";
+import { Location, MenuCategory, AddonCategory } from "@/typing/types";
 
 const Menus = () => {
   const { company, app, setApp } = React.useContext(BackOfficeContext);
@@ -25,6 +25,10 @@ const Menus = () => {
     []
   );
   const [selectedMenuCategories, setSelectedMenuCategories] = React.useState<
+    string[]
+  >([]);
+
+  const [selectedAddonCategories, setSelectedAddonCategories] = React.useState<
     string[]
   >([]);
 
@@ -39,6 +43,7 @@ const Menus = () => {
       );
       if (response.ok) {
         const data = await response.json();
+        console.log({ newdata: data });
         setApp((pre) => ({
           ...pre,
           menus: [...pre.menus, data],
@@ -75,12 +80,22 @@ const Menus = () => {
 
     const menuCategoriesObjArr = selectedMenuCategories
       .map((el) => app.menuCategories.find((item) => item.name === el))
-      .map((el) => ({ name: el?.name, id: el?.id }));
+      .filter((item): item is MenuCategory => item !== undefined)
+      .map((el) => ({ name: el.name, id: el.id }));
+
+    const addonCategoriesObjArr = selectedAddonCategories
+      .map((el) => app.addonCategories.find((item) => item.name === el))
+      .filter((item): item is AddonCategory => item !== undefined)
+      .map((el) => ({ name: el.name, id: el.id }));
 
     formData.append("selectedLocations", JSON.stringify(locationObjArr));
     formData.append(
       "selectedMenuCategories",
       JSON.stringify(menuCategoriesObjArr)
+    );
+    formData.append(
+      "selectedAddonCategories",
+      JSON.stringify(addonCategoriesObjArr)
     );
     formData.append("companyId", String(company.id));
 
@@ -181,6 +196,26 @@ const Menus = () => {
               }
               renderInput={(params) => (
                 <TextField {...params} label="Choose Menu Categories" />
+              )}
+            />
+
+            <Autocomplete
+              multiple
+              size="small"
+              options={app?.addonCategories.map((item) => item.name)}
+              disablePortal
+              value={selectedAddonCategories}
+              onChange={(event: any, newValue: string[]) =>
+                setSelectedAddonCategories(newValue)
+              }
+              sx={{ width: 200 }}
+              renderTags={(value: readonly string[], getTagProps) =>
+                value.map((option: string, index: number) => (
+                  <Chip label={option} {...getTagProps({ index })} />
+                ))
+              }
+              renderInput={(params) => (
+                <TextField {...params} label="Choose Addon Categories" />
               )}
             />
 

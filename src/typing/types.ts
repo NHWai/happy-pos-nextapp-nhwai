@@ -13,6 +13,7 @@ export interface Menu extends BaseType {
     id: number;
   }[];
   locationArr: { is_available: boolean; id: number }[];
+  addonCategoryArr: { id: number }[];
 }
 
 export interface MenuCategory extends BaseType {

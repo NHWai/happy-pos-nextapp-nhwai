@@ -48,12 +48,14 @@ export default async function uploadHandler(
             is_available: boolean;
           }[];
           selectedMenuCategories: { name: string; id: number }[];
+          selectedAddonCategories: { name: string; id: number }[];
         } = {
           name: req.body.name,
           price: parseInt(req.body.price, 10),
           selectedLocations: JSON.parse(req.body.selectedLocations),
           selectedMenuCategories: JSON.parse(req.body.selectedMenuCategories),
           companyId: parseInt(req.body.companyId, 10),
+          selectedAddonCategories: JSON.parse(req.body.selectedAddonCategories),
         };
 
         // create a new menu
@@ -82,6 +84,16 @@ export default async function uploadHandler(
           data: menusMenuCategoriesLocationsIdArr,
         });
 
+        //inserting in menus_addon_categories table
+        const addonsMenus = reqBody.selectedAddonCategories.map((el) => ({
+          menus_id: newMenu.id,
+          addon_categories_id: el.id,
+        }));
+
+        await prisma.menus_addon_categories.createMany({
+          data: addonsMenus,
+        });
+
         const menuCategoryArr = reqBody.selectedMenuCategories.map((item) => ({
           id: item.id,
         }));
@@ -89,9 +101,15 @@ export default async function uploadHandler(
           id: item.id,
           is_available: item.is_available,
         }));
+        const addonCategoryArr = reqBody.selectedAddonCategories.map(
+          (item) => ({
+            id: item.id,
+          })
+        );
+
         return res
           .status(201)
-          .json({ ...newMenu, menuCategoryArr, locationArr });
+          .json({ ...newMenu, menuCategoryArr, locationArr, addonCategoryArr });
       });
     } catch (error) {
       return res.status(500).end();

@@ -23,8 +23,12 @@ export default async function handler(
       },
     });
 
+    //fetching menus_menu_categories_locations relationship
     const menusMenuCategoryLocationsIds =
       await prisma.menus_menu_categories_locations.findMany();
+
+    //fetching menus_addon_categories relationship
+    const menusAddonCategories = await prisma.menus_addon_categories.findMany();
 
     const menusArr = menus.map((el) => ({
       ...el,
@@ -37,6 +41,13 @@ export default async function handler(
         )
         .filter((item, idx, arr) => arr.indexOf(item) === idx)
         .map((item) => JSON.parse(item)),
+
+      addonCategoryArr: menusAddonCategories
+        .filter((item) => item.menus_id === el.id)
+        .map((item) => JSON.stringify({ id: item.addon_categories_id }))
+        .filter((item, idx, arr) => arr.indexOf(item) === idx)
+        .map((item) => JSON.parse(item)),
+
       locationArr: menusMenuCategoryLocationsIds
         .filter((item) => item.menus_id === el.id)
         .map((item) =>

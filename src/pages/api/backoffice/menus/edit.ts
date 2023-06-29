@@ -49,6 +49,7 @@ export default async function uploadHandler(
           locations_id: number;
           is_available: boolean;
         }[];
+        addonCategoryIds: number[];
       } = {
         name: req.body.name,
         price: parseInt(req.body.price, 10),
@@ -56,8 +57,29 @@ export default async function uploadHandler(
         removeItems: JSON.parse(req.body.removeItems),
         addItems: JSON.parse(req.body.addItems),
         companyId: parseInt(req.body.companyId, 10),
+        addonCategoryIds: JSON.parse(req.body.addonCategoryIds),
       };
 
+      const menusAddonCategories = reqBody.addonCategoryIds.map((item) => ({
+        menus_id: reqBody.menuId,
+        addon_categories_id: item,
+      }));
+
+      //removing old rows in menus_addon_categories table
+      await prisma.menus_addon_categories.deleteMany({
+        where: { menus_id: reqBody.menuId },
+      });
+
+      //adding new rows in menus_addon_categories table
+      await prisma.menus_addon_categories.createMany({
+        data: menusAddonCategories,
+      });
+
+      const addonCategoryArr = reqBody.addonCategoryIds.map((item) => ({
+        id: item,
+      }));
+
+      //removing old rows in menus_menu_categories_locations table
       await prisma.$transaction(
         reqBody.removeItems.map(
           (item: {
@@ -133,7 +155,12 @@ export default async function uploadHandler(
           price: reqBody.price,
         },
       });
-      res.status(200).json({ ...updateMenu, menuCategoryArr, locationArr });
+      res.status(200).json({
+        ...updateMenu,
+        menuCategoryArr,
+        locationArr,
+        addonCategoryArr,
+      });
     });
   } else {
     res.status(401).end();

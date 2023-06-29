@@ -183,13 +183,14 @@ const Location = () => {
           direction="row"
           gap={1}
         >
+          {" "}
+          <IconButton onClick={() => setOpen(true)}>
+            <AddCircleOutlineIcon />
+          </IconButton>
           {app.status === "loading" ? (
             <div>Loading...</div>
           ) : app.locations.length > 0 ? (
             <>
-              <IconButton onClick={() => setOpen(true)}>
-                <AddCircleOutlineIcon />
-              </IconButton>
               {app.locations?.map((item) => (
                 <Chip
                   key={item.name}

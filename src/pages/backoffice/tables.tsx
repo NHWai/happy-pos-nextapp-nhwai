@@ -35,8 +35,6 @@ const Table = () => {
     location: "",
   });
 
-  console.log(app.tables);
-
   const chgLocationNametoId = (
     locationName: string,
     locationsArr: Location[]
@@ -205,18 +203,18 @@ const Table = () => {
           direction="row"
           gap={1}
         >
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+              setCurrTable({ id: 0, name: "", location: "" });
+            }}
+          >
+            <AddCircleOutlineIcon />
+          </IconButton>
           {app.status === "loading" ? (
             <div>Loading...</div>
-          ) : app.locations.length > 0 ? (
+          ) : app.tables.length > 0 ? (
             <>
-              <IconButton
-                onClick={() => {
-                  setOpen(true);
-                  setCurrTable({ id: 0, name: "", location: "" });
-                }}
-              >
-                <AddCircleOutlineIcon />
-              </IconButton>
               {app.tables?.map((item) => (
                 <Chip
                   key={item.name}

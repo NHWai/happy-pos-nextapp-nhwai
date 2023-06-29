@@ -32,16 +32,19 @@ const MenuItem = () => {
   const [selectedMenuCategories, setSelectedMenuCategories] = React.useState<
     string[]
   >([]);
+  const [selectedAddonCategories, setSelectedAddonCategories] = React.useState<
+    string[]
+  >([]);
   const [menuItem, setMenuItem] = useState<Menu>({
     id: 0,
     locationArr: [],
     menuCategoryArr: [],
+    addonCategoryArr: [],
     name: "",
     price: 0,
   });
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
-
   useEffect(() => {
     if (app.error) {
       alert(app.error);
@@ -92,6 +95,7 @@ const MenuItem = () => {
       });
       if (response.ok) {
         const data = await response.json();
+
         setApp((pre) => ({
           ...pre,
           menus: pre.menus.map((el) => (el.id === data.id ? data : el)),
@@ -162,11 +166,16 @@ const MenuItem = () => {
       .filter((item) => !originalMenuMenuCategoryLocation.includes(item))
       .map((item) => JSON.parse(item));
 
+    const addonCategoryIds = app.addonCategories
+      .filter((item) => selectedAddonCategories.find((el) => el === item.name))
+      .map((item) => item.id);
+
     // formData.append("sameItems", JSON.stringify(sameItems));
     formData.append("removeItems", JSON.stringify(removeItems));
     formData.append("addItems", JSON.stringify(addItems));
     formData.append("companyId", String(company.id));
     formData.append("menuId", String(menuItem.id));
+    formData.append("addonCategoryIds", JSON.stringify(addonCategoryIds));
 
     // for (var [key, value] of formData.entries()) {
     //   console.log(key, "-->", value);
@@ -253,6 +262,12 @@ const MenuItem = () => {
                     setSelectedLocations(
                       filteredNames(menuItem.locationArr, app.locations)
                     );
+                    setSelectedAddonCategories(
+                      filteredNames(
+                        menuItem.addonCategoryArr,
+                        app.addonCategories
+                      )
+                    );
                   }}
                 >
                   <EditIcon />
@@ -293,6 +308,21 @@ const MenuItem = () => {
                   {filteredNames(
                     menuItem.menuCategoryArr,
                     app.menuCategories
+                  ).join(", ")}
+                </Typography>
+              </Stack>
+              <Stack flexDirection={"row"} alignItems="baseline">
+                <Typography textAlign={"end"} width={140} variant="body1">
+                  Addon Categories:
+                </Typography>
+                <Typography
+                  width={200}
+                  fontStyle={"italic"}
+                  fontWeight={"bold"}
+                >
+                  {filteredNames(
+                    menuItem.addonCategoryArr,
+                    app.addonCategories
                   ).join(", ")}
                 </Typography>
               </Stack>
@@ -383,6 +413,26 @@ const MenuItem = () => {
                   }
                   renderInput={(params) => (
                     <TextField {...params} label="Choose Menu Categories" />
+                  )}
+                />
+
+                <Autocomplete
+                  multiple
+                  size="small"
+                  options={app.addonCategories?.map((item) => item.name)}
+                  disablePortal
+                  value={selectedAddonCategories}
+                  onChange={(event: any, newValue: string[]) =>
+                    setSelectedAddonCategories(newValue)
+                  }
+                  sx={{ width: 200 }}
+                  renderTags={(value: readonly string[], getTagProps) =>
+                    value.map((option: string, index: number) => (
+                      <Chip label={option} {...getTagProps({ index })} />
+                    ))
+                  }
+                  renderInput={(params) => (
+                    <TextField {...params} label="Choose Addon Categories" />
                   )}
                 />
 

@@ -191,7 +191,7 @@ const MenuCategories = () => {
           >
             <AddCircleOutlineIcon />
           </IconButton>
-          {app.menuCategories?.length > 0 ? (
+          {app.addonCategories.length > 0 ? (
             <>
               {app.addonCategories?.map((item) => (
                 <Chip
@@ -228,7 +228,7 @@ const MenuCategories = () => {
               ))}
             </>
           ) : (
-            <div>No Menu Categories</div>
+            <div>No Addon Categories</div>
           )}
         </Stack>
 
