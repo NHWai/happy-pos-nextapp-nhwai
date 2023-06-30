@@ -82,6 +82,11 @@ export default async function handler(
       where: { companies_id: companyId },
     });
 
+    //fetching addons
+    const addons = await prisma.addons.findMany({
+      where: { companies_id: companyId },
+    });
+
     // if (locations.length === 0) {
     //   //create a location with given company_id
 
@@ -102,6 +107,7 @@ export default async function handler(
       menus: menusArr,
       menuCategories,
       addonCategories,
+      addons,
       locations,
       tables,
     };

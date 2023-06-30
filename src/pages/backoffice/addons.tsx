@@ -7,6 +7,8 @@ import {
   Stack,
   TextField,
   Typography,
+  Autocomplete,
+  InputAdornment,
 } from "@mui/material";
 import { config } from "@/config/config";
 import { RouteLayout } from "../../components/RouteLayout";
@@ -15,28 +17,31 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import { Addon } from "@/typing/types";
 
-const initialAddonCategory = {
+const initialAddon = {
   id: 0,
   name: "",
-  is_required: false,
+  price: 0,
+  is_available: false,
+  addonCategory: "",
+  companies_id: 0,
 };
 
-const MenuCategories = () => {
+const Addons = () => {
   const { company, app, setApp } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
 
-  const [currAddonCategory, setCurrAddonCategory] =
-    useState(initialAddonCategory);
+  const [currAddon, setCurrAddon] = useState(initialAddon);
 
   //to change menuCategoryArr to addonCategoryArr
-  function showMenus(currId: number) {
-    return app.menus
-      .filter((item) => item.menuCategoryArr.find((el) => el.id === currId))
-      .map((item) => item.name);
-  }
+  // function showMenus(currId: number) {
+  //   return app.menus
+  //     .filter((item) => item.addonCategoryArr.find((el) => el.id === currId))
+  //     .map((item) => item.name);
+  // }
 
   React.useEffect(() => {
     if (app.error) {
@@ -47,13 +52,16 @@ const MenuCategories = () => {
 
   const createAddonCategory = async () => {
     const body = {
-      name: currAddonCategory.name,
-      is_required: currAddonCategory.is_required,
-      companyId: company.id,
+      name: currAddon.name,
+      is_available: currAddon.is_available,
+      price: Number(currAddon.price),
+      addon_categories_id: chgAddonCategoryNameToId(currAddon.addonCategory),
+      companies_id: company.id,
     };
+
     try {
       const response = await fetch(
-        `${config.baseurl}/backoffice/addon-categories/create`,
+        `${config.baseurl}/backoffice/addons/create`,
         {
           method: "POST",
           body: JSON.stringify(body),
@@ -63,14 +71,14 @@ const MenuCategories = () => {
         const data = await response.json();
         setApp((pre) => ({
           ...pre,
-          addonCategories: [...pre.addonCategories, data],
+          addons: [...pre.addons, data],
           status: "idle",
           error: "",
         }));
-        setCurrAddonCategory(initialAddonCategory);
+        setCurrAddon(initialAddon);
         setOpen(false);
       } else {
-        throw new Error("Failed to create a new menu-category");
+        throw new Error("Failed to create a new addon");
       }
     } catch (error) {
       setApp((pre) => ({
@@ -83,33 +91,32 @@ const MenuCategories = () => {
 
   const updateAddonCategory = async () => {
     const body = {
-      id: currAddonCategory.id,
-      name: currAddonCategory.name,
-      is_required: currAddonCategory.is_required,
-      companyId: company.id,
+      name: currAddon.name,
+      is_available: currAddon.is_available,
+      price: Number(currAddon.price),
+      addon_categories_id: chgAddonCategoryNameToId(currAddon.addonCategory),
+      companies_id: company.id,
+      id: currAddon.id,
     };
     try {
-      const response = await fetch(
-        `${config.baseurl}/backoffice/addon-categories/edit`,
-        {
-          method: "PUT",
-          body: JSON.stringify(body),
-        }
-      );
+      const response = await fetch(`${config.baseurl}/backoffice/addons/edit`, {
+        method: "PUT",
+        body: JSON.stringify(body),
+      });
       if (response.ok) {
         const data = await response.json();
         setApp((pre) => ({
           ...pre,
-          addonCategories: pre.addonCategories.map((item) =>
-            item.id === currAddonCategory.id ? data : item
+          addons: pre.addons.map((item) =>
+            item.id === currAddon.id ? data : item
           ),
           status: "idle",
           error: "",
         }));
-        setCurrAddonCategory(initialAddonCategory);
+        setCurrAddon(initialAddon);
         setOpen(false);
       } else {
-        throw new Error("Failed to create a new menu-category");
+        throw new Error("Failed to update the addon");
       }
     } catch (error) {
       setApp((pre) => ({
@@ -124,7 +131,7 @@ const MenuCategories = () => {
     e.preventDefault();
 
     setApp((pre) => ({ ...pre, status: "loading" }));
-    if (!currAddonCategory.id) {
+    if (!currAddon.id) {
       //creat newAddonCategories
       company.id && createAddonCategory();
     } else {
@@ -136,7 +143,7 @@ const MenuCategories = () => {
     setApp((pre) => ({ ...pre, status: "loading" }));
     try {
       const response = await fetch(
-        `${config.baseurl}/backoffice/addon-categories/delete?id=${id}`,
+        `${config.baseurl}/backoffice/addons/delete?id=${id}`,
         {
           method: "DELETE",
         }
@@ -144,12 +151,10 @@ const MenuCategories = () => {
       if (response.ok) {
         setApp((pre) => ({
           ...pre,
-          addonCategories: pre.addonCategories.filter(
-            (menuCategory) => menuCategory.id !== id
-          ),
+          addons: pre.addons.filter((menuCategory) => menuCategory.id !== id),
           status: "idle",
         }));
-        setCurrAddonCategory(initialAddonCategory);
+        setCurrAddon(initialAddon);
         setOpenConfirmation(false);
       } else {
         throw new Error(
@@ -165,11 +170,27 @@ const MenuCategories = () => {
     }
   };
 
+  const chgAddonCategoryNameToId = (addonCat: string): number => {
+    return app.addonCategories.filter((item) => item.name === addonCat)[0].id;
+  };
+
+  const chgAddonCategoryIdtoName = (addonCatId: number): string => {
+    return app.addonCategories.filter((item) => item.id === addonCatId)[0].name;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCurrAddon((pre) => ({
+      ...pre,
+      [e.target.name]:
+        e.target.name === "is_available" ? e.target.checked : e.target.value,
+    }));
+  };
+
   return (
     <PageLayout>
       <RouteLayout>
         <Typography mt={3} mb={2} variant="h4">
-          Addon Categories
+          Addons
         </Typography>
 
         <Stack
@@ -186,14 +207,14 @@ const MenuCategories = () => {
           <IconButton
             onClick={() => {
               setOpen(true);
-              setCurrAddonCategory(initialAddonCategory);
+              setCurrAddon(initialAddon);
             }}
           >
             <AddCircleOutlineIcon />
           </IconButton>
-          {app.addonCategories.length > 0 ? (
+          {app.addons.length > 0 ? (
             <>
-              {app.addonCategories?.map((item) => (
+              {app.addons?.map((item) => (
                 <Chip
                   key={item?.id}
                   sx={{
@@ -204,40 +225,46 @@ const MenuCategories = () => {
                       padding: 1,
                     },
                   }}
-                  label={
-                    item.name + " \n (" + showMenus(item.id).length + " menu/s)"
-                  }
+                  label={item.name}
                   style={{ cursor: "pointer" }}
                   onDelete={() => {
                     setOpenConfirmation(true);
-                    setCurrAddonCategory({
+                    setCurrAddon({
                       id: item.id,
                       name: item.name,
-                      is_required: item.is_required,
+                      is_available: item.is_available,
+                      addonCategory: chgAddonCategoryIdtoName(
+                        item.addon_categories_id
+                      ),
+                      companies_id: item.companies_id,
+                      price: item.price,
                     });
                   }}
                   onClick={() => {
                     setOpen(true);
-                    setCurrAddonCategory({
+                    setCurrAddon({
                       id: item.id,
                       name: item.name,
-                      is_required: item.is_required,
+                      is_available: item.is_available,
+                      addonCategory: chgAddonCategoryIdtoName(
+                        item.addon_categories_id
+                      ),
+                      companies_id: item.companies_id,
+                      price: item.price,
                     });
                   }}
                 />
               ))}
             </>
           ) : (
-            <div>No Addon Categories</div>
+            <div>No Addons</div>
           )}
         </Stack>
 
         <ModalBox
           open={open}
           setOpen={setOpen}
-          heading={`${
-            !currAddonCategory.id ? "Create" : "Edit"
-          } Addon Category`}
+          heading={`${!currAddon.id ? "Create" : "Edit"} Addon`}
         >
           <Box
             onSubmit={handleSubmit}
@@ -254,46 +281,60 @@ const MenuCategories = () => {
               error={!!app.error}
               variant="standard"
               label="name"
-              name="newMenuCategory"
-              value={currAddonCategory.name}
-              onChange={(e) =>
-                setCurrAddonCategory((pre) => ({
-                  ...pre,
-                  name: e.target.value,
-                }))
-              }
+              value={currAddon.name}
+              name="name"
+              onChange={handleChange}
+              autoComplete="off"
+              required
+            />
+            <TextField
+              error={!!app.error}
+              variant="standard"
+              label="price"
+              type="number"
+              value={currAddon.price}
+              name="price"
+              onChange={handleChange}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">MMK</InputAdornment>
+                ),
+              }}
               autoComplete="off"
               required
             />
 
+            <Autocomplete
+              size="small"
+              options={app.addonCategories.map((item) => item.name)}
+              disablePortal
+              value={currAddon.addonCategory}
+              onChange={(event: any, newValue: string | null) =>
+                typeof newValue === "string" &&
+                setCurrAddon((pre) => ({
+                  ...pre,
+                  addonCategory: newValue,
+                }))
+              }
+              isOptionEqualToValue={(option, value) =>
+                typeof option === typeof value
+              }
+              sx={{ width: "100%" }}
+              renderInput={(params) => (
+                <TextField {...params} label="Choose Addon Categories" />
+              )}
+            />
+
             <label>
               <input
-                name="is_required"
-                checked={currAddonCategory.is_required}
+                name="is_available"
+                checked={currAddon.is_available}
                 type="checkbox"
-                onChange={(e) =>
-                  setCurrAddonCategory((pre) => ({
-                    ...pre,
-                    is_required: e.target.checked,
-                  }))
-                }
-              />{" "}
+                onChange={handleChange}
+              />
               is_required
             </label>
-            <Stack
-              sx={{ width: "75%" }}
-              direction={"row"}
-              justifyContent={"space-around"}
-              flexWrap={"wrap"}
-            >
-              <Typography variant="body2" align="left">
-                {" "}
-                Menus :
-              </Typography>
-              <Typography width={"50%"} variant="caption">
-                {showMenus(currAddonCategory.id).join(", ")}
-              </Typography>
-            </Stack>
+
             <Button
               disabled={app.status === "loading"}
               variant="contained"
@@ -305,14 +346,14 @@ const MenuCategories = () => {
           </Box>
         </ModalBox>
         <ConfirmationBox
-          handleDelete={() => handleDelete(currAddonCategory.id)}
+          handleDelete={() => handleDelete(currAddon.id)}
           open={openConfirmation}
           setOpen={setOpenConfirmation}
-          heading="Are you sure to delete this because this might delete related menus?"
+          heading="Are you sure to delete this because this might delete related addons_categories?"
         />
       </RouteLayout>
     </PageLayout>
   );
 };
 
-export default MenuCategories;
+export default Addons;

@@ -8,12 +8,11 @@ import {
   Menu,
   MenuCategoriesType,
   MenuCategory,
-  MenusMenuCategoriesLocations,
   MenusType,
   Status,
   Table,
 } from "@/typing/types";
-import { useRouter } from "next/router";
+
 import { createContext, ReactNode, useEffect, useState } from "react";
 
 interface AppType {
@@ -22,6 +21,7 @@ interface AppType {
   menuCategories: MenuCategory[];
   tables: Table[];
   addonCategories: AddonCategory[];
+  addons: Addon[];
   status: Status;
   error: string;
 }
@@ -69,6 +69,7 @@ const initialApp: AppType = {
   menus: [],
   menuCategories: [],
   addonCategories: [],
+  addons: [],
   tables: [],
   status: "idle",
   error: "",
@@ -240,13 +241,20 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       );
 
       if (res.ok) {
-        const { menus, locations, menuCategories, tables, addonCategories } =
-          await res.json();
+        const {
+          menus,
+          locations,
+          menuCategories,
+          tables,
+          addonCategories,
+          addons,
+        } = await res.json();
         setApp({
           menus,
           locations,
           menuCategories,
           addonCategories,
+          addons,
           tables,
           status: "idle",
           error: "",
