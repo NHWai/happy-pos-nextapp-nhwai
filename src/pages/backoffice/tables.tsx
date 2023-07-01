@@ -7,6 +7,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Snackbar,
 } from "@mui/material";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { config } from "@/config/config";
@@ -17,23 +18,21 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { RouteLayout } from "@/components/RouteLayout";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Location } from "@/typing/types";
+import CloseIcon from "@mui/icons-material/Close";
+
+const initalTable = {
+  id: 0,
+  name: "",
+  location: "",
+};
 
 const Table = () => {
-  const initialLocation = {
-    id: 0,
-    name: "",
-    address: "",
-    companies_id: 0,
-  };
-  const { company, app, setApp } = React.useContext(BackOfficeContext);
+  const { app, setApp } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
-  const [currTable, setCurrTable] = useState({
-    id: 0,
-    name: "",
-    location: "",
-  });
+  const [currTable, setCurrTable] = useState(initalTable);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
 
   const chgLocationNametoId = (
     locationName: string,
@@ -80,11 +79,7 @@ const Table = () => {
           status: "idle",
           error: "",
         }));
-        setCurrTable({
-          id: 0,
-          name: "",
-          location: "",
-        });
+        setCurrTable(initalTable);
         setOpen(false);
       } else {
         throw new Error("Failed to create a new table");
@@ -119,11 +114,7 @@ const Table = () => {
           status: "idle",
           error: "",
         }));
-        setCurrTable({
-          id: 0,
-          name: "",
-          location: "",
-        });
+        setCurrTable(initalTable);
         setOpen(false);
       } else {
         throw new Error(
@@ -154,12 +145,8 @@ const Table = () => {
           tables: pre.tables.filter((location) => location.id !== id),
           status: "idle",
         }));
-        setCurrTable({
-          id: 0,
-          name: "",
-          location: "",
-        });
         setOpenConfirmation(false);
+        setOpen(false);
       } else {
         throw new Error("Failed to delete current table");
       }
@@ -181,6 +168,13 @@ const Table = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const inputNotValid = !currTable.name || !currTable.location;
+
+    if (inputNotValid) {
+      setOpenSnackBar(true);
+      return;
+    }
+
     setApp((pre) => ({ ...pre, status: "loading" }));
     if (!currTable.id) {
       //create new location
@@ -190,6 +184,19 @@ const Table = () => {
       updateLocation();
     }
   };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={() => setOpenSnackBar(false)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <PageLayout>
@@ -220,17 +227,6 @@ const Table = () => {
                   key={item.name}
                   label={item.name}
                   style={{ cursor: "pointer" }}
-                  onDelete={() => {
-                    setOpenConfirmation(true);
-                    setCurrTable({
-                      id: item.id,
-                      name: item.name,
-                      location: chgLocationIdtoName(
-                        item.locations_id,
-                        app.locations
-                      ),
-                    });
-                  }}
                   onClick={() => {
                     setOpen(true);
                     setCurrTable({
@@ -267,6 +263,7 @@ const Table = () => {
             }}
           >
             <TextField
+              fullWidth
               variant="standard"
               label="name"
               name="name"
@@ -289,19 +286,44 @@ const Table = () => {
               }
               sx={{ width: "100%" }}
               renderInput={(params) => (
-                <TextField {...params} label="Choose Locations" />
+                <TextField {...params} label="Choose Locations" required />
               )}
               readOnly={!!currTable.id}
             />
 
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+            {!currTable.id ? (
+              <Button
+                disabled={app.status === "loading"}
+                variant="contained"
+                type="submit"
+                sx={{ alignSelf: "end" }}
+              >
+                Submit
+              </Button>
+            ) : (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
+              >
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )}
           </Box>
         </Modal>
         <ConfirmationBox
@@ -309,6 +331,13 @@ const Table = () => {
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           heading="Are you sure to delete this table?"
+        />
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
         />
       </RouteLayout>
     </PageLayout>

@@ -7,6 +7,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Snackbar,
 } from "@mui/material";
 import { config } from "@/config/config";
 import { RouteLayout } from "../../components/RouteLayout";
@@ -15,6 +16,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import CloseIcon from "@mui/icons-material/Close";
 
 const initialAddonCategory = {
   id: 0,
@@ -31,10 +33,12 @@ const MenuCategories = () => {
   const [currAddonCategory, setCurrAddonCategory] =
     useState(initialAddonCategory);
 
+  const [openSnackBar, setOpenSnackBar] = useState(false);
+
   //to change menuCategoryArr to addonCategoryArr
   function showMenus(currId: number) {
     return app.menus
-      .filter((item) => item.menuCategoryArr.find((el) => el.id === currId))
+      .filter((item) => item.addonCategoryArr.find((el) => el.id === currId))
       .map((item) => item.name);
   }
 
@@ -123,6 +127,13 @@ const MenuCategories = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const isValidInput = !currAddonCategory.name;
+
+    if (isValidInput) {
+      setOpenSnackBar(true);
+      return;
+    }
+
     setApp((pre) => ({ ...pre, status: "loading" }));
     if (!currAddonCategory.id) {
       //creat newAddonCategories
@@ -147,10 +158,20 @@ const MenuCategories = () => {
           addonCategories: pre.addonCategories.filter(
             (menuCategory) => menuCategory.id !== id
           ),
+          addons: pre.addons.filter(
+            (addon) => addon.addon_categories_id !== id
+          ),
+          menus: pre.menus.map((menuItem) => ({
+            ...menuItem,
+            addonCategoryArr: menuItem.addonCategoryArr.filter(
+              (item) => item.id !== id
+            ),
+          })),
           status: "idle",
         }));
         setCurrAddonCategory(initialAddonCategory);
         setOpenConfirmation(false);
+        setOpen(false);
       } else {
         throw new Error(
           `Failed to delete current menu category \n Status Code: ${response.status}`
@@ -164,6 +185,19 @@ const MenuCategories = () => {
       }));
     }
   };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={() => setOpenSnackBar(false)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <PageLayout>
@@ -208,14 +242,6 @@ const MenuCategories = () => {
                     item.name + " \n (" + showMenus(item.id).length + " menu/s)"
                   }
                   style={{ cursor: "pointer" }}
-                  onDelete={() => {
-                    setOpenConfirmation(true);
-                    setCurrAddonCategory({
-                      id: item.id,
-                      name: item.name,
-                      is_required: item.is_required,
-                    });
-                  }}
                   onClick={() => {
                     setOpen(true);
                     setCurrAddonCategory({
@@ -294,14 +320,38 @@ const MenuCategories = () => {
                 {showMenus(currAddonCategory.id).join(", ")}
               </Typography>
             </Stack>
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+            {!currAddonCategory.id ? (
+              <Button
+                disabled={app.status === "loading"}
+                variant="contained"
+                type="submit"
+              >
+                Submit
+              </Button>
+            ) : (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
+              >
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )}
           </Box>
         </ModalBox>
         <ConfirmationBox
@@ -309,6 +359,13 @@ const MenuCategories = () => {
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           heading="Are you sure to delete this because this might delete related menus?"
+        />
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
         />
       </RouteLayout>
     </PageLayout>

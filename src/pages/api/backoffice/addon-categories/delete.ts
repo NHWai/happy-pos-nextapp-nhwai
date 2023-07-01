@@ -16,6 +16,16 @@ export default async function handler(
       return res.status(400).end();
     }
 
+    //delete menus_addon_categories table
+    await prisma.menus_addon_categories.deleteMany({
+      where: { addon_categories_id: id },
+    });
+
+    //delete addons related to this addon catgory
+    await prisma.addons.deleteMany({
+      where: { addon_categories_id: id },
+    });
+
     //delete addonCategory
     const delAddonCatgory = await prisma.addon_categories.delete({
       where: { id },

@@ -16,7 +16,7 @@ export default async function handler(
       return res.status(400).end();
     }
 
-    //delete addonCategory
+    //delete addon
     const delAddon = await prisma.addons.delete({
       where: { id },
       select: {

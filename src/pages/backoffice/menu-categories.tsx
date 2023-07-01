@@ -1,18 +1,13 @@
 import React, { useState } from "react";
 import {
-  Autocomplete,
   Box,
   Button,
   Chip,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
   Stack,
   TextField,
   Typography,
+  Snackbar,
 } from "@mui/material";
 import { config } from "@/config/config";
 import { RouteLayout } from "../../components/RouteLayout";
@@ -21,6 +16,7 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import CloseIcon from "@mui/icons-material/Close";
 
 const MenuCategories = () => {
   const { company, app, setApp } = React.useContext(BackOfficeContext);
@@ -31,6 +27,7 @@ const MenuCategories = () => {
     string | null
   >("");
   const [currMenuCategory, setCurrMenuCategory] = useState({ id: 0, name: "" });
+  const [openSnackBar, setOpenSnackBar] = useState(false);
 
   function showMenus(currId: number) {
     return app.menus
@@ -119,13 +116,16 @@ const MenuCategories = () => {
     }
   };
 
-  // const handleChange = (event: string | null) => {
-  //   //set search params of location
-  //   setUserSelectlocation(event as string);
-  // };
-
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    const isInvalidInput = !currMenuCategory.name;
+
+    if (isInvalidInput) {
+      setOpenSnackBar(true);
+      return;
+    }
+
     setApp((pre) => ({ ...pre, status: "loading" }));
     if (!currMenuCategory.id) {
       //creat newMenuCategories
@@ -157,6 +157,7 @@ const MenuCategories = () => {
           name: "",
         });
         setOpenConfirmation(false);
+        setOpen(false);
       } else {
         throw new Error("Failed to delete current menu category");
       }
@@ -168,6 +169,19 @@ const MenuCategories = () => {
       }));
     }
   };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={() => setOpenSnackBar(false)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <PageLayout>
@@ -227,13 +241,6 @@ const MenuCategories = () => {
                     item.name + " \n (" + showMenus(item.id).length + " menu/s)"
                   }
                   style={{ cursor: "pointer" }}
-                  onDelete={() => {
-                    setOpenConfirmation(true);
-                    setCurrMenuCategory({
-                      id: item.id,
-                      name: item.name,
-                    });
-                  }}
                   onClick={() => {
                     setOpen(true);
                     setCurrMenuCategory({ id: item.id, name: item.name });
@@ -288,14 +295,40 @@ const MenuCategories = () => {
                 {showMenus(currMenuCategory.id).join(", ")}
               </Typography>
             </Stack>
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+
+            {!currMenuCategory.id ? (
+              <Button
+                disabled={app.status === "loading"}
+                variant="contained"
+                type="submit"
+                sx={{ alignSelf: "end" }}
+              >
+                Submit
+              </Button>
+            ) : (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
+              >
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )}
           </Box>
         </ModalBox>
         <ConfirmationBox
@@ -303,6 +336,13 @@ const MenuCategories = () => {
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           heading="Are you sure to delete this because this might delete related menus?"
+        />
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
         />
       </RouteLayout>
     </PageLayout>

@@ -9,6 +9,7 @@ import {
   Autocomplete,
   Button,
   Chip,
+  Snackbar,
   TextField,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
@@ -21,6 +22,7 @@ import { Location, MenuCategory, Menu } from "@/typing/types";
 import { config } from "@/config/config";
 import CircularProgress from "@mui/material/CircularProgress";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import CloseIcon from "@mui/icons-material/Close";
 
 const MenuItem = () => {
   const { company, app, setApp } = useContext(BackOfficeContext);
@@ -45,6 +47,9 @@ const MenuItem = () => {
   });
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
+
+  const [openSnackBar, setOpenSnackBar] = React.useState(false);
+
   useEffect(() => {
     if (app.error) {
       alert(app.error);
@@ -120,6 +125,17 @@ const MenuItem = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
+
+    const isInvalidInput =
+      !selectedLocations.length ||
+      !selectedMenuCategories.length ||
+      !formData.get("name") ||
+      !/^[0-9]+$/.test(String(formData.get("price")));
+
+    if (isInvalidInput) {
+      setOpenSnackBar(true);
+      return;
+    }
 
     const editedLocationObjArr = selectedLocations
       .map((el) => app.locations.find((loc) => loc.name === el))
@@ -217,6 +233,19 @@ const MenuItem = () => {
       }));
     }
   };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={() => setOpenSnackBar(false)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <PageLayout>
@@ -501,6 +530,13 @@ const MenuItem = () => {
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           heading="Are you sure to delete this menu?"
+        />
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
         />
       </RouteLayout>
     </PageLayout>

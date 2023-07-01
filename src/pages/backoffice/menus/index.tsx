@@ -10,6 +10,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Snackbar,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import React from "react";
@@ -17,6 +18,7 @@ import { config } from "@/config/config";
 import ModalBox from "@/components/ModalBox";
 import Link from "next/link";
 import { Location, MenuCategory, AddonCategory } from "@/typing/types";
+import CloseIcon from "@mui/icons-material/Close";
 
 const Menus = () => {
   const { company, app, setApp } = React.useContext(BackOfficeContext);
@@ -31,6 +33,8 @@ const Menus = () => {
   const [selectedAddonCategories, setSelectedAddonCategories] = React.useState<
     string[]
   >([]);
+
+  const [openSnackBar, setOpenSnackBar] = React.useState(false);
 
   const createMenu = async (formData: FormData) => {
     try {
@@ -67,7 +71,21 @@ const Menus = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
     const formData = new FormData(e.target as HTMLFormElement);
+
+    console.log(formData.get("name"), formData.get("price"));
+    const isInvalidInput =
+      !selectedLocations.length ||
+      !selectedMenuCategories.length ||
+      !formData.get("name") ||
+      !/^[0-9]+$/.test(String(formData.get("price")));
+
+    if (isInvalidInput) {
+      setOpenSnackBar(true);
+      return;
+    }
+
     //
     const locationObjArr = selectedLocations
       .map((el) => app.locations.find((loc) => loc.name === el))
@@ -109,6 +127,19 @@ const Menus = () => {
     }));
     createMenu(formData);
   };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={() => setOpenSnackBar(false)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <PageLayout>
@@ -264,6 +295,20 @@ const Menus = () => {
             </Button>
           </Box>
         </ModalBox>
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
+        />
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
+        />
       </RouteLayout>
     </PageLayout>
   );

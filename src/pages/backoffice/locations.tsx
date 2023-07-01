@@ -7,6 +7,7 @@ import {
   Stack,
   TextField,
   Typography,
+  Snackbar,
 } from "@mui/material";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { config } from "@/config/config";
@@ -15,17 +16,21 @@ import Modal from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import { RouteLayout } from "@/components/RouteLayout";
+import CloseIcon from "@mui/icons-material/Close";
+
+const initialLocation = {
+  id: 0,
+  name: "",
+  address: "",
+};
 
 const Location = () => {
   const { company, app, setApp } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
-  const [currLocation, setCurrLocation] = useState({
-    id: 0,
-    name: "",
-    address: "",
-  });
+  const [currLocation, setCurrLocation] = useState(initialLocation);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
 
   React.useEffect(() => {
     if (app.error) {
@@ -57,11 +62,7 @@ const Location = () => {
           status: "idle",
           error: "",
         }));
-        setCurrLocation({
-          id: 0,
-          name: "",
-          address: "",
-        });
+        setCurrLocation(initialLocation);
         setOpen(false);
       } else {
         throw new Error("Failed to create a new location");
@@ -99,11 +100,7 @@ const Location = () => {
           status: "idle",
           error: "",
         }));
-        setCurrLocation({
-          id: 0,
-          name: "",
-          address: "",
-        });
+        setCurrLocation(initialLocation);
         setOpen(false);
       } else {
         throw new Error(
@@ -134,12 +131,8 @@ const Location = () => {
           locations: pre.locations.filter((location) => location.id !== id),
           status: "idle",
         }));
-        setCurrLocation({
-          id: 0,
-          name: "",
-          address: "",
-        });
         setOpenConfirmation(false);
+        setOpen(false);
       } else {
         throw new Error("Failed to delete current location");
       }
@@ -161,6 +154,13 @@ const Location = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    const inputNotValid = !currLocation.name || !currLocation.address;
+
+    if (inputNotValid) {
+      setOpenSnackBar(true);
+      return;
+    }
+
     setApp((pre) => ({ ...pre, status: "loading" }));
     if (!currLocation.id) {
       //create new location
@@ -170,6 +170,19 @@ const Location = () => {
       updateLocation();
     }
   };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={() => setOpenSnackBar(false)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <PageLayout>
@@ -184,7 +197,12 @@ const Location = () => {
           gap={1}
         >
           {" "}
-          <IconButton onClick={() => setOpen(true)}>
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+              setCurrLocation(initialLocation);
+            }}
+          >
             <AddCircleOutlineIcon />
           </IconButton>
           {app.status === "loading" ? (
@@ -196,14 +214,6 @@ const Location = () => {
                   key={item.name}
                   label={item.name}
                   style={{ cursor: "pointer" }}
-                  onDelete={() => {
-                    setOpenConfirmation(true);
-                    setCurrLocation({
-                      id: item.id,
-                      name: item.name,
-                      address: item.address,
-                    });
-                  }}
                   onClick={() => {
                     setOpen(true);
                     setCurrLocation({
@@ -254,14 +264,39 @@ const Location = () => {
               autoComplete="off"
               required
             />
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+            {!currLocation.id ? (
+              <Button
+                disabled={app.status === "loading"}
+                variant="contained"
+                type="submit"
+                sx={{ alignSelf: "end" }}
+              >
+                Submit
+              </Button>
+            ) : (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
+              >
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )}
           </Box>
         </Modal>
         <ConfirmationBox
@@ -269,6 +304,13 @@ const Location = () => {
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           heading="Are you sure to delete this because this might delete related menu categories and menus?"
+        />
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
         />
       </RouteLayout>
     </PageLayout>

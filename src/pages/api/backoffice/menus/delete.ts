@@ -20,14 +20,11 @@ export default async function handler(
 
     //delete menus and menu categories
 
-    const delRowsinMenusMenuCategoriesLocations =
-      await prisma.menus_menu_categories_locations.deleteMany({
-        where: { menus_id: id },
-      });
+    await prisma.menus_menu_categories_locations.deleteMany({
+      where: { menus_id: id },
+    });
 
-    console.log(delRowsinMenusMenuCategoriesLocations);
-
-    //delete location
+    //delete menu
     const delMenu = await prisma.menus.delete({
       where: { id },
       select: {

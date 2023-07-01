@@ -9,6 +9,7 @@ import {
   Typography,
   Autocomplete,
   InputAdornment,
+  Snackbar,
 } from "@mui/material";
 import { config } from "@/config/config";
 import { RouteLayout } from "../../components/RouteLayout";
@@ -17,13 +18,13 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
-import { Addon } from "@/typing/types";
+import CloseIcon from "@mui/icons-material/Close";
 
 const initialAddon = {
   id: 0,
   name: "",
   price: 0,
-  is_available: false,
+  is_available: true,
   addonCategory: "",
   companies_id: 0,
 };
@@ -33,15 +34,9 @@ const Addons = () => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
+  const [openSnackBar, setOpenSnackBar] = useState(false);
 
   const [currAddon, setCurrAddon] = useState(initialAddon);
-
-  //to change menuCategoryArr to addonCategoryArr
-  // function showMenus(currId: number) {
-  //   return app.menus
-  //     .filter((item) => item.addonCategoryArr.find((el) => el.id === currId))
-  //     .map((item) => item.name);
-  // }
 
   React.useEffect(() => {
     if (app.error) {
@@ -129,6 +124,15 @@ const Addons = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    const isInputFieldsValid =
+      !currAddon.addonCategory ||
+      !currAddon.name ||
+      !/^[0-9]+$/.test(String(currAddon.price));
+
+    if (isInputFieldsValid) {
+      setOpenSnackBar(true);
+      return;
+    }
 
     setApp((pre) => ({ ...pre, status: "loading" }));
     if (!currAddon.id) {
@@ -155,6 +159,7 @@ const Addons = () => {
           status: "idle",
         }));
         setCurrAddon(initialAddon);
+        setOpen(false);
         setOpenConfirmation(false);
       } else {
         throw new Error(
@@ -185,6 +190,19 @@ const Addons = () => {
         e.target.name === "is_available" ? e.target.checked : e.target.value,
     }));
   };
+
+  const action = (
+    <React.Fragment>
+      <IconButton
+        size="small"
+        aria-label="close"
+        color="inherit"
+        onClick={() => setOpenSnackBar(false)}
+      >
+        <CloseIcon fontSize="small" />
+      </IconButton>
+    </React.Fragment>
+  );
 
   return (
     <PageLayout>
@@ -227,19 +245,6 @@ const Addons = () => {
                   }}
                   label={item.name}
                   style={{ cursor: "pointer" }}
-                  onDelete={() => {
-                    setOpenConfirmation(true);
-                    setCurrAddon({
-                      id: item.id,
-                      name: item.name,
-                      is_available: item.is_available,
-                      addonCategory: chgAddonCategoryIdtoName(
-                        item.addon_categories_id
-                      ),
-                      companies_id: item.companies_id,
-                      price: item.price,
-                    });
-                  }}
                   onClick={() => {
                     setOpen(true);
                     setCurrAddon({
@@ -278,7 +283,7 @@ const Addons = () => {
             }}
           >
             <TextField
-              error={!!app.error}
+              fullWidth
               variant="standard"
               label="name"
               value={currAddon.name}
@@ -288,7 +293,6 @@ const Addons = () => {
               required
             />
             <TextField
-              error={!!app.error}
               variant="standard"
               label="price"
               type="number"
@@ -321,7 +325,11 @@ const Addons = () => {
               }
               sx={{ width: "100%" }}
               renderInput={(params) => (
-                <TextField {...params} label="Choose Addon Categories" />
+                <TextField
+                  {...params}
+                  label="Choose Addon Categories"
+                  required
+                />
               )}
             />
 
@@ -332,17 +340,40 @@ const Addons = () => {
                 type="checkbox"
                 onChange={handleChange}
               />
-              is_required
+              <Typography variant="button"> is_available</Typography>
             </label>
-
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+            {!currAddon.id ? (
+              <Button
+                disabled={app.status === "loading"}
+                variant="contained"
+                type="submit"
+              >
+                Submit
+              </Button>
+            ) : (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
+              >
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )}
           </Box>
         </ModalBox>
         <ConfirmationBox
@@ -350,6 +381,13 @@ const Addons = () => {
           open={openConfirmation}
           setOpen={setOpenConfirmation}
           heading="Are you sure to delete this because this might delete related addons_categories?"
+        />
+        <Snackbar
+          open={openSnackBar}
+          autoHideDuration={6000}
+          onClose={() => setOpenSnackBar(false)}
+          message="Please fill up valid input values"
+          action={action}
         />
       </RouteLayout>
     </PageLayout>
