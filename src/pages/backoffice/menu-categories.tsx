@@ -183,27 +183,14 @@ const MenuCategories = () => {
     </React.Fragment>
   );
 
+  console.log(app.status, app.menuCategories);
+
   return (
     <PageLayout>
       <RouteLayout>
         <Typography mt={3} mb={2} variant="h4">
           MenuCategories
         </Typography>
-
-        {/* {app.locations.length > 0 && (
-          <Autocomplete
-            value={userSelectlocation}
-            onChange={(event: any, newValue: string | null) =>
-              handleChange(newValue)
-            }
-            disablePortal
-            options={app.locations.map((el) => el.name)}
-            sx={{ width: 200, my: 2 }}
-            renderInput={(params) => (
-              <TextField {...params} label="Choose your location" />
-            )}
-          />
-        )} */}
 
         <Stack
           sx={{
@@ -224,7 +211,9 @@ const MenuCategories = () => {
           >
             <AddCircleOutlineIcon />
           </IconButton>
-          {!userSelectlocation && app.menuCategories?.length > 0 ? (
+          {app.status === "loading" ? (
+            <div>Loading</div>
+          ) : app.status === "idle" && app.menuCategories?.length > 0 ? (
             <>
               {app.menuCategories?.map((item) => (
                 <Chip
@@ -248,8 +237,10 @@ const MenuCategories = () => {
                 />
               ))}
             </>
-          ) : (
+          ) : app.status === "idle" && app.menuCategories.length === 0 ? (
             <div>No Menu Categories</div>
+          ) : (
+            <></>
           )}
         </Stack>
 
