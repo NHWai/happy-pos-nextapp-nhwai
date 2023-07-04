@@ -35,7 +35,7 @@ model addons {
 
 model companies {
   id              Int               @id @default(autoincrement())
-  name            String
+  name            String            @unique
   address         String            @default("Default address")
   is_archived     Boolean           @default(false)
   createdAt       DateTime          @default(now())
