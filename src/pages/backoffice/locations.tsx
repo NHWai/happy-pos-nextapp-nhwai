@@ -11,11 +11,10 @@ import {
 } from "@mui/material";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { config } from "@/config/config";
-import PageLayout from "@/components/PageLayout";
+import BackofficeLayout from "@/components/BackofficeLayout";
 import Modal from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { RouteLayout } from "@/components/RouteLayout";
 import CloseIcon from "@mui/icons-material/Close";
 
 const initialLocation = {
@@ -193,135 +192,133 @@ const Location = () => {
   );
 
   return (
-    <PageLayout>
-      <RouteLayout>
-        <Typography my={2} variant="h4">
-          Locations
-        </Typography>
-        <Stack
-          sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
-          alignItems="center"
-          direction="row"
-          gap={1}
+    <BackofficeLayout>
+      <Typography my={2} variant="h4">
+        Locations
+      </Typography>
+      <Stack
+        sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
+        alignItems="center"
+        direction="row"
+        gap={1}
+      >
+        {" "}
+        <IconButton
+          onClick={() => {
+            setOpen(true);
+            setCurrLocation(initialLocation);
+          }}
         >
-          {" "}
-          <IconButton
-            onClick={() => {
-              setOpen(true);
-              setCurrLocation(initialLocation);
-            }}
-          >
-            <AddCircleOutlineIcon />
-          </IconButton>
-          {app.status === "loading" ? (
-            <div>Loading...</div>
-          ) : app.locations.length > 0 ? (
-            <>
-              {app.locations?.map((item) => (
-                <Chip
-                  key={item.id}
-                  label={item.name}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setOpen(true);
-                    setCurrLocation({
-                      id: item.id,
-                      name: item.name,
-                      address: item.address,
-                    });
-                  }}
-                />
-              ))}
-            </>
-          ) : (
-            <div>No Locations Found</div>
-          )}
-        </Stack>
+          <AddCircleOutlineIcon />
+        </IconButton>
+        {app.status === "loading" ? (
+          <div>Loading...</div>
+        ) : app.locations.length > 0 ? (
+          <>
+            {app.locations?.map((item) => (
+              <Chip
+                key={item.id}
+                label={item.name}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setOpen(true);
+                  setCurrLocation({
+                    id: item.id,
+                    name: item.name,
+                    address: item.address,
+                  });
+                }}
+              />
+            ))}
+          </>
+        ) : (
+          <div>No Locations Found</div>
+        )}
+      </Stack>
 
-        <Modal
-          setOpen={setOpen}
-          open={open}
-          heading={` ${!currLocation.name ? "Create" : "Edit"} Location`}
+      <Modal
+        setOpen={setOpen}
+        open={open}
+        heading={` ${!currLocation.name ? "Create" : "Edit"} Location`}
+      >
+        <Box
+          onSubmit={handleSubmit}
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+          }}
         >
-          <Box
-            onSubmit={handleSubmit}
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <TextField
-              variant="standard"
-              label="name"
-              name="name"
-              value={currLocation.name}
-              onChange={handleChange}
-              autoComplete="off"
-              required
-            />
-            <TextField
-              variant="standard"
-              label="address"
-              name="address"
-              value={currLocation.address}
-              onChange={handleChange}
-              autoComplete="off"
-              required
-            />
-            {!currLocation.id ? (
+          <TextField
+            variant="standard"
+            label="name"
+            name="name"
+            value={currLocation.name}
+            onChange={handleChange}
+            autoComplete="off"
+            required
+          />
+          <TextField
+            variant="standard"
+            label="address"
+            name="address"
+            value={currLocation.address}
+            onChange={handleChange}
+            autoComplete="off"
+            required
+          />
+          {!currLocation.id ? (
+            <Button
+              disabled={app.status === "loading"}
+              variant="contained"
+              type="submit"
+              sx={{ alignSelf: "end" }}
+            >
+              Submit
+            </Button>
+          ) : (
+            <Stack
+              direction="row"
+              justifyContent={"space-between"}
+              width="100%"
+            >
+              <Button
+                color="error"
+                variant="outlined"
+                onClick={() => {
+                  setOpenConfirmation(true);
+                }}
+              >
+                Delete
+              </Button>
               <Button
                 disabled={app.status === "loading"}
-                variant="contained"
+                variant="outlined"
                 type="submit"
-                sx={{ alignSelf: "end" }}
               >
-                Submit
+                Edit
               </Button>
-            ) : (
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
-            )}
-          </Box>
-        </Modal>
-        <ConfirmationBox
-          handleDelete={() => handleDelete(currLocation.id)}
-          open={openConfirmation}
-          setOpen={setOpenConfirmation}
-          heading="Are you sure to delete this because this might delete related menu categories and menus?"
-        />
-        <Snackbar
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackBar(false)}
-          message="Please fill up valid input values"
-          action={action}
-        />
-      </RouteLayout>
-    </PageLayout>
+            </Stack>
+          )}
+        </Box>
+      </Modal>
+      <ConfirmationBox
+        handleDelete={() => handleDelete(currLocation.id)}
+        open={openConfirmation}
+        setOpen={setOpenConfirmation}
+        heading="Are you sure to delete this because this might delete related menu categories and menus?"
+      />
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackBar(false)}
+        message="Please fill up valid input values"
+        action={action}
+      />
+    </BackofficeLayout>
   );
 };
 

@@ -123,21 +123,30 @@ export default function Navbar() {
     <Box sx={{ flexGrow: 1, backgroundColor: "primary" }}>
       <AppBar color="primary" position="static">
         <Toolbar>
-          {session && pathname !== "/backoffice/company" && (
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-              onClick={toggleDrawer(true)}
-            >
-              <MenuIcon />
-            </IconButton>
-          )}
-          <Drawer anchor="left" open={isOpen} onClose={toggleDrawer(false)}>
-            {list()}
-          </Drawer>
+          {session &&
+            pathname !== "/backoffice/company" &&
+            pathname !== "/order" && (
+              <>
+                <IconButton
+                  size="large"
+                  edge="start"
+                  color="inherit"
+                  aria-label="menu"
+                  sx={{ mr: 2 }}
+                  onClick={toggleDrawer(true)}
+                >
+                  <MenuIcon />
+                </IconButton>
+
+                <Drawer
+                  anchor="left"
+                  open={isOpen}
+                  onClose={toggleDrawer(false)}
+                >
+                  {list()}
+                </Drawer>
+              </>
+            )}
           <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
             {session ? pageLabel : "Happy Pos Login Page"}
           </Typography>

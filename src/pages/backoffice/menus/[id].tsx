@@ -1,5 +1,4 @@
-import PageLayout from "@/components/PageLayout";
-import { RouteLayout } from "@/components/RouteLayout";
+import BackofficeLayout from "@/components/BackofficeLayout";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import {
   Typography,
@@ -248,298 +247,271 @@ const MenuItem = () => {
   );
 
   return (
-    <PageLayout>
-      <RouteLayout>
-        {app.status === "loading" ? (
+    <BackofficeLayout>
+      {app.status === "loading" ? (
+        <Box
+          sx={{
+            display: "flex",
+            mt: "30vh",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : app.status === "idle" && app.menus.length > 0 && menuItem.id ? (
+        <>
+          {" "}
           <Box
             sx={{
+              mt: 3,
               display: "flex",
-              mt: "30vh",
+              justifyContent: "space-between",
+              alignItems: "center",
+              width: "70%",
             }}
           >
-            <CircularProgress />
-          </Box>
-        ) : app.status === "idle" && app.menus.length > 0 && menuItem.id ? (
-          <>
-            {" "}
             <Box
-              sx={{
-                mt: 3,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                width: "70%",
-              }}
+              sx={{ textDecoration: "none" }}
+              component={Link}
+              href="/backoffice/menus"
             >
-              <Box
-                sx={{ textDecoration: "none" }}
-                component={Link}
-                href="/backoffice/menus"
-              >
-                Go Back
-              </Box>
-              <Stack direction={"row"}>
-                <IconButton
-                  onClick={() => {
-                    setOpen(true);
-                    setSelectedMenuCategories(
-                      filteredNames(
-                        menuItem.menuCategoryArr,
-                        app.menuCategories
-                      )
-                    );
-                    setSelectedLocations(
-                      filteredNames(menuItem.locationArr, app.locations)
-                    );
-                    setSelectedAddonCategories(
-                      filteredNames(
-                        menuItem.addonCategoryArr,
-                        app.addonCategories
-                      )
-                    );
-                  }}
-                >
-                  <EditIcon />
-                </IconButton>
-                <IconButton onClick={() => setOpenConfirmation(true)}>
-                  <DeleteIcon />
-                </IconButton>{" "}
-              </Stack>
+              Go Back
             </Box>
-            <Box sx={{ mt: 2, maxWidth: 350 }}>
-              <Typography align="center" variant="h3">
-                {menuItem.name}
-              </Typography>
-              <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
-                <img width={200} height={150} src={menuItem.asset_url} />
-              </Box>
-              <Stack flexDirection={"row"} alignItems="baseline">
-                <Typography textAlign={"end"} width={140} variant="body1">
-                  Price:
-                </Typography>
-                <Typography
-                  width={200}
-                  fontStyle={"italic"}
-                  fontWeight={"bold"}
-                >
-                  {menuItem.price}MMK
-                </Typography>
-              </Stack>
-              <Stack flexDirection={"row"} alignItems="baseline">
-                <Typography textAlign={"end"} width={140} variant="body1">
-                  Menu Categories:
-                </Typography>
-                <Typography
-                  width={200}
-                  fontStyle={"italic"}
-                  fontWeight={"bold"}
-                >
-                  {filteredNames(
-                    menuItem.menuCategoryArr,
-                    app.menuCategories
-                  ).join(", ")}
-                </Typography>
-              </Stack>
-              <Stack flexDirection={"row"} alignItems="baseline">
-                <Typography textAlign={"end"} width={140} variant="body1">
-                  Addon Categories:
-                </Typography>
-                <Typography
-                  width={200}
-                  fontStyle={"italic"}
-                  fontWeight={"bold"}
-                >
-                  {filteredNames(
-                    menuItem.addonCategoryArr,
-                    app.addonCategories
-                  ).join(", ")}
-                </Typography>
-              </Stack>
-              <Stack flexDirection={"row"} alignItems="baseline">
-                <Typography textAlign={"end"} width={140} variant="body1">
-                  All Locations :
-                </Typography>
-                <Typography
-                  width={200}
-                  fontStyle={"italic"}
-                  fontWeight={"bold"}
-                >
-                  {filteredNames(menuItem.locationArr, app.locations).join(
-                    ", "
-                  )}
-                </Typography>
-              </Stack>
-              <Stack flexDirection={"row"} alignItems="baseline">
-                <Typography textAlign={"end"} width={140} variant="body1">
-                  Ava Locations :
-                </Typography>
-                <Typography
-                  width={200}
-                  fontStyle={"italic"}
-                  fontWeight={"bold"}
-                >
-                  {filteredAvailableLocations(
-                    menuItem.locationArr,
-                    app.locations
-                  ).join(", ")}
-                </Typography>
-              </Stack>
-            </Box>
-            <ModalBox setOpen={setOpen} open={open} heading="Edit Menu">
-              <Box
-                onSubmit={handleSubmit}
-                component="form"
-                sx={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  gap: 3,
+            <Stack direction={"row"}>
+              <IconButton
+                onClick={() => {
+                  setOpen(true);
+                  setSelectedMenuCategories(
+                    filteredNames(menuItem.menuCategoryArr, app.menuCategories)
+                  );
+                  setSelectedLocations(
+                    filteredNames(menuItem.locationArr, app.locations)
+                  );
+                  setSelectedAddonCategories(
+                    filteredNames(
+                      menuItem.addonCategoryArr,
+                      app.addonCategories
+                    )
+                  );
                 }}
-                encType="multipart/form-data"
               >
-                <TextField
-                  defaultValue={menuItem.name}
-                  variant="standard"
-                  label="name"
-                  name="name"
-                  autoComplete="off"
-                  required
-                />
-                <TextField
-                  defaultValue={menuItem.price}
-                  variant="standard"
-                  label="price"
-                  name="price"
-                  autoComplete="off"
-                  required
-                  type="number"
-                />
-
-                <input
-                  style={{
-                    maxWidth: "180px",
-                  }}
-                  name="menuImg"
-                  type="file"
-                  accept="image/png, image/jpeg"
-                />
-
-                <Autocomplete
-                  multiple
-                  size="small"
-                  options={app.menuCategories?.map((item) => item.name)}
-                  disablePortal
-                  value={selectedMenuCategories}
-                  onChange={(event: any, newValue: string[]) =>
-                    setSelectedMenuCategories(newValue)
-                  }
-                  sx={{ width: 200 }}
-                  renderTags={(value: readonly string[], getTagProps) =>
-                    value.map((option: string, index: number) => (
-                      <Chip label={option} {...getTagProps({ index })} />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} label="Choose Menu Categories" />
-                  )}
-                />
-
-                <Autocomplete
-                  multiple
-                  size="small"
-                  options={app.addonCategories?.map((item) => item.name)}
-                  disablePortal
-                  value={selectedAddonCategories}
-                  onChange={(event: any, newValue: string[]) =>
-                    setSelectedAddonCategories(newValue)
-                  }
-                  sx={{ width: 200 }}
-                  renderTags={(value: readonly string[], getTagProps) =>
-                    value.map((option: string, index: number) => (
-                      <Chip label={option} {...getTagProps({ index })} />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} label="Choose Addon Categories" />
-                  )}
-                />
-
-                <Autocomplete
-                  multiple
-                  freeSolo
-                  size="small"
-                  options={app.locations?.map((item) => item.name)}
-                  disablePortal
-                  value={selectedLocations}
-                  onChange={(event: any, newValue: string[]) =>
-                    setSelectedLocations(newValue)
-                  }
-                  sx={{ width: 200 }}
-                  renderTags={(value: readonly string[], getTagProps) =>
-                    value.map((option: string, index: number) => (
-                      <Chip label={option} {...getTagProps({ index })} />
-                    ))
-                  }
-                  renderInput={(params) => (
-                    <TextField {...params} label="Choose Locations" />
-                  )}
-                />
-
-                <Box sx={{ display: "flex", flexDirection: "column" }}>
-                  <span>Item is availiable in :</span>
-                  {selectedLocations.map((el, idx) => (
-                    <label key={idx}>
-                      <input
-                        defaultChecked={
-                          menuItem.locationArr[idx]
-                            ? menuItem.locationArr[idx].is_available
-                            : true
-                        }
-                        name={el}
-                        type="checkbox"
-                      />
-                      {el}
-                    </label>
-                  ))}
-                </Box>
-
-                <Button
-                  // disabled={menus.status === "loading"}
-                  variant="contained"
-                  type="submit"
-                  sx={{ alignSelf: "end" }}
-                >
-                  Submit
-                </Button>
-              </Box>
-            </ModalBox>{" "}
-          </>
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              mt: "30vh",
-            }}
-          >
-            No menu item for given id
+                <EditIcon />
+              </IconButton>
+              <IconButton onClick={() => setOpenConfirmation(true)}>
+                <DeleteIcon />
+              </IconButton>{" "}
+            </Stack>
           </Box>
-        )}
-        <ConfirmationBox
-          handleDelete={() => handleDelete(menuItem.id)}
-          open={openConfirmation}
-          setOpen={setOpenConfirmation}
-          heading="Are you sure to delete this menu?"
-        />
-        <Snackbar
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackBar(false)}
-          message="Please fill up valid input values"
-          action={action}
-        />
-      </RouteLayout>
-    </PageLayout>
+          <Box sx={{ mt: 2, maxWidth: 350 }}>
+            <Typography align="center" variant="h3">
+              {menuItem.name}
+            </Typography>
+            <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
+              <img width={200} height={150} src={menuItem.asset_url} />
+            </Box>
+            <Stack flexDirection={"row"} alignItems="baseline">
+              <Typography textAlign={"end"} width={140} variant="body1">
+                Price:
+              </Typography>
+              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
+                {menuItem.price}MMK
+              </Typography>
+            </Stack>
+            <Stack flexDirection={"row"} alignItems="baseline">
+              <Typography textAlign={"end"} width={140} variant="body1">
+                Menu Categories:
+              </Typography>
+              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
+                {filteredNames(
+                  menuItem.menuCategoryArr,
+                  app.menuCategories
+                ).join(", ")}
+              </Typography>
+            </Stack>
+            <Stack flexDirection={"row"} alignItems="baseline">
+              <Typography textAlign={"end"} width={140} variant="body1">
+                Addon Categories:
+              </Typography>
+              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
+                {filteredNames(
+                  menuItem.addonCategoryArr,
+                  app.addonCategories
+                ).join(", ")}
+              </Typography>
+            </Stack>
+            <Stack flexDirection={"row"} alignItems="baseline">
+              <Typography textAlign={"end"} width={140} variant="body1">
+                All Locations :
+              </Typography>
+              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
+                {filteredNames(menuItem.locationArr, app.locations).join(", ")}
+              </Typography>
+            </Stack>
+            <Stack flexDirection={"row"} alignItems="baseline">
+              <Typography textAlign={"end"} width={140} variant="body1">
+                Ava Locations :
+              </Typography>
+              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
+                {filteredAvailableLocations(
+                  menuItem.locationArr,
+                  app.locations
+                ).join(", ")}
+              </Typography>
+            </Stack>
+          </Box>
+          <ModalBox setOpen={setOpen} open={open} heading="Edit Menu">
+            <Box
+              onSubmit={handleSubmit}
+              component="form"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                gap: 3,
+              }}
+              encType="multipart/form-data"
+            >
+              <TextField
+                defaultValue={menuItem.name}
+                variant="standard"
+                label="name"
+                name="name"
+                autoComplete="off"
+                required
+              />
+              <TextField
+                defaultValue={menuItem.price}
+                variant="standard"
+                label="price"
+                name="price"
+                autoComplete="off"
+                required
+                type="number"
+              />
+
+              <input
+                style={{
+                  maxWidth: "180px",
+                }}
+                name="menuImg"
+                type="file"
+                accept="image/png, image/jpeg"
+              />
+
+              <Autocomplete
+                multiple
+                size="small"
+                options={app.menuCategories?.map((item) => item.name)}
+                disablePortal
+                value={selectedMenuCategories}
+                onChange={(event: any, newValue: string[]) =>
+                  setSelectedMenuCategories(newValue)
+                }
+                sx={{ width: 200 }}
+                renderTags={(value: readonly string[], getTagProps) =>
+                  value.map((option: string, index: number) => (
+                    <Chip label={option} {...getTagProps({ index })} />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Choose Menu Categories" />
+                )}
+              />
+
+              <Autocomplete
+                multiple
+                size="small"
+                options={app.addonCategories?.map((item) => item.name)}
+                disablePortal
+                value={selectedAddonCategories}
+                onChange={(event: any, newValue: string[]) =>
+                  setSelectedAddonCategories(newValue)
+                }
+                sx={{ width: 200 }}
+                renderTags={(value: readonly string[], getTagProps) =>
+                  value.map((option: string, index: number) => (
+                    <Chip label={option} {...getTagProps({ index })} />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Choose Addon Categories" />
+                )}
+              />
+
+              <Autocomplete
+                multiple
+                freeSolo
+                size="small"
+                options={app.locations?.map((item) => item.name)}
+                disablePortal
+                value={selectedLocations}
+                onChange={(event: any, newValue: string[]) =>
+                  setSelectedLocations(newValue)
+                }
+                sx={{ width: 200 }}
+                renderTags={(value: readonly string[], getTagProps) =>
+                  value.map((option: string, index: number) => (
+                    <Chip label={option} {...getTagProps({ index })} />
+                  ))
+                }
+                renderInput={(params) => (
+                  <TextField {...params} label="Choose Locations" />
+                )}
+              />
+
+              <Box sx={{ display: "flex", flexDirection: "column" }}>
+                <span>Item is availiable in :</span>
+                {selectedLocations.map((el, idx) => (
+                  <label key={idx}>
+                    <input
+                      defaultChecked={
+                        menuItem.locationArr[idx]
+                          ? menuItem.locationArr[idx].is_available
+                          : true
+                      }
+                      name={el}
+                      type="checkbox"
+                    />
+                    {el}
+                  </label>
+                ))}
+              </Box>
+
+              <Button
+                // disabled={menus.status === "loading"}
+                variant="contained"
+                type="submit"
+                sx={{ alignSelf: "end" }}
+              >
+                Submit
+              </Button>
+            </Box>
+          </ModalBox>{" "}
+        </>
+      ) : (
+        <Box
+          sx={{
+            display: "flex",
+            mt: "30vh",
+          }}
+        >
+          No menu item for given id
+        </Box>
+      )}
+      <ConfirmationBox
+        handleDelete={() => handleDelete(menuItem.id)}
+        open={openConfirmation}
+        setOpen={setOpenConfirmation}
+        heading="Are you sure to delete this menu?"
+      />
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackBar(false)}
+        message="Please fill up valid input values"
+        action={action}
+      />
+    </BackofficeLayout>
   );
 };
 

@@ -12,8 +12,7 @@ import {
   Snackbar,
 } from "@mui/material";
 import { config } from "@/config/config";
-import { RouteLayout } from "../../components/RouteLayout";
-import PageLayout from "@/components/PageLayout";
+import BackofficeLayout from "@/components/BackofficeLayout";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
@@ -205,192 +204,184 @@ const Addons = () => {
   );
 
   return (
-    <PageLayout>
-      <RouteLayout>
-        <Typography mt={3} mb={2} variant="h4">
-          Addons
-        </Typography>
+    <BackofficeLayout>
+      <Typography mt={3} mb={2} variant="h4">
+        Addons
+      </Typography>
 
-        <Stack
-          sx={{
-            maxWidth: "400px",
-            mx: "auto",
-            px: 3,
-            flexWrap: "wrap",
+      <Stack
+        sx={{
+          maxWidth: "400px",
+          mx: "auto",
+          px: 3,
+          flexWrap: "wrap",
+        }}
+        alignItems="center"
+        direction="row"
+        gap={1}
+      >
+        <IconButton
+          onClick={() => {
+            setOpen(true);
+            setCurrAddon(initialAddon);
           }}
-          alignItems="center"
-          direction="row"
-          gap={1}
         >
-          <IconButton
-            onClick={() => {
-              setOpen(true);
-              setCurrAddon(initialAddon);
-            }}
-          >
-            <AddCircleOutlineIcon />
-          </IconButton>
-          {app.addons.length > 0 ? (
-            <>
-              {app.addons?.map((item) => (
-                <Chip
-                  key={item?.id}
-                  sx={{
-                    height: "auto",
-                    "& .MuiChip-label": {
-                      display: "block",
-                      whiteSpace: "pre-wrap",
-                      padding: 1,
-                    },
-                  }}
-                  label={item.name}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setOpen(true);
-                    setCurrAddon({
-                      id: item.id,
-                      name: item.name,
-                      is_available: item.is_available,
-                      addonCategory: chgAddonCategoryIdtoName(
-                        item.addon_categories_id
-                      ),
-                      companies_id: item.companies_id,
-                      price: item.price,
-                    });
-                  }}
-                />
-              ))}
-            </>
-          ) : (
-            <div>No Addons</div>
-          )}
-        </Stack>
-
-        <ModalBox
-          open={open}
-          setOpen={setOpen}
-          heading={`${!currAddon.id ? "Create" : "Edit"} Addon`}
-        >
-          <Box
-            onSubmit={handleSubmit}
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <TextField
-              fullWidth
-              variant="standard"
-              label="name"
-              value={currAddon.name}
-              name="name"
-              onChange={handleChange}
-              autoComplete="off"
-              required
-            />
-            <TextField
-              variant="standard"
-              label="price"
-              type="number"
-              value={currAddon.price}
-              name="price"
-              onChange={handleChange}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">MMK</InputAdornment>
-                ),
-              }}
-              autoComplete="off"
-              required
-            />
-
-            <Autocomplete
-              size="small"
-              options={app.addonCategories.map((item) => item.name)}
-              disablePortal
-              value={currAddon.addonCategory}
-              onChange={(event: any, newValue: string | null) =>
-                typeof newValue === "string" &&
-                setCurrAddon((pre) => ({
-                  ...pre,
-                  addonCategory: newValue,
-                }))
-              }
-              isOptionEqualToValue={(option, value) =>
-                typeof option === typeof value
-              }
-              sx={{ width: "100%" }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Choose Addon Categories"
-                  required
-                />
-              )}
-            />
-
-            <label>
-              <input
-                name="is_available"
-                checked={currAddon.is_available}
-                type="checkbox"
-                onChange={handleChange}
+          <AddCircleOutlineIcon />
+        </IconButton>
+        {app.addons.length > 0 ? (
+          <>
+            {app.addons?.map((item) => (
+              <Chip
+                key={item?.id}
+                sx={{
+                  height: "auto",
+                  "& .MuiChip-label": {
+                    display: "block",
+                    whiteSpace: "pre-wrap",
+                    padding: 1,
+                  },
+                }}
+                label={item.name}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setOpen(true);
+                  setCurrAddon({
+                    id: item.id,
+                    name: item.name,
+                    is_available: item.is_available,
+                    addonCategory: chgAddonCategoryIdtoName(
+                      item.addon_categories_id
+                    ),
+                    companies_id: item.companies_id,
+                    price: item.price,
+                  });
+                }}
               />
-              <Typography variant="button"> is_available</Typography>
-            </label>
-            {!currAddon.id ? (
+            ))}
+          </>
+        ) : (
+          <div>No Addons</div>
+        )}
+      </Stack>
+
+      <ModalBox
+        open={open}
+        setOpen={setOpen}
+        heading={`${!currAddon.id ? "Create" : "Edit"} Addon`}
+      >
+        <Box
+          onSubmit={handleSubmit}
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <TextField
+            fullWidth
+            variant="standard"
+            label="name"
+            value={currAddon.name}
+            name="name"
+            onChange={handleChange}
+            autoComplete="off"
+            required
+          />
+          <TextField
+            variant="standard"
+            label="price"
+            type="number"
+            value={currAddon.price}
+            name="price"
+            onChange={handleChange}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">MMK</InputAdornment>,
+            }}
+            autoComplete="off"
+            required
+          />
+
+          <Autocomplete
+            size="small"
+            options={app.addonCategories.map((item) => item.name)}
+            disablePortal
+            value={currAddon.addonCategory}
+            onChange={(event: any, newValue: string | null) =>
+              typeof newValue === "string" &&
+              setCurrAddon((pre) => ({
+                ...pre,
+                addonCategory: newValue,
+              }))
+            }
+            isOptionEqualToValue={(option, value) =>
+              typeof option === typeof value
+            }
+            sx={{ width: "100%" }}
+            renderInput={(params) => (
+              <TextField {...params} label="Choose Addon Categories" required />
+            )}
+          />
+
+          <label>
+            <input
+              name="is_available"
+              checked={currAddon.is_available}
+              type="checkbox"
+              onChange={handleChange}
+            />
+            <Typography variant="button"> is_available</Typography>
+          </label>
+          {!currAddon.id ? (
+            <Button
+              disabled={app.status === "loading"}
+              variant="contained"
+              type="submit"
+            >
+              Submit
+            </Button>
+          ) : (
+            <Stack
+              direction="row"
+              justifyContent={"space-between"}
+              width="100%"
+            >
+              <Button
+                color="error"
+                variant="outlined"
+                onClick={() => {
+                  setOpenConfirmation(true);
+                }}
+              >
+                Delete
+              </Button>
               <Button
                 disabled={app.status === "loading"}
-                variant="contained"
+                variant="outlined"
                 type="submit"
               >
-                Submit
+                Edit
               </Button>
-            ) : (
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
-            )}
-          </Box>
-        </ModalBox>
-        <ConfirmationBox
-          handleDelete={() => handleDelete(currAddon.id)}
-          open={openConfirmation}
-          setOpen={setOpenConfirmation}
-          heading="Are you sure to delete this because this might delete related addons_categories?"
-        />
-        <Snackbar
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackBar(false)}
-          message="Please fill up valid input values"
-          action={action}
-        />
-      </RouteLayout>
-    </PageLayout>
+            </Stack>
+          )}
+        </Box>
+      </ModalBox>
+      <ConfirmationBox
+        handleDelete={() => handleDelete(currAddon.id)}
+        open={openConfirmation}
+        setOpen={setOpenConfirmation}
+        heading="Are you sure to delete this because this might delete related addons_categories?"
+      />
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackBar(false)}
+        message="Please fill up valid input values"
+        action={action}
+      />
+    </BackofficeLayout>
   );
 };
 

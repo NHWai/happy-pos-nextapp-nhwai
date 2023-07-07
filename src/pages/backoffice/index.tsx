@@ -1,15 +1,12 @@
 import { Typography } from "@mui/material";
 import React, { useContext } from "react";
-import PageLayout from "@/components/PageLayout";
-import { RouteLayout } from "@/components/RouteLayout";
+import BackofficeLayout from "@/components/BackofficeLayout";
 
 const Home = () => {
   return (
-    <PageLayout>
-      <RouteLayout>
-        <Typography variant="h4">Home</Typography>
-      </RouteLayout>
-    </PageLayout>
+    <BackofficeLayout>
+      <Typography variant="h4">Home</Typography>
+    </BackofficeLayout>
   );
 };
 

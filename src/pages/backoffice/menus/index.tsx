@@ -1,5 +1,5 @@
-import PageLayout from "@/components/PageLayout";
-import { RouteLayout } from "@/components/RouteLayout";
+import BackofficeLayout from "@/components/BackofficeLayout";
+
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import {
   Autocomplete,
@@ -142,175 +142,173 @@ const Menus = () => {
   );
 
   return (
-    <PageLayout>
-      <RouteLayout>
-        <Typography mt={3} mb={2} variant="h4">
-          Menus
-        </Typography>
-        <Stack
-          sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
-          alignItems="center"
-          direction="row"
-          gap={1}
+    <BackofficeLayout>
+      <Typography mt={3} mb={2} variant="h4">
+        Menus
+      </Typography>
+      <Stack
+        sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
+        alignItems="center"
+        direction="row"
+        gap={1}
+      >
+        <IconButton onClick={() => setOpen(true)}>
+          <AddCircleOutlineIcon />
+        </IconButton>
+        {app.status === "loading" ? (
+          <div>Loading...</div>
+        ) : app.status === "idle" && app.menus.length > 0 ? (
+          app.menus?.map((item) => (
+            <Chip
+              href={"/backoffice/menus/" + item.id}
+              component={Link}
+              key={item.name}
+              label={item.name}
+              style={{ cursor: "pointer" }}
+            />
+          ))
+        ) : app.status === "idle" && app.menus.length === 0 ? (
+          <div>No Menus</div>
+        ) : null}
+      </Stack>
+      <ModalBox setOpen={setOpen} open={open} heading="Create Menu">
+        <Box
+          onSubmit={handleSubmit}
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 4,
+          }}
+          encType="multipart/form-data"
         >
-          <IconButton onClick={() => setOpen(true)}>
-            <AddCircleOutlineIcon />
-          </IconButton>
-          {app.status === "loading" ? (
-            <div>Loading...</div>
-          ) : app.status === "idle" && app.menus.length > 0 ? (
-            app.menus?.map((item) => (
-              <Chip
-                href={"/backoffice/menus/" + item.id}
-                component={Link}
-                key={item.name}
-                label={item.name}
-                style={{ cursor: "pointer" }}
-              />
-            ))
-          ) : app.status === "idle" && app.menus.length === 0 ? (
-            <div>No Menus</div>
-          ) : null}
-        </Stack>
-        <ModalBox setOpen={setOpen} open={open} heading="Create Menu">
-          <Box
-            onSubmit={handleSubmit}
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 4,
+          <TextField
+            variant="standard"
+            label="name"
+            name="name"
+            autoComplete="off"
+            required
+          />
+          <TextField
+            variant="standard"
+            label="price"
+            name="price"
+            autoComplete="off"
+            required
+            type="number"
+          />
+
+          <input
+            style={{
+              maxWidth: "180px",
             }}
-            encType="multipart/form-data"
-          >
-            <TextField
-              variant="standard"
-              label="name"
-              name="name"
-              autoComplete="off"
-              required
-            />
-            <TextField
-              variant="standard"
-              label="price"
-              name="price"
-              autoComplete="off"
-              required
-              type="number"
-            />
+            name="menuImg"
+            type="file"
+            accept="image/png, image/jpeg"
+          />
 
-            <input
-              style={{
-                maxWidth: "180px",
-              }}
-              name="menuImg"
-              type="file"
-              accept="image/png, image/jpeg"
-            />
+          <Autocomplete
+            multiple
+            size="small"
+            options={app?.menuCategories.map((item) => item.name)}
+            disablePortal
+            value={selectedMenuCategories}
+            onChange={(event: any, newValue: string[]) =>
+              setSelectedMenuCategories(newValue)
+            }
+            sx={{ width: 200 }}
+            renderTags={(value: readonly string[], getTagProps) =>
+              value.map((option: string, index: number) => (
+                <Chip label={option} {...getTagProps({ index })} />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Choose Menu Categories" />
+            )}
+          />
 
-            <Autocomplete
-              multiple
-              size="small"
-              options={app?.menuCategories.map((item) => item.name)}
-              disablePortal
-              value={selectedMenuCategories}
-              onChange={(event: any, newValue: string[]) =>
-                setSelectedMenuCategories(newValue)
-              }
-              sx={{ width: 200 }}
-              renderTags={(value: readonly string[], getTagProps) =>
-                value.map((option: string, index: number) => (
-                  <Chip label={option} {...getTagProps({ index })} />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Choose Menu Categories" />
-              )}
-            />
+          <Autocomplete
+            multiple
+            size="small"
+            options={app?.addonCategories.map((item) => item.name)}
+            disablePortal
+            value={selectedAddonCategories}
+            onChange={(event: any, newValue: string[]) =>
+              setSelectedAddonCategories(newValue)
+            }
+            sx={{ width: 200 }}
+            renderTags={(value: readonly string[], getTagProps) =>
+              value.map((option: string, index: number) => (
+                <Chip label={option} {...getTagProps({ index })} />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField {...params} label="Choose Addon Categories" />
+            )}
+          />
 
-            <Autocomplete
-              multiple
-              size="small"
-              options={app?.addonCategories.map((item) => item.name)}
-              disablePortal
-              value={selectedAddonCategories}
-              onChange={(event: any, newValue: string[]) =>
-                setSelectedAddonCategories(newValue)
-              }
-              sx={{ width: 200 }}
-              renderTags={(value: readonly string[], getTagProps) =>
-                value.map((option: string, index: number) => (
-                  <Chip label={option} {...getTagProps({ index })} />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Choose Addon Categories" />
-              )}
-            />
+          <Autocomplete
+            multiple
+            freeSolo
+            size="small"
+            options={app?.locations.map((item) => item.name)}
+            disablePortal
+            value={selectedLocations}
+            onChange={(event: any, newValue: string[]) =>
+              setSelectedLocations(newValue)
+            }
+            sx={{ width: 200 }}
+            renderTags={(value: readonly string[], getTagProps) =>
+              value.map((option: string, index: number) => (
+                <Chip label={option} {...getTagProps({ index })} />
+              ))
+            }
+            renderInput={(params) => (
+              <TextField
+                name="locations"
+                {...params}
+                label="Choose Locations"
+              />
+            )}
+          />
 
-            <Autocomplete
-              multiple
-              freeSolo
-              size="small"
-              options={app?.locations.map((item) => item.name)}
-              disablePortal
-              value={selectedLocations}
-              onChange={(event: any, newValue: string[]) =>
-                setSelectedLocations(newValue)
-              }
-              sx={{ width: 200 }}
-              renderTags={(value: readonly string[], getTagProps) =>
-                value.map((option: string, index: number) => (
-                  <Chip label={option} {...getTagProps({ index })} />
-                ))
-              }
-              renderInput={(params) => (
-                <TextField
-                  name="locations"
-                  {...params}
-                  label="Choose Locations"
-                />
-              )}
-            />
-
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <span>Is this item availiable in : </span>
-              {selectedLocations.map((el) => (
-                <label key={el}>
-                  <input defaultChecked={true} name={el} type="checkbox" />
-                  {el}
-                </label>
-              ))}
-            </Box>
-
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <span>Is this item availiable in : </span>
+            {selectedLocations.map((el) => (
+              <label key={el}>
+                <input defaultChecked={true} name={el} type="checkbox" />
+                {el}
+              </label>
+            ))}
           </Box>
-        </ModalBox>
-        <Snackbar
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackBar(false)}
-          message="Please fill up valid input values"
-          action={action}
-        />
-        <Snackbar
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackBar(false)}
-          message="Please fill up valid input values"
-          action={action}
-        />
-      </RouteLayout>
-    </PageLayout>
+
+          <Button
+            disabled={app.status === "loading"}
+            variant="contained"
+            type="submit"
+            sx={{ alignSelf: "end" }}
+          >
+            Submit
+          </Button>
+        </Box>
+      </ModalBox>
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackBar(false)}
+        message="Please fill up valid input values"
+        action={action}
+      />
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackBar(false)}
+        message="Please fill up valid input values"
+        action={action}
+      />
+    </BackofficeLayout>
   );
 };
 

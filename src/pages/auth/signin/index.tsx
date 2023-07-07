@@ -1,4 +1,4 @@
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/components/BackofficeLayout";
 import Button from "@mui/material/Button";
 import React from "react";
 import { signIn } from "next-auth/react";

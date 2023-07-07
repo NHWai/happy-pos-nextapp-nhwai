@@ -11,11 +11,10 @@ import {
 } from "@mui/material";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { config } from "@/config/config";
-import PageLayout from "@/components/PageLayout";
+import BackofficeLayout from "@/components/BackofficeLayout";
 import Modal from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { RouteLayout } from "@/components/RouteLayout";
 import Autocomplete from "@mui/material/Autocomplete";
 import { Location } from "@/typing/types";
 import CloseIcon from "@mui/icons-material/Close";
@@ -199,148 +198,146 @@ const Table = () => {
   );
 
   return (
-    <PageLayout>
-      <RouteLayout>
-        <Typography my={2} variant="h4">
-          Tables
-        </Typography>
-        <Stack
-          sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
-          alignItems="center"
-          direction="row"
-          gap={1}
+    <BackofficeLayout>
+      <Typography my={2} variant="h4">
+        Tables
+      </Typography>
+      <Stack
+        sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
+        alignItems="center"
+        direction="row"
+        gap={1}
+      >
+        <IconButton
+          onClick={() => {
+            setOpen(true);
+            setCurrTable({ id: 0, name: "", location: "" });
+          }}
         >
-          <IconButton
-            onClick={() => {
-              setOpen(true);
-              setCurrTable({ id: 0, name: "", location: "" });
+          <AddCircleOutlineIcon />
+        </IconButton>
+        {app.status === "loading" ? (
+          <div>Loading...</div>
+        ) : app.tables.length > 0 ? (
+          <>
+            {app.tables?.map((item) => (
+              <Chip
+                key={item.name}
+                label={item.name}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setOpen(true);
+                  setCurrTable({
+                    id: item.id,
+                    name: item.name,
+                    location: chgLocationIdtoName(
+                      item.locations_id,
+                      app.locations
+                    ),
+                  });
+                }}
+              />
+            ))}
+          </>
+        ) : (
+          <div>No Tables Found</div>
+        )}
+      </Stack>
+
+      <Modal
+        setOpen={setOpen}
+        open={open}
+        heading={` ${!currTable.name ? "Create" : "Edit"} Table`}
+      >
+        <Box
+          onSubmit={handleSubmit}
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <TextField
+            fullWidth
+            variant="standard"
+            label="name"
+            name="name"
+            value={currTable.name}
+            onChange={handleChange}
+            autoComplete="off"
+            required
+          />
+          {/* //choose locations from list */}
+
+          <Autocomplete
+            value={currTable.location}
+            onChange={(event: any, newValue: string | null) => {
+              typeof newValue === "string" &&
+                setCurrTable((pre) => ({ ...pre, location: newValue }));
             }}
-          >
-            <AddCircleOutlineIcon />
-          </IconButton>
-          {app.status === "loading" ? (
-            <div>Loading...</div>
-          ) : app.tables.length > 0 ? (
-            <>
-              {app.tables?.map((item) => (
-                <Chip
-                  key={item.name}
-                  label={item.name}
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setOpen(true);
-                    setCurrTable({
-                      id: item.id,
-                      name: item.name,
-                      location: chgLocationIdtoName(
-                        item.locations_id,
-                        app.locations
-                      ),
-                    });
-                  }}
-                />
-              ))}
-            </>
+            options={app.locations.map((item) => item.name)}
+            isOptionEqualToValue={(option, value) =>
+              typeof option === typeof value
+            }
+            sx={{ width: "100%" }}
+            renderInput={(params) => (
+              <TextField {...params} label="Choose Locations" required />
+            )}
+            readOnly={!!currTable.id}
+          />
+
+          {!currTable.id ? (
+            <Button
+              disabled={app.status === "loading"}
+              variant="contained"
+              type="submit"
+              sx={{ alignSelf: "end" }}
+            >
+              Submit
+            </Button>
           ) : (
-            <div>No Tables Found</div>
-          )}
-        </Stack>
-
-        <Modal
-          setOpen={setOpen}
-          open={open}
-          heading={` ${!currTable.name ? "Create" : "Edit"} Table`}
-        >
-          <Box
-            onSubmit={handleSubmit}
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <TextField
-              fullWidth
-              variant="standard"
-              label="name"
-              name="name"
-              value={currTable.name}
-              onChange={handleChange}
-              autoComplete="off"
-              required
-            />
-            {/* //choose locations from list */}
-
-            <Autocomplete
-              value={currTable.location}
-              onChange={(event: any, newValue: string | null) => {
-                typeof newValue === "string" &&
-                  setCurrTable((pre) => ({ ...pre, location: newValue }));
-              }}
-              options={app.locations.map((item) => item.name)}
-              isOptionEqualToValue={(option, value) =>
-                typeof option === typeof value
-              }
-              sx={{ width: "100%" }}
-              renderInput={(params) => (
-                <TextField {...params} label="Choose Locations" required />
-              )}
-              readOnly={!!currTable.id}
-            />
-
-            {!currTable.id ? (
+            <Stack
+              direction="row"
+              justifyContent={"space-between"}
+              width="100%"
+            >
+              <Button
+                color="error"
+                variant="outlined"
+                onClick={() => {
+                  setOpenConfirmation(true);
+                }}
+              >
+                Delete
+              </Button>
               <Button
                 disabled={app.status === "loading"}
-                variant="contained"
+                variant="outlined"
                 type="submit"
-                sx={{ alignSelf: "end" }}
               >
-                Submit
+                Edit
               </Button>
-            ) : (
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
-            )}
-          </Box>
-        </Modal>
-        <ConfirmationBox
-          handleDelete={() => handleDelete(currTable.id)}
-          open={openConfirmation}
-          setOpen={setOpenConfirmation}
-          heading="Are you sure to delete this table?"
-        />
-        <Snackbar
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackBar(false)}
-          message="Please fill up valid input values"
-          action={action}
-        />
-      </RouteLayout>
-    </PageLayout>
+            </Stack>
+          )}
+        </Box>
+      </Modal>
+      <ConfirmationBox
+        handleDelete={() => handleDelete(currTable.id)}
+        open={openConfirmation}
+        setOpen={setOpenConfirmation}
+        heading="Are you sure to delete this table?"
+      />
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackBar(false)}
+        message="Please fill up valid input values"
+        action={action}
+      />
+    </BackofficeLayout>
   );
 };
 

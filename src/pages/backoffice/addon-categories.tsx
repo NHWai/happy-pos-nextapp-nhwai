@@ -10,8 +10,8 @@ import {
   Snackbar,
 } from "@mui/material";
 import { config } from "@/config/config";
-import { RouteLayout } from "../../components/RouteLayout";
-import PageLayout from "@/components/PageLayout";
+
+import BackofficeLayout from "@/components/BackofficeLayout";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
@@ -200,175 +200,171 @@ const MenuCategories = () => {
   );
 
   return (
-    <PageLayout>
-      <RouteLayout>
-        <Typography mt={3} mb={2} variant="h4">
-          Addon Categories
-        </Typography>
+    <BackofficeLayout>
+      <Typography mt={3} mb={2} variant="h4">
+        Addon Categories
+      </Typography>
 
-        <Stack
-          sx={{
-            maxWidth: "400px",
-            mx: "auto",
-            px: 3,
-            flexWrap: "wrap",
+      <Stack
+        sx={{
+          maxWidth: "400px",
+          mx: "auto",
+          px: 3,
+          flexWrap: "wrap",
+        }}
+        alignItems="center"
+        direction="row"
+        gap={1}
+      >
+        <IconButton
+          onClick={() => {
+            setOpen(true);
+            setCurrAddonCategory(initialAddonCategory);
           }}
-          alignItems="center"
-          direction="row"
-          gap={1}
         >
-          <IconButton
-            onClick={() => {
-              setOpen(true);
-              setCurrAddonCategory(initialAddonCategory);
-            }}
-          >
-            <AddCircleOutlineIcon />
-          </IconButton>
-          {app.addonCategories.length > 0 ? (
-            <>
-              {app.addonCategories?.map((item) => (
-                <Chip
-                  key={item?.id}
-                  sx={{
-                    height: "auto",
-                    "& .MuiChip-label": {
-                      display: "block",
-                      whiteSpace: "pre-wrap",
-                      padding: 1,
-                    },
-                  }}
-                  label={
-                    item.name + " \n (" + showMenus(item.id).length + " menu/s)"
-                  }
-                  style={{ cursor: "pointer" }}
-                  onClick={() => {
-                    setOpen(true);
-                    setCurrAddonCategory({
-                      id: item.id,
-                      name: item.name,
-                      is_required: item.is_required,
-                    });
-                  }}
-                />
-              ))}
-            </>
-          ) : (
-            <div>No Addon Categories</div>
-          )}
-        </Stack>
+          <AddCircleOutlineIcon />
+        </IconButton>
+        {app.addonCategories.length > 0 ? (
+          <>
+            {app.addonCategories?.map((item) => (
+              <Chip
+                key={item?.id}
+                sx={{
+                  height: "auto",
+                  "& .MuiChip-label": {
+                    display: "block",
+                    whiteSpace: "pre-wrap",
+                    padding: 1,
+                  },
+                }}
+                label={
+                  item.name + " \n (" + showMenus(item.id).length + " menu/s)"
+                }
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setOpen(true);
+                  setCurrAddonCategory({
+                    id: item.id,
+                    name: item.name,
+                    is_required: item.is_required,
+                  });
+                }}
+              />
+            ))}
+          </>
+        ) : (
+          <div>No Addon Categories</div>
+        )}
+      </Stack>
 
-        <ModalBox
-          open={open}
-          setOpen={setOpen}
-          heading={`${
-            !currAddonCategory.id ? "Create" : "Edit"
-          } Addon Category`}
+      <ModalBox
+        open={open}
+        setOpen={setOpen}
+        heading={`${!currAddonCategory.id ? "Create" : "Edit"} Addon Category`}
+      >
+        <Box
+          onSubmit={handleSubmit}
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+          }}
         >
-          <Box
-            onSubmit={handleSubmit}
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <TextField
-              error={!!app.error}
-              variant="standard"
-              label="name"
-              name="newMenuCategory"
-              value={currAddonCategory.name}
+          <TextField
+            error={!!app.error}
+            variant="standard"
+            label="name"
+            name="newMenuCategory"
+            value={currAddonCategory.name}
+            onChange={(e) =>
+              setCurrAddonCategory((pre) => ({
+                ...pre,
+                name: e.target.value,
+              }))
+            }
+            autoComplete="off"
+            required
+          />
+
+          <label>
+            <input
+              name="is_required"
+              checked={currAddonCategory.is_required}
+              type="checkbox"
               onChange={(e) =>
                 setCurrAddonCategory((pre) => ({
                   ...pre,
-                  name: e.target.value,
+                  is_required: e.target.checked,
                 }))
               }
-              autoComplete="off"
-              required
-            />
-
-            <label>
-              <input
-                name="is_required"
-                checked={currAddonCategory.is_required}
-                type="checkbox"
-                onChange={(e) =>
-                  setCurrAddonCategory((pre) => ({
-                    ...pre,
-                    is_required: e.target.checked,
-                  }))
-                }
-              />{" "}
-              is_required
-            </label>
-            <Stack
-              sx={{ width: "75%" }}
-              direction={"row"}
-              justifyContent={"space-around"}
-              flexWrap={"wrap"}
+            />{" "}
+            is_required
+          </label>
+          <Stack
+            sx={{ width: "75%" }}
+            direction={"row"}
+            justifyContent={"space-around"}
+            flexWrap={"wrap"}
+          >
+            <Typography variant="body2" align="left">
+              {" "}
+              Menus :
+            </Typography>
+            <Typography width={"50%"} variant="caption">
+              {showMenus(currAddonCategory.id).join(", ")}
+            </Typography>
+          </Stack>
+          {!currAddonCategory.id ? (
+            <Button
+              disabled={app.status === "loading"}
+              variant="contained"
+              type="submit"
             >
-              <Typography variant="body2" align="left">
-                {" "}
-                Menus :
-              </Typography>
-              <Typography width={"50%"} variant="caption">
-                {showMenus(currAddonCategory.id).join(", ")}
-              </Typography>
-            </Stack>
-            {!currAddonCategory.id ? (
+              Submit
+            </Button>
+          ) : (
+            <Stack
+              direction="row"
+              justifyContent={"space-between"}
+              width="100%"
+            >
+              <Button
+                color="error"
+                variant="outlined"
+                onClick={() => {
+                  setOpenConfirmation(true);
+                }}
+              >
+                Delete
+              </Button>
               <Button
                 disabled={app.status === "loading"}
-                variant="contained"
+                variant="outlined"
                 type="submit"
               >
-                Submit
+                Edit
               </Button>
-            ) : (
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
-            )}
-          </Box>
-        </ModalBox>
-        <ConfirmationBox
-          handleDelete={() => handleDelete(currAddonCategory.id)}
-          open={openConfirmation}
-          setOpen={setOpenConfirmation}
-          heading="Are you sure to delete this because this might delete related menus?"
-        />
-        <Snackbar
-          open={openSnackBar}
-          autoHideDuration={6000}
-          onClose={() => setOpenSnackBar(false)}
-          message="Please fill up valid input values"
-          action={action}
-        />
-      </RouteLayout>
-    </PageLayout>
+            </Stack>
+          )}
+        </Box>
+      </ModalBox>
+      <ConfirmationBox
+        handleDelete={() => handleDelete(currAddonCategory.id)}
+        open={openConfirmation}
+        setOpen={setOpenConfirmation}
+        heading="Are you sure to delete this because this might delete related menus?"
+      />
+      <Snackbar
+        open={openSnackBar}
+        autoHideDuration={6000}
+        onClose={() => setOpenSnackBar(false)}
+        message="Please fill up valid input values"
+        action={action}
+      />
+    </BackofficeLayout>
   );
 };
 

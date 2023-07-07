@@ -10,10 +10,9 @@ import {
 } from "@mui/material";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { config } from "@/config/config";
-import PageLayout from "@/components/PageLayout";
+import PageLayout from "@/components/BackofficeLayout";
 import Modal from "@/components/ModalBox";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import { RouteLayout } from "@/components/RouteLayout";
 
 const Setting = () => {
   const { locations, setLocations, getLocationsByCompanyId, company } =
@@ -82,72 +81,70 @@ const Setting = () => {
 
   return (
     <PageLayout>
-      <RouteLayout>
-        <Typography my={2} variant="h4">
-          Locations
-        </Typography>
-        <Stack
-          sx={{ maxWidth: "600px" }}
-          alignItems="center"
-          direction="row"
-          spacing={2}
-        >
-          {locations.status === "loading" ? (
-            <div>Loading...</div>
-          ) : locations.items.length > 0 ? (
-            <>
-              <IconButton onClick={() => setOpen(true)}>
-                <AddCircleOutlineIcon />
-              </IconButton>
-              {locations.items?.map((item) => (
-                <Chip
-                  key={item.name}
-                  label={item.name}
-                  style={{ cursor: "pointer" }}
-                />
-              ))}
-            </>
-          ) : (
-            <div>No Locations Found</div>
-          )}
-        </Stack>
+      <Typography my={2} variant="h4">
+        Locations
+      </Typography>
+      <Stack
+        sx={{ maxWidth: "600px" }}
+        alignItems="center"
+        direction="row"
+        spacing={2}
+      >
+        {locations.status === "loading" ? (
+          <div>Loading...</div>
+        ) : locations.items.length > 0 ? (
+          <>
+            <IconButton onClick={() => setOpen(true)}>
+              <AddCircleOutlineIcon />
+            </IconButton>
+            {locations.items?.map((item) => (
+              <Chip
+                key={item.name}
+                label={item.name}
+                style={{ cursor: "pointer" }}
+              />
+            ))}
+          </>
+        ) : (
+          <div>No Locations Found</div>
+        )}
+      </Stack>
 
-        <Modal setOpen={setOpen} open={open} heading="Create Location">
-          <Box
-            onSubmit={handleNewLocationSubmit}
-            component="form"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              gap: 2,
-            }}
-          >
-            <TextField
-              variant="standard"
-              label="name"
-              name="name"
-              value={newLocation.name}
-              onChange={handleNewLocationChange}
-              autoComplete="off"
-              required
-            />
-            <TextField
-              variant="standard"
-              label="address"
-              name="address"
-              value={newLocation.address}
-              onChange={handleNewLocationChange}
-              autoComplete="off"
-              required
-            />
-            <Button variant="contained" type="submit" sx={{ alignSelf: "end" }}>
-              Submit
-            </Button>
-          </Box>
-        </Modal>
-      </RouteLayout>
+      <Modal setOpen={setOpen} open={open} heading="Create Location">
+        <Box
+          onSubmit={handleNewLocationSubmit}
+          component="form"
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+          }}
+        >
+          <TextField
+            variant="standard"
+            label="name"
+            name="name"
+            value={newLocation.name}
+            onChange={handleNewLocationChange}
+            autoComplete="off"
+            required
+          />
+          <TextField
+            variant="standard"
+            label="address"
+            name="address"
+            value={newLocation.address}
+            onChange={handleNewLocationChange}
+            autoComplete="off"
+            required
+          />
+          <Button variant="contained" type="submit" sx={{ alignSelf: "end" }}>
+            Submit
+          </Button>
+        </Box>
+      </Modal>
     </PageLayout>
   );
 };

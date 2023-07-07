@@ -6,9 +6,9 @@ import { BackOfficeContextProvider } from "@/contexts/BackofficeContext";
 export default function App({ Component, pageProps }: AppProps) {
   return (
     <SessionProvider session={pageProps.session}>
-      <BackOfficeContextProvider>
-        <Component {...pageProps} />
-      </BackOfficeContextProvider>
+      {/* <BackOfficeContextProvider> */}
+      <Component {...pageProps} />
+      {/* </BackOfficeContextProvider> */}
     </SessionProvider>
   );
 }
