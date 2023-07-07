@@ -12,6 +12,32 @@ export default async function handler(
     //if session exists
     const data = JSON.parse(req.body);
 
+    //check the new menucategory is not in archived
+    const archivedMenuCat = await prisma.menu_categories.findFirst({
+      where: {
+        companies_id: data.companyId,
+        is_archived: true,
+        name: {
+          equals: data.name,
+          mode: "insensitive",
+        },
+      },
+      select: { name: true, id: true },
+    });
+
+    //if it's archived, set is_archived false
+    if (archivedMenuCat?.id) {
+      const newMenuCategory = await prisma.menu_categories.update({
+        where: { id: archivedMenuCat.id },
+        data: {
+          name: data.name,
+          companies_id: data.companyId,
+          is_archived: false,
+        },
+      });
+      return res.status(201).json(newMenuCategory);
+    }
+
     //create menu-category
     const newMenuCategory = await prisma.menu_categories.create({
       data: {

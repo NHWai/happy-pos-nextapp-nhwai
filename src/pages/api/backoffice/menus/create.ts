@@ -4,6 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
 import { upload } from "@/config/upload";
 import { Request, Response } from "express";
+import type { menus } from "@prisma/client";
 
 // Create a custom type for the combined request
 type CustomRequest = NextApiRequest & Request & { files: any };
@@ -58,15 +59,54 @@ export default async function uploadHandler(
           selectedAddonCategories: JSON.parse(req.body.selectedAddonCategories),
         };
 
-        // create a new menu
-        const newMenu = await prisma.menus.create({
-          data: {
-            name: reqBody.name,
-            price: reqBody.price,
-            asset_url: menuUrl,
+        //check the new menuc is not in archived
+        const archivedMenu = await prisma.menus.findFirst({
+          where: {
             companies_id: reqBody.companyId,
+            is_archived: true,
+            name: {
+              equals: reqBody.name,
+              mode: "insensitive",
+            },
           },
+          select: { name: true, id: true },
         });
+
+        let newMenu: menus = {
+          asset_url: "",
+          companies_id: 0,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          name: "",
+          price: 0,
+          description: "",
+          id: 0,
+          is_archived: false,
+        };
+
+        //if it's archived, set is_archived false
+        if (archivedMenu?.id) {
+          newMenu = await prisma.menus.update({
+            where: { id: archivedMenu.id },
+            data: {
+              name: reqBody.name,
+              price: reqBody.price,
+              asset_url: menuUrl,
+              companies_id: reqBody.companyId,
+              is_archived: false,
+            },
+          });
+        } else {
+          // create a new menu
+          newMenu = await prisma.menus.create({
+            data: {
+              name: reqBody.name,
+              price: reqBody.price,
+              asset_url: menuUrl,
+              companies_id: reqBody.companyId,
+            },
+          });
+        }
 
         const menusMenuCategoriesLocationsIdArr = reqBody.selectedLocations
           .map((location) =>

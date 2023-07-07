@@ -3,7 +3,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
-import { json } from "stream/consumers";
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,21 +13,28 @@ export default async function handler(
   if (session?.user?.name && session.user.email) {
     const companyId = Number(req.query.companyId);
 
-    if (!companyId) return res.send(404);
+    if (!companyId) return res.status(404).end();
 
     //fetching menus
     const menus = await prisma.menus.findMany({
       where: {
         companies_id: companyId,
+        is_archived: false,
       },
     });
 
+    const menuIds = menus.map((menu) => menu.id);
+
     //fetching menus_menu_categories_locations relationship
     const menusMenuCategoryLocationsIds =
-      await prisma.menus_menu_categories_locations.findMany();
+      await prisma.menus_menu_categories_locations.findMany({
+        where: { menus_id: { in: menuIds } },
+      });
 
     //fetching menus_addon_categories relationship
-    const menusAddonCategories = await prisma.menus_addon_categories.findMany();
+    const menusAddonCategories = await prisma.menus_addon_categories.findMany({
+      where: { menus_id: { in: menuIds } },
+    });
 
     const menusArr = menus.map((el) => ({
       ...el,
@@ -64,44 +70,32 @@ export default async function handler(
     const menuCategories = await prisma.menu_categories.findMany({
       where: {
         companies_id: companyId,
+        is_archived: false,
       },
     });
 
     //fetching locations
     const locations = await prisma.locations.findMany({
-      where: { companies_id: companyId },
+      where: { companies_id: companyId, is_archived: false },
     });
 
     //fetching tables
     const tables = await prisma.tables.findMany({
-      where: { locations_id: { in: locations.map((item) => item.id) } },
+      where: {
+        locations_id: { in: locations.map((item) => item.id) },
+        is_archived: false,
+      },
     });
 
     //fetching addonCategories
     const addonCategories = await prisma.addon_categories.findMany({
-      where: { companies_id: companyId },
+      where: { companies_id: companyId, is_archived: false },
     });
 
     //fetching addons
     const addons = await prisma.addons.findMany({
-      where: { companies_id: companyId },
+      where: { companies_id: companyId, is_archived: false },
     });
-
-    // if (locations.length === 0) {
-    //   //create a location with given company_id
-
-    //   const newLocation = await prisma.locations.create({
-    //     data: {
-    //       name: "default location",
-    //       address: "default address",
-    //       companies_id: companyId,
-    //     },
-    //   });
-    //   res.status(200).json([newLocation]);
-    // } else {
-    //   // if location exits return the info of that location
-    //   res.status(200).json(locations);
-    // }
 
     const response = {
       menus: menusArr,

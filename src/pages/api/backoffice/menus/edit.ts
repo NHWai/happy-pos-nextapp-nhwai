@@ -4,7 +4,6 @@ import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
 import { upload } from "@/config/upload";
 import { Request, Response } from "express";
-import { isArray } from "util";
 
 // Create a custom type for the combined request
 type CustomRequest = NextApiRequest & Request & { files: any };
@@ -80,30 +79,35 @@ export default async function uploadHandler(
       }));
 
       //removing old rows in menus_menu_categories_locations table
-      await prisma.$transaction(
-        reqBody.removeItems.map(
-          (item: {
-            menus_id: number;
-            menu_categories_id: number;
-            locations_id: number;
-            is_available: boolean;
-          }) =>
-            prisma.menus_menu_categories_locations.delete({
-              where: {
-                menusMenuCategoriesLocations: {
-                  menus_id: item.menus_id,
-                  menu_categories_id: item.menu_categories_id,
-                  locations_id: item.locations_id,
+
+      if (reqBody.removeItems.length > 0) {
+        await prisma.$transaction(
+          reqBody.removeItems.map(
+            (item: {
+              menus_id: number;
+              menu_categories_id: number;
+              locations_id: number;
+              is_available: boolean;
+            }) =>
+              prisma.menus_menu_categories_locations.delete({
+                where: {
+                  menusMenuCategoriesLocations: {
+                    menus_id: item.menus_id,
+                    menu_categories_id: item.menu_categories_id,
+                    locations_id: item.locations_id,
+                  },
                 },
-              },
-            })
-        )
-      );
+              })
+          )
+        );
+      }
 
       //adding new items in  menus_menu_categories_locations table
-      await prisma.menus_menu_categories_locations.createMany({
-        data: reqBody.addItems,
-      });
+      if (reqBody.addItems.length > 0) {
+        await prisma.menus_menu_categories_locations.createMany({
+          data: reqBody.addItems,
+        });
+      }
 
       const editedMenuMenuCategoryLocation =
         await prisma.menus_menu_categories_locations.findMany({
@@ -143,7 +147,12 @@ export default async function uploadHandler(
             asset_url: menuUrl,
           },
         });
-        res.status(200).json({ ...updateMenu, menuCategoryArr, locationArr });
+        return res.status(200).json({
+          ...updateMenu,
+          menuCategoryArr,
+          locationArr,
+          addonCategoryArr,
+        });
       }
       //update a new menu without uploading new image
       const updateMenu = await prisma.menus.update({
@@ -155,7 +164,7 @@ export default async function uploadHandler(
           price: reqBody.price,
         },
       });
-      res.status(200).json({
+      return res.status(200).json({
         ...updateMenu,
         menuCategoryArr,
         locationArr,
@@ -163,6 +172,6 @@ export default async function uploadHandler(
       });
     });
   } else {
-    res.status(401).end();
+    return res.status(401).end();
   }
 }

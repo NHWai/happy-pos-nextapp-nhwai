@@ -22,15 +22,18 @@ export default async function handler(
     });
 
     //delete addons related to this addon catgory
-    await prisma.addons.deleteMany({
+    await prisma.addons.updateMany({
       where: { addon_categories_id: id },
+      data: {
+        is_archived: true,
+      },
     });
 
     //delete addonCategory
-    const delAddonCatgory = await prisma.addon_categories.delete({
+    const delAddonCatgory = await prisma.addon_categories.update({
       where: { id },
-      select: {
-        id: true,
+      data: {
+        is_archived: true,
       },
     });
     if (!delAddonCatgory.id) return res.status(500).end();

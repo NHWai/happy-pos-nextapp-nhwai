@@ -18,6 +18,8 @@ import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import CloseIcon from "@mui/icons-material/Close";
 
+const initialMenuCategory = { id: 0, name: "" };
+
 const MenuCategories = () => {
   const { company, app, setApp } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
@@ -26,7 +28,7 @@ const MenuCategories = () => {
   const [userSelectlocation, setUserSelectlocation] = React.useState<
     string | null
   >("");
-  const [currMenuCategory, setCurrMenuCategory] = useState({ id: 0, name: "" });
+  const [currMenuCategory, setCurrMenuCategory] = useState(initialMenuCategory);
   const [openSnackBar, setOpenSnackBar] = useState(false);
 
   function showMenus(currId: number) {
@@ -63,10 +65,12 @@ const MenuCategories = () => {
           status: "idle",
           error: "",
         }));
-        setCurrMenuCategory({ id: 0, name: "" });
+        setCurrMenuCategory(initialMenuCategory);
         setOpen(false);
       } else {
-        throw new Error("Failed to create a new menu-category");
+        throw new Error(
+          `Failed to create a new menu-category  \n Status Code: ${response.status}`
+        );
       }
     } catch (error) {
       setApp((pre) => ({
@@ -102,10 +106,12 @@ const MenuCategories = () => {
           status: "idle",
           error: "",
         }));
-        setCurrMenuCategory({ id: 0, name: "" });
+        setCurrMenuCategory(initialMenuCategory);
         setOpen(false);
       } else {
-        throw new Error("Failed to create a new menu-category");
+        throw new Error(
+          `Failed to update a new menu-category  \n Status Code: ${response.status}`
+        );
       }
     } catch (error) {
       setApp((pre) => ({
@@ -150,16 +156,23 @@ const MenuCategories = () => {
           menuCategories: pre.menuCategories.filter(
             (menuCategory) => menuCategory.id !== id
           ),
+          menus: pre.menus
+            .map((menuItem) => ({
+              ...menuItem,
+              menuCategoryArr: menuItem.menuCategoryArr.filter(
+                (menuCat) => menuCat.id !== id
+              ),
+            }))
+            .filter((menuItem) => menuItem.menuCategoryArr.length !== 0),
           status: "idle",
         }));
-        setCurrMenuCategory({
-          id: 0,
-          name: "",
-        });
+        setCurrMenuCategory(initialMenuCategory);
         setOpenConfirmation(false);
         setOpen(false);
       } else {
-        throw new Error("Failed to delete current menu category");
+        throw new Error(
+          `Failed to delete current menu category  \n Status Code: ${response.status}`
+        );
       }
     } catch (error) {
       setApp((pre) => ({
@@ -183,8 +196,6 @@ const MenuCategories = () => {
     </React.Fragment>
   );
 
-  console.log(app.status, app.menuCategories);
-
   return (
     <PageLayout>
       <RouteLayout>
@@ -206,7 +217,7 @@ const MenuCategories = () => {
           <IconButton
             onClick={() => {
               setOpen(true);
-              setCurrMenuCategory({ id: 0, name: "" });
+              setCurrMenuCategory(initialMenuCategory);
             }}
           >
             <AddCircleOutlineIcon />

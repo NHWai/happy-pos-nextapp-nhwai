@@ -25,11 +25,9 @@ export default async function handler(
     });
 
     //delete menu
-    const delMenu = await prisma.menus.delete({
+    const delMenu = await prisma.menus.update({
       where: { id },
-      select: {
-        id: true,
-      },
+      data: { is_archived: true },
     });
     if (!delMenu.id) return res.status(500).end();
 

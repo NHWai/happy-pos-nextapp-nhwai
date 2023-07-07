@@ -193,9 +193,9 @@ const MenuItem = () => {
     formData.append("menuId", String(menuItem.id));
     formData.append("addonCategoryIds", JSON.stringify(addonCategoryIds));
 
-    // for (var [key, value] of formData.entries()) {
-    //   console.log(key, "-->", value);
-    // }
+    for (var [key, value] of formData.entries()) {
+      console.log(key, "-->", value);
+    }
 
     setApp((pre) => ({
       ...pre,

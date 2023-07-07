@@ -39,6 +39,7 @@ export default async function handler(
     const companyDB = await prisma.companies.findFirst({
       where: {
         name: companyName,
+        is_archived: false,
       },
     });
 

@@ -129,6 +129,14 @@ const Location = () => {
         setApp((pre) => ({
           ...pre,
           locations: pre.locations.filter((location) => location.id !== id),
+          menus: pre.menus
+            .map((menuItem) => ({
+              ...menuItem,
+              locationArr: menuItem.locationArr.filter(
+                (location) => location.id !== id
+              ),
+            }))
+            .filter((menuItem) => menuItem.locationArr.length !== 0),
           status: "idle",
         }));
         setOpenConfirmation(false);
@@ -211,7 +219,7 @@ const Location = () => {
             <>
               {app.locations?.map((item) => (
                 <Chip
-                  key={item.name}
+                  key={item.id}
                   label={item.name}
                   style={{ cursor: "pointer" }}
                   onClick={() => {

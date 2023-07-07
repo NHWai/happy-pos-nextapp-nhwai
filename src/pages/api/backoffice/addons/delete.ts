@@ -17,10 +17,10 @@ export default async function handler(
     }
 
     //delete addon
-    const delAddon = await prisma.addons.delete({
+    const delAddon = await prisma.addons.update({
       where: { id },
-      select: {
-        id: true,
+      data: {
+        is_archived: true,
       },
     });
     if (!delAddon.id) return res.status(500).end();

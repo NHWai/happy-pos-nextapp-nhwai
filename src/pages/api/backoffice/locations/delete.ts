@@ -17,16 +17,49 @@ export default async function handler(
       return res.status(400).end();
     }
 
+    //get menu_ids before del
+    let menuIdsBeforeDel = (
+      await prisma.menus_menu_categories_locations.findMany({
+        where: { locations_id: id },
+        select: {
+          menus_id: true,
+        },
+      })
+    )
+      .map((item) => item.menus_id)
+      .filter((menu, idx, arr) => arr.indexOf(menu) === idx);
+
     //delete menus and menu categories
     await prisma.menus_menu_categories_locations.deleteMany({
       where: { locations_id: id },
     });
 
+    //menus_id after delete
+    const menuIdsAfterDel = (
+      await prisma.menus_menu_categories_locations.findMany({
+        where: { menus_id: { in: menuIdsBeforeDel } },
+      })
+    )
+      .map((item) => item.menus_id)
+      .filter((item, idx, arr) => arr.indexOf(item) === idx);
+
+    const menuIdToDel = menuIdsBeforeDel.filter(
+      (item1) => !menuIdsAfterDel.find((item2) => item1 === item2)
+    );
+
+    //del menus
+    await prisma.menus.updateMany({
+      where: { id: { in: menuIdToDel } },
+      data: {
+        is_archived: true,
+      },
+    });
+
     //delete location
-    const delLocation = await prisma.locations.delete({
+    const delLocation = await prisma.locations.update({
       where: { id },
-      select: {
-        id: true,
+      data: {
+        is_archived: true,
       },
     });
 
