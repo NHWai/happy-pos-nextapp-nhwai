@@ -2,20 +2,25 @@ import MenuCard from "@/components/MenuCard";
 import OrderLayout from "@/components/OrderLayout";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useContext } from "react";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import OrderContext from "@/contexts/OrderContext";
+import { OrderMenu } from "@/typing/types";
 
-const menuItemList = [
-  "Mote-hin-ghar",
-  "shan-noodle",
-  "pel nan pyar",
-  "moke lat saung",
-];
 const imgUrl =
   "https://media-cdn.tripadvisor.com/media/photo-p/1d/05/85/a5/laminarosa-or-give-a.jpg";
 export default function MenuItem() {
   const router = useRouter();
-  console.log(router.pathname);
+  const { app } = useContext(OrderContext);
+  const filteredMenuItems = (menuCat: string): OrderMenu[] => {
+    const menuCatId = app.menuCategories.find(
+      (item) => item.name === menuCat
+    )?.id;
+    const filteredItems = app.menus.filter((menu) =>
+      menu.menuCategoryArr.find((item) => item.id === menuCatId)
+    );
+    return filteredItems;
+  };
   return (
     <OrderLayout>
       <Button
@@ -37,8 +42,8 @@ export default function MenuItem() {
           paddingBottom: "1rem",
         }}
       >
-        {menuItemList.map((item) => (
-          <MenuCard key={item} name={item} url={imgUrl} />
+        {filteredMenuItems(router.query.id as string).map((item) => (
+          <MenuCard key={item.id} name={item.name} url={imgUrl} />
         ))}
       </Box>
     </OrderLayout>

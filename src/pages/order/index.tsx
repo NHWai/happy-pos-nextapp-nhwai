@@ -1,3 +1,4 @@
+import React, { useContext, useEffect } from "react";
 import OrderLayout from "@/components/OrderLayout";
 import {
   Box,
@@ -8,8 +9,8 @@ import {
   Typography,
 } from "@mui/material";
 import { useRouter } from "next/router";
-import React from "react";
 import RouterLink from "next/link";
+import OrderContext from "@/contexts/OrderContext";
 
 const style = {
   width: "100%",
@@ -26,8 +27,16 @@ function capitalize(str: string) {
 }
 
 const OrderApp = () => {
+  const { app, getMenusByLocationId } = useContext(OrderContext);
   const { query } = useRouter();
-  console.log({ query });
+
+  useEffect(() => {
+    const locationId = Number(query.locationId);
+    if (locationId) {
+      getMenusByLocationId(locationId);
+    }
+  }, [query.locationId]);
+
   return (
     <OrderLayout>
       <Box
@@ -44,10 +53,14 @@ const OrderApp = () => {
           Make Your Orders Here!!
         </Typography>
         <List sx={style} component="nav" aria-label="mailbox folders">
-          {categoryList.map((el, idx) => (
-            <div key={el}>
-              <ListItem button component={RouterLink} href={`/order/${el}`}>
-                <ListItemText primary={capitalize(el)} align="center" />
+          {app.menuCategories.map((el, idx) => (
+            <div key={el.name}>
+              <ListItem
+                button
+                component={RouterLink}
+                href={`/order/${el.name}`}
+              >
+                <ListItemText primary={capitalize(el.name)} align="center" />
               </ListItem>
               {categoryList.length - 1 !== idx && <Divider />}
             </div>

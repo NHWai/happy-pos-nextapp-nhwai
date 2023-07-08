@@ -16,6 +16,16 @@ export interface Menu extends BaseType {
   addonCategoryArr: { id: number }[];
 }
 
+export interface OrderMenu extends BaseType {
+  price: number;
+  asset_url?: string;
+  description?: string;
+  menuCategoryArr: {
+    id: number;
+  }[];
+  addonCategoryArr: { id: number }[];
+}
+
 export interface MenuCategory extends BaseType {
   companies_id?: number;
 }

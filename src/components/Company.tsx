@@ -1,10 +1,8 @@
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { Box, TextField, Button } from "@mui/material";
-import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 
 const Company = () => {
-  const router = useRouter();
   const { fetchCompany, company } = useContext(BackOfficeContext);
 
   const [companyName, setCompanyName] = useState("");

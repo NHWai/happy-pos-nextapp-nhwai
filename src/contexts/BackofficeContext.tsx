@@ -86,6 +86,7 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       });
       if (response.ok) {
         const data = await response.json();
+        console.log(data);
         localStorage.setItem("company", JSON.stringify(data));
         setCompany({ ...data, error: "" });
         fetchApp(data.id);
