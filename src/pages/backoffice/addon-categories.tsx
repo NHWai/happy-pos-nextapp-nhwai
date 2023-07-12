@@ -36,9 +36,9 @@ const MenuCategories = () => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
 
   //to change menuCategoryArr to addonCategoryArr
-  function showMenus(currId: number) {
-    return app.menus
-      .filter((item) => item.addonCategoryArr.find((el) => el.id === currId))
+  function showAddons(currId: number) {
+    return app.addons
+      .filter((item) => item.addon_categories_id === currId)
       .map((item) => item.name);
   }
 
@@ -238,7 +238,7 @@ const MenuCategories = () => {
                   },
                 }}
                 label={
-                  item.name + " \n (" + showMenus(item.id).length + " menu/s)"
+                  item.name + " \n (" + showAddons(item.id).length + " addon/s)"
                 }
                 style={{ cursor: "pointer" }}
                 onClick={() => {
@@ -311,10 +311,10 @@ const MenuCategories = () => {
           >
             <Typography variant="body2" align="left">
               {" "}
-              Menus :
+              Addons :
             </Typography>
             <Typography width={"50%"} variant="caption">
-              {showMenus(currAddonCategory.id).join(", ")}
+              {showAddons(currAddonCategory.id).join(", ")}
             </Typography>
           </Stack>
           {!currAddonCategory.id ? (
