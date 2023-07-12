@@ -37,7 +37,7 @@ const OrderApp = () => {
       localStorage.setItem("OrderlocationId", query.locationId as string);
       localStorage.setItem("OrdertableId", query.tableId as string);
     }
-    const locationId = Number(localStorage.getItem("OrderlocationId"));
+    const locationId = Number(query.locationId);
     if (locationId && locationId !== app.location.id) {
       getMenusByLocationId(locationId);
     }

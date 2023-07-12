@@ -7,7 +7,7 @@ import OrderAppBottombar from "./OrderAppBottombar";
 
 interface Props {
   children: React.ReactNode;
-  height?: number;
+  height?: string;
 }
 
 const OrderApp = ({ children, height }: Props) => {

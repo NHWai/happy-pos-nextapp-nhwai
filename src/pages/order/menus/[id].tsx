@@ -20,7 +20,8 @@ const initialMenuItem: OrderMenu = {
 };
 
 export default function Menu() {
-  const { app, setOrderLines, orderLines } = useContext(OrderContext);
+  const { app, setOrderLines, orderLines, getMenusByLocationId } =
+    useContext(OrderContext);
   const router = useRouter();
   const [menuItem, setMenuItem] = useState<OrderMenu>(initialMenuItem);
   const [qty, setQty] = useState(1);
@@ -44,6 +45,13 @@ export default function Menu() {
   };
   const orderlineId = Number(router.query.orderlineidx);
   const hasOrderLineId = !isNaN(orderlineId) && typeof orderlineId === "number";
+
+  useEffect(() => {
+    if (!app.location.id) {
+      const locationId = localStorage.getItem("OrderlocationId");
+      getMenusByLocationId(Number(locationId));
+    }
+  }, []);
 
   useEffect(() => {
     if (typeof router.query.id === "string" && app.location.id) {

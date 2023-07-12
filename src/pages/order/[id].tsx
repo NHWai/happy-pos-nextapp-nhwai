@@ -2,14 +2,14 @@ import MenuCard from "@/components/MenuCard";
 import OrderLayout from "@/components/OrderLayout";
 import { Box, Button, Typography } from "@mui/material";
 import { useRouter } from "next/router";
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import OrderContext from "@/contexts/OrderContext";
 import { OrderMenu } from "@/typing/types";
 
 export default function MenuItem() {
   const router = useRouter();
-  const { app } = useContext(OrderContext);
+  const { app, getMenusByLocationId } = useContext(OrderContext);
 
   const filteredMenuItems = (menuCat: string): OrderMenu[] => {
     const menuCatId = app.menuCategories.find(
@@ -21,8 +21,15 @@ export default function MenuItem() {
     return filteredItems;
   };
 
+  useEffect(() => {
+    if (!app.location.id) {
+      const locationId = localStorage.getItem("OrderlocationId");
+      getMenusByLocationId(Number(locationId));
+    }
+  }, []);
+
   return (
-    <OrderLayout>
+    <OrderLayout height={`calc(100vh - 64px)`}>
       <Button
         sx={{ alignSelf: "flex-start" }}
         onClick={() => router.back()}

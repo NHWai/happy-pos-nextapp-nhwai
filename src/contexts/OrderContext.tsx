@@ -8,6 +8,7 @@ import {
   Status,
   Location,
 } from "@/typing/types";
+import { useRouter } from "next/router";
 
 interface AppContextType {
   menus: OrderMenu[];
@@ -59,16 +60,8 @@ export function OrderContextProvider({ children }: Props) {
   const [app, setApp] = useState<AppContextType>(initialApp);
   const [orderLines, setOrderLines] = useState<OrderLineType[]>([]);
 
-  useEffect(() => {
-    const locationId = localStorage.getItem("OrderlocationId");
-    if (!app.location.id && locationId) {
-      getMenusByLocationId(Number(locationId));
-      console.log("work here");
-    }
-  }, [app.location.id]);
-
   async function getMenusByLocationId(locationId: number) {
-    console.log("fetch order app ");
+    console.log("fetch order app with location ", locationId);
     setApp((pre) => ({
       ...pre,
       status: "loading",
