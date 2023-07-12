@@ -10,6 +10,10 @@ export default async function handler(
     res.status(400).end();
   }
 
+  const location = await prisma.locations.findUnique({
+    where: { id: locationId },
+  });
+
   const menusMenuCategoryLocationsIds =
     await prisma.menus_menu_categories_locations.findMany({
       where: {
@@ -77,6 +81,7 @@ export default async function handler(
     menuCategories,
     addonCategories,
     addons,
+    location,
   };
 
   res.status(200).json(response);

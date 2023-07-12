@@ -4,22 +4,24 @@ import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
 import Typography from "@mui/material/Typography";
 import { CardActionArea } from "@mui/material";
+import RouteLink from "next/link";
 
 interface Props {
   name: string;
   url: string;
+  href: string;
+  price: number;
 }
 
-export default function MenuCard({ name, url }: Props) {
+export default function MenuCard({ name, url, href, price }: Props) {
   return (
-    <Card sx={{ maxWidth: 345, minWidth: 25 }}>
+    <Card
+      component={RouteLink}
+      href={href}
+      sx={{ maxWidth: 345, minWidth: 25, textDecoration: "none" }}
+    >
       <CardActionArea>
-        <CardMedia
-          component="img"
-          height="140"
-          image={url}
-          alt="green iguana"
-        />
+        <CardMedia component="img" height="140" image={url} />
         <CardContent>
           <Typography
             gutterBottom
@@ -29,6 +31,15 @@ export default function MenuCard({ name, url }: Props) {
             fontWeight={"bold"}
           >
             {name}
+          </Typography>
+          <Typography
+            gutterBottom
+            variant="caption"
+            align="center"
+            component="div"
+            fontWeight={"bold"}
+          >
+            {price + " MMK"}
           </Typography>
         </CardContent>
       </CardActionArea>

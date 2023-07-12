@@ -7,9 +7,10 @@ import OrderAppBottombar from "./OrderAppBottombar";
 
 interface Props {
   children: React.ReactNode;
+  height?: number;
 }
 
-const OrderApp = ({ children }: Props) => {
+const OrderApp = ({ children, height }: Props) => {
   return (
     <MainLayout>
       <OrderAppNavbar />
@@ -19,9 +20,11 @@ const OrderApp = ({ children }: Props) => {
           flexDirection: "column",
           alignItems: "center",
           paddingX: "1rem",
+          paddingBottom: "64px",
         }}
         style={{
-          height: `calc(100vh - 64px - 64px)`,
+          // height: `calc(100vh - 64px  + ${height}px)`,
+          height: `{height}`,
           overflowY: "auto",
         }}
       >

@@ -7,9 +7,11 @@ import { useRouter } from "next/router";
 
 export default function OrderAppBottombar() {
   const { pathname } = useRouter();
+
   if (pathname === "/order/myorder") {
     return <> </>;
   }
+
   return (
     <AppBar
       component={RouterLink}

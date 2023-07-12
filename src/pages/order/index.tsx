@@ -3,11 +3,13 @@ import OrderLayout from "@/components/OrderLayout";
 import {
   Box,
   Divider,
+  IconButton,
   List,
   ListItem,
   ListItemText,
   Typography,
 } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import { useRouter } from "next/router";
 import RouterLink from "next/link";
 import OrderContext from "@/contexts/OrderContext";
@@ -31,14 +33,22 @@ const OrderApp = () => {
   const { query } = useRouter();
 
   useEffect(() => {
-    const locationId = Number(query.locationId);
-    if (locationId) {
+    if (query.locationId) {
+      localStorage.setItem("OrderlocationId", query.locationId as string);
+      localStorage.setItem("OrdertableId", query.tableId as string);
+    }
+    const locationId = Number(localStorage.getItem("OrderlocationId"));
+    if (locationId && locationId !== app.location.id) {
       getMenusByLocationId(locationId);
     }
   }, [query.locationId]);
 
+  useEffect(() => {
+    if (app.status === "failed") alert("Failed to load data from server");
+  }, [app.status]);
+
   return (
-    <OrderLayout>
+    <OrderLayout height={`calc(100vh - 64px)`}>
       <Box
         sx={{
           width: "90%",
@@ -52,19 +62,29 @@ const OrderApp = () => {
         <Typography variant="h5" align="center">
           Make Your Orders Here!!
         </Typography>
+
         <List sx={style} component="nav" aria-label="mailbox folders">
-          {app.menuCategories.map((el, idx) => (
-            <div key={el.name}>
-              <ListItem
-                button
-                component={RouterLink}
-                href={`/order/${el.name}`}
-              >
-                <ListItemText primary={capitalize(el.name)} align="center" />
-              </ListItem>
-              {categoryList.length - 1 !== idx && <Divider />}
-            </div>
-          ))}
+          {app.status === "loading" ? (
+            <CircularProgress />
+          ) : (
+            <>
+              {app.menuCategories.map((el, idx) => (
+                <div key={el.name}>
+                  <ListItem
+                    button
+                    component={RouterLink}
+                    href={`/order/${el.name}`}
+                  >
+                    <ListItemText
+                      primary={capitalize(el.name)}
+                      sx={{ textAlign: "center" }}
+                    />
+                  </ListItem>
+                  {categoryList.length - 1 !== idx && <Divider />}
+                </div>
+              ))}
+            </>
+          )}
         </List>
       </Box>
     </OrderLayout>
