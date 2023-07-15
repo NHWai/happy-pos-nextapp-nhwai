@@ -161,23 +161,23 @@ model orders {
   price        Int?         @default(0)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @default(now()) @updatedAt
+  order_status OrderStatus  @default(PENDING)
   locations    locations    @relation(fields: [locations_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   tables       tables       @relation(fields: [tables_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   orderlines   orderlines[]
 }
 
 model orderlines {
-  id           Int         @id @default(autoincrement())
-  orders_id    Int
-  menus_id     Int
-  addons_id    Int?
-  quantity     Int         @default(1)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @default(now()) @updatedAt
-  order_status OrderStatus @default(PENDING)
-  orders       orders      @relation(fields: [orders_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  menus        menus       @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  addons       addons?     @relation(fields: [addons_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id        Int      @id @default(autoincrement())
+  orders_id Int
+  menus_id  Int
+  addons_id Int?
+  quantity  Int      @default(1)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  orders    orders   @relation(fields: [orders_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  menus     menus    @relation(fields: [menus_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  addons    addons?  @relation(fields: [addons_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum OrderStatus {
