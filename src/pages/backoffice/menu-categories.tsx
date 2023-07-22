@@ -20,7 +20,8 @@ import CloseIcon from "@mui/icons-material/Close";
 const initialMenuCategory = { id: 0, name: "" };
 
 const MenuCategories = () => {
-  const { company, app, setApp } = React.useContext(BackOfficeContext);
+  const { company, app, setApp, selectedLocation } =
+    React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
@@ -200,7 +201,19 @@ const MenuCategories = () => {
       <Typography mt={3} mb={2} variant="h4">
         MenuCategories
       </Typography>
-
+      {selectedLocation.id ? (
+        <Typography
+          alignSelf={"left"}
+          variant="caption"
+          fontStyle={"italic"}
+          fontWeight={"bold"}
+          paddingBottom={"1rem"}
+        >
+          Location : {selectedLocation.name}
+        </Typography>
+      ) : (
+        ""
+      )}
       <Stack
         sx={{
           maxWidth: "400px",
@@ -212,14 +225,16 @@ const MenuCategories = () => {
         direction="row"
         gap={1}
       >
-        <IconButton
-          onClick={() => {
-            setOpen(true);
-            setCurrMenuCategory(initialMenuCategory);
-          }}
-        >
-          <AddCircleOutlineIcon />
-        </IconButton>
+        {!selectedLocation.id && (
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+              setCurrMenuCategory(initialMenuCategory);
+            }}
+          >
+            <AddCircleOutlineIcon />
+          </IconButton>
+        )}
         {app.status === "loading" ? (
           <div>Loading</div>
         ) : app.status === "idle" && app.menuCategories?.length > 0 ? (
@@ -306,28 +321,30 @@ const MenuCategories = () => {
               Submit
             </Button>
           ) : (
-            <Stack
-              direction="row"
-              justifyContent={"space-between"}
-              width="100%"
-            >
-              <Button
-                color="error"
-                variant="outlined"
-                onClick={() => {
-                  setOpenConfirmation(true);
-                }}
+            !selectedLocation.id && (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
               >
-                Delete
-              </Button>
-              <Button
-                disabled={app.status === "loading"}
-                variant="outlined"
-                type="submit"
-              >
-                Edit
-              </Button>
-            </Stack>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )
           )}
         </Box>
       </ModalBox>

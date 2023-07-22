@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -17,6 +17,7 @@ import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import CloseIcon from "@mui/icons-material/Close";
+import { AddonCategory } from "@/typing/types";
 
 const initialAddonCategory = {
   id: 0,
@@ -25,7 +26,8 @@ const initialAddonCategory = {
 };
 
 const MenuCategories = () => {
-  const { company, app, setApp } = React.useContext(BackOfficeContext);
+  const { company, app, setApp, selectedLocation } =
+    React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
@@ -199,12 +201,44 @@ const MenuCategories = () => {
     </React.Fragment>
   );
 
+  const filteredAddonCategories = (locationId: number): AddonCategory[] => {
+    const filteredMenus = app.menus
+      .filter((item) => item.locationArr.find((loc) => loc.id === locationId))
+      .map((item) => item.addonCategoryArr)
+      .flat()
+      .map((item) => item.id)
+      .filter((item, idx, arr) => arr.indexOf(item) === idx);
+
+    return filteredMenus.map(
+      (item) =>
+        app.addonCategories.find(
+          (addonCat) => addonCat.id === item
+        ) as AddonCategory
+    );
+  };
+
+  const addonCategoryItems = selectedLocation.id
+    ? filteredAddonCategories(selectedLocation.id)
+    : app.addonCategories;
+
   return (
     <BackofficeLayout>
       <Typography mt={3} mb={2} variant="h4">
         Addon Categories
       </Typography>
-
+      {selectedLocation.id ? (
+        <Typography
+          alignSelf={"left"}
+          variant="caption"
+          fontStyle={"italic"}
+          fontWeight={"bold"}
+          paddingBottom={"1rem"}
+        >
+          Location : {selectedLocation.name}
+        </Typography>
+      ) : (
+        ""
+      )}
       <Stack
         sx={{
           maxWidth: "400px",
@@ -216,17 +250,19 @@ const MenuCategories = () => {
         direction="row"
         gap={1}
       >
-        <IconButton
-          onClick={() => {
-            setOpen(true);
-            setCurrAddonCategory(initialAddonCategory);
-          }}
-        >
-          <AddCircleOutlineIcon />
-        </IconButton>
+        {!selectedLocation.name && (
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+              setCurrAddonCategory(initialAddonCategory);
+            }}
+          >
+            <AddCircleOutlineIcon />
+          </IconButton>
+        )}
         {app.addonCategories.length > 0 ? (
           <>
-            {app.addonCategories?.map((item) => (
+            {addonCategoryItems?.map((item) => (
               <Chip
                 key={item?.id}
                 sx={{
@@ -289,20 +325,22 @@ const MenuCategories = () => {
             required
           />
 
-          <label>
-            <input
-              name="is_required"
-              checked={currAddonCategory.is_required}
-              type="checkbox"
-              onChange={(e) =>
-                setCurrAddonCategory((pre) => ({
-                  ...pre,
-                  is_required: e.target.checked,
-                }))
-              }
-            />{" "}
-            is_required
-          </label>
+          {!selectedLocation.id && (
+            <label>
+              <input
+                name="is_required"
+                checked={currAddonCategory.is_required}
+                type="checkbox"
+                onChange={(e) =>
+                  setCurrAddonCategory((pre) => ({
+                    ...pre,
+                    is_required: e.target.checked,
+                  }))
+                }
+              />{" "}
+              is_required
+            </label>
+          )}
           <Stack
             sx={{ width: "75%" }}
             direction={"row"}
@@ -326,28 +364,30 @@ const MenuCategories = () => {
               Submit
             </Button>
           ) : (
-            <Stack
-              direction="row"
-              justifyContent={"space-between"}
-              width="100%"
-            >
-              <Button
-                color="error"
-                variant="outlined"
-                onClick={() => {
-                  setOpenConfirmation(true);
-                }}
+            !selectedLocation.id && (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
               >
-                Delete
-              </Button>
-              <Button
-                disabled={app.status === "loading"}
-                variant="outlined"
-                type="submit"
-              >
-                Edit
-              </Button>
-            </Stack>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )
           )}
         </Box>
       </ModalBox>

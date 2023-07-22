@@ -22,9 +22,11 @@ import { config } from "@/config/config";
 import CircularProgress from "@mui/material/CircularProgress";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import CloseIcon from "@mui/icons-material/Close";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 const MenuItem = () => {
-  const { company, app, setApp } = useContext(BackOfficeContext);
+  const { company, app, setApp, selectedLocation } =
+    useContext(BackOfficeContext);
   const router = useRouter();
   const [open, setOpen] = React.useState<boolean>(false);
   const [selectedLocations, setSelectedLocations] = React.useState<string[]>(
@@ -136,14 +138,45 @@ const MenuItem = () => {
       return;
     }
 
-    const editedLocationObjArr = selectedLocations
-      .map((el) => app.locations.find((loc) => loc.name === el))
-      .filter((item): item is Location => item !== undefined)
-      .map((el) => ({
-        is_available: !!formData.get(el.name),
-        id: el.id,
-        name: el.name,
-      }));
+    interface EditedLocationObjArr {
+      is_available: boolean;
+      name: string;
+      id: number;
+    }
+
+    let editedLocationObjArr: EditedLocationObjArr[] = [
+      {
+        is_available: false,
+        name: "",
+        id: 0,
+      },
+    ];
+
+    if (!selectedLocation.id) {
+      editedLocationObjArr = selectedLocations
+        .map((el) => app.locations.find((loc) => loc.name === el))
+        .filter((item): item is Location => item !== undefined)
+        .map((el) => ({
+          is_available: !!formData.get(el.name),
+          id: el.id,
+          name: el.name,
+        }));
+    } else {
+      const getLocationName = (id: number): string =>
+        app.locations.find((item) => item.id === id)?.name as string;
+      editedLocationObjArr = menuItem.locationArr
+        .map((item) => ({
+          ...item,
+          name: getLocationName(item.id),
+        }))
+        .map((item) => ({
+          ...item,
+          is_available:
+            item.name === selectedLocation.name
+              ? !!formData.get(item.name)
+              : item.is_available,
+        }));
+    }
 
     const editedMenuCategoriesObjArr = selectedMenuCategories
       .map((el) => app.menuCategories.find((cat) => cat.name === el))
@@ -191,10 +224,6 @@ const MenuItem = () => {
     formData.append("companyId", String(company.id));
     formData.append("menuId", String(menuItem.id));
     formData.append("addonCategoryIds", JSON.stringify(addonCategoryIds));
-
-    // for (var [key, value] of formData.entries()) {
-    //   console.log(key, "-->", value);
-    // }
 
     setApp((pre) => ({
       ...pre,
@@ -274,7 +303,7 @@ const MenuItem = () => {
               component={Link}
               href="/backoffice/menus"
             >
-              Go Back
+              <KeyboardBackspaceIcon />
             </Box>
             <Stack direction={"row"}>
               <IconButton
@@ -296,12 +325,14 @@ const MenuItem = () => {
               >
                 <EditIcon />
               </IconButton>
-              <IconButton onClick={() => setOpenConfirmation(true)}>
-                <DeleteIcon />
-              </IconButton>{" "}
+              {!selectedLocation.id && (
+                <IconButton onClick={() => setOpenConfirmation(true)}>
+                  <DeleteIcon />
+                </IconButton>
+              )}
             </Stack>
           </Box>
-          <Box sx={{ mt: 2, maxWidth: 350 }}>
+          <Box sx={{ mt: 2, maxWidth: 350, paddingBottom: "2rem" }}>
             <Typography align="center" variant="h3">
               {menuItem.name}
             </Typography>
@@ -378,6 +409,7 @@ const MenuItem = () => {
                 name="name"
                 autoComplete="off"
                 required
+                inputProps={{ readOnly: !!selectedLocation.id }}
               />
               <TextField
                 defaultValue={menuItem.price}
@@ -387,6 +419,7 @@ const MenuItem = () => {
                 autoComplete="off"
                 required
                 type="number"
+                inputProps={{ readOnly: !!selectedLocation.id }}
               />
 
               <input
@@ -396,6 +429,7 @@ const MenuItem = () => {
                 name="menuImg"
                 type="file"
                 accept="image/png, image/jpeg"
+                disabled={!!selectedLocation.id}
               />
 
               <Autocomplete
@@ -416,6 +450,7 @@ const MenuItem = () => {
                 renderInput={(params) => (
                   <TextField {...params} label="Choose Menu Categories" />
                 )}
+                readOnly={!!selectedLocation.name}
               />
 
               <Autocomplete
@@ -436,9 +471,11 @@ const MenuItem = () => {
                 renderInput={(params) => (
                   <TextField {...params} label="Choose Addon Categories" />
                 )}
+                readOnly={!!selectedLocation.name}
               />
 
               <Autocomplete
+                readOnly={!!selectedLocation.name}
                 multiple
                 freeSolo
                 size="small"
@@ -464,6 +501,11 @@ const MenuItem = () => {
                 {selectedLocations.map((el, idx) => (
                   <label key={idx}>
                     <input
+                      disabled={
+                        !!selectedLocation.id
+                          ? selectedLocation.name !== el
+                          : false
+                      }
                       defaultChecked={
                         menuItem.locationArr[idx]
                           ? menuItem.locationArr[idx].is_available

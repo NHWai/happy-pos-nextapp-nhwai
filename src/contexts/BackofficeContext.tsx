@@ -2,13 +2,11 @@ import { config } from "@/config/config";
 import {
   Addon,
   AddonCategory,
+  BackofficeOrderlinesType,
   Company,
   Location,
-  LocationsType,
   Menu,
-  MenuCategoriesType,
   MenuCategory,
-  MenusType,
   Status,
   Table,
 } from "@/typing/types";
@@ -29,6 +27,13 @@ interface AppType {
 interface BackOfficeContextType {
   app: AppType;
   setApp: React.Dispatch<React.SetStateAction<AppType>>;
+  selectedLocation: Location;
+  setSelectedLocation: React.Dispatch<React.SetStateAction<Location>>;
+  backofficeOrderlines: BackofficeOrderlinesType;
+  setBackofficeOrderlines: React.Dispatch<
+    React.SetStateAction<BackofficeOrderlinesType>
+  >;
+  getOrders: (locationId?: number) => void;
   fetchCompany: (companyName: string) => void;
   company: Company;
 }
@@ -44,10 +49,28 @@ const initialApp: AppType = {
   error: "",
 };
 
+export const initialLocation: Location = {
+  id: 0,
+  name: "",
+  address: "",
+  companies_id: 0,
+};
+
+const initialBackOfficeOrderlines: BackofficeOrderlinesType = {
+  items: [],
+  error: "",
+  status: "idle",
+};
+
 //
 const BackOfficeContext = createContext<BackOfficeContextType>({
   app: initialApp,
   setApp: () => {},
+  selectedLocation: initialLocation,
+  setSelectedLocation: () => {},
+  backofficeOrderlines: initialBackOfficeOrderlines,
+  setBackofficeOrderlines: () => [],
+  getOrders: (locationId?: number) => {},
   fetchCompany: (companyName: string) => {},
   company: { id: 0, address: "", name: "", error: "" },
 });
@@ -65,6 +88,12 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
     name: "",
     error: "",
   });
+
+  const [selectedLocation, setSelectedLocation] =
+    useState<Location>(initialLocation);
+
+  const [backofficeOrderlines, setBackofficeOrderlines] =
+    useState<BackofficeOrderlinesType>(initialBackOfficeOrderlines);
 
   useEffect(() => {
     const localStorageCompany = localStorage.getItem("company");
@@ -95,6 +124,32 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       }
     } catch (error) {
       setCompany((pre) => ({ ...pre, error: error as string }));
+    }
+  };
+
+  const getOrders = async (locationId?: number) => {
+    setBackofficeOrderlines((pre) => ({ ...pre, status: "loading" }));
+    console.log("getting orders from frontend");
+    try {
+      const response = await fetch(
+        `${config.baseurl}/backoffice/orders?locationId=${locationId}`
+      );
+      if (response.status) {
+        const data = await response.json();
+        setBackofficeOrderlines((pre) => ({
+          items: data,
+          status: "idle",
+          error: "",
+        }));
+      } else {
+        throw new Error("Failed to fetch orders");
+      }
+    } catch (err) {
+      setBackofficeOrderlines((pre) => ({
+        ...pre,
+        status: "failed",
+        error: err as string,
+      }));
     }
   };
 
@@ -140,6 +195,11 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       value={{
         app,
         setApp,
+        selectedLocation,
+        setSelectedLocation,
+        backofficeOrderlines,
+        setBackofficeOrderlines,
+        getOrders,
         fetchCompany,
         company,
       }}

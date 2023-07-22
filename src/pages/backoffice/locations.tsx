@@ -24,7 +24,8 @@ const initialLocation = {
 };
 
 const Location = () => {
-  const { company, app, setApp } = React.useContext(BackOfficeContext);
+  const { company, app, setApp, selectedLocation } =
+    React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
@@ -202,15 +203,16 @@ const Location = () => {
         direction="row"
         gap={1}
       >
-        {" "}
-        <IconButton
-          onClick={() => {
-            setOpen(true);
-            setCurrLocation(initialLocation);
-          }}
-        >
-          <AddCircleOutlineIcon />
-        </IconButton>
+        {!selectedLocation.id && (
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+              setCurrLocation(initialLocation);
+            }}
+          >
+            <AddCircleOutlineIcon />
+          </IconButton>
+        )}
         {app.status === "loading" ? (
           <div>Loading...</div>
         ) : app.locations.length > 0 ? (
@@ -280,28 +282,30 @@ const Location = () => {
               Submit
             </Button>
           ) : (
-            <Stack
-              direction="row"
-              justifyContent={"space-between"}
-              width="100%"
-            >
-              <Button
-                color="error"
-                variant="outlined"
-                onClick={() => {
-                  setOpenConfirmation(true);
-                }}
+            !selectedLocation.id && (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
               >
-                Delete
-              </Button>
-              <Button
-                disabled={app.status === "loading"}
-                variant="outlined"
-                type="submit"
-              >
-                Edit
-              </Button>
-            </Stack>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )
           )}
         </Box>
       </Modal>

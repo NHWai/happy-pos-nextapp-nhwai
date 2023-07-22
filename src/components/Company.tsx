@@ -1,5 +1,5 @@
 import BackOfficeContext from "@/contexts/BackofficeContext";
-import { Box, TextField, Button } from "@mui/material";
+import { Box, TextField, Button, Typography } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 
 const Company = () => {
@@ -20,6 +20,9 @@ const Company = () => {
           mt: 10,
         }}
       >
+        <Typography variant="h6" marginBottom={"1rem"}>
+          Type Your company name and Login
+        </Typography>
         <Box
           component={"form"}
           sx={{
@@ -42,7 +45,7 @@ const Company = () => {
             onChange={(e) => setCompanyName(e.target.value)}
           />
           <Button size="small" type="submit" variant="contained">
-            SignIn
+            Login
           </Button>
         </Box>
       </Box>

@@ -20,6 +20,7 @@ import LocalDiningIcon from "@mui/icons-material/LocalDining";
 import LunchDiningIcon from "@mui/icons-material/LunchDining";
 import SettingsIcon from "@mui/icons-material/Settings";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import ListAltIcon from "@mui/icons-material/ListAlt";
 import Divider from "@mui/material/Divider";
 import { AccountCircle } from "@mui/icons-material";
 import { Menu, MenuItem } from "@mui/material";
@@ -43,6 +44,7 @@ export default function Navbar() {
   };
 
   const drawerItems = [
+    { label: "Orders", icon: <ListAltIcon />, link: "" },
     { label: "Menus", icon: <LocalDiningIcon />, link: "menus" },
     {
       label: "Menu Categories",
@@ -120,8 +122,8 @@ export default function Navbar() {
     );
   };
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: "primary" }}>
-      <AppBar color="primary" position="static">
+    <Box sx={{ backgroundColor: "primary" }}>
+      <AppBar color="primary" position="static" sx={{ width: "100%" }}>
         <Toolbar>
           {session &&
             pathname !== "/backoffice/company" &&
@@ -147,7 +149,13 @@ export default function Navbar() {
                 </Drawer>
               </>
             )}
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            component={RouterLink}
+            href="/backoffice"
+            variant="h6"
+            color="white"
+            sx={{ flexGrow: 1, textDecoration: "none" }}
+          >
             {session ? pageLabel : "Happy Pos Login Page"}
           </Typography>
 

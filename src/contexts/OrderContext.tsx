@@ -7,8 +7,8 @@ import {
   MenuCategory,
   Status,
   Location,
+  OrderLineType,
 } from "@/typing/types";
-import { useRouter } from "next/router";
 
 interface AppContextType {
   menus: OrderMenu[];
@@ -16,16 +16,9 @@ interface AppContextType {
   addons: Addon[];
   addonCategories: AddonCategory[];
   location: Location;
+  tableId: number;
   status: Status;
   error: string;
-}
-
-interface OrderLineType {
-  name: string;
-  price: number;
-  qty: number;
-  addons: string[];
-  formData: {};
 }
 
 interface OrderContextType {
@@ -41,6 +34,7 @@ const initialApp: AppContextType = {
   addons: [],
   addonCategories: [],
   location: { id: 0, name: "", address: "", companies_id: 0 },
+  tableId: 0,
   status: "idle",
   error: "",
 };
@@ -80,6 +74,7 @@ export function OrderContextProvider({ children }: Props) {
         ...data,
         error: "",
         status: "idle",
+        tableId: Number(localStorage.getItem("OrdertableId")),
       });
     } catch (error) {
       setApp((pre) => ({

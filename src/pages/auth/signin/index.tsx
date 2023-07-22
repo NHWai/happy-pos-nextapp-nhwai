@@ -1,21 +1,37 @@
-import PageLayout from "@/components/BackofficeLayout";
 import Button from "@mui/material/Button";
-import React from "react";
+import React, { useState } from "react";
 import { signIn } from "next-auth/react";
 import Box from "@mui/material/Box";
+import { MainLayout } from "@/components/MainLayout";
+import Navbar from "@/components/Navbar";
 
 const SignIn = () => {
   return (
-    <PageLayout>
-      <Box sx={{ py: 2, display: "flex", justifyContent: "center" }}>
-        <Button
-          variant="contained"
-          onClick={() => signIn("google", { callbackUrl: "/backoffice" })}
+    <MainLayout>
+      <Navbar />
+      <Box
+        sx={{
+          width: "100%",
+          marginX: "auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Box
+          sx={{
+            paddingTop: 10,
+          }}
         >
-          Sign In With Google
-        </Button>{" "}
+          <Button
+            variant="contained"
+            onClick={() => signIn("google", { callbackUrl: "/backoffice" })}
+          >
+            SignIn With Google
+          </Button>
+        </Box>
       </Box>
-    </PageLayout>
+    </MainLayout>
   );
 };
 

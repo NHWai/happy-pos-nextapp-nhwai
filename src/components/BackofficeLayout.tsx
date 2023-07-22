@@ -17,6 +17,8 @@ const BackofficeLayout = ({ children }: Props) => {
       <Box
         sx={{
           width: "100%",
+          maxWidth: "1080px",
+          paddingX: "1.5rem",
           marginX: "auto",
           display: "flex",
           flexDirection: "column",
@@ -24,6 +26,7 @@ const BackofficeLayout = ({ children }: Props) => {
         }}
       >
         {company.id ? <> {children}</> : <Company />}
+        {/* {children} */}
       </Box>
     </MainLayout>
   );

@@ -13,15 +13,16 @@ import {
   Snackbar,
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import React from "react";
+import React, { useEffect } from "react";
 import { config } from "@/config/config";
 import ModalBox from "@/components/ModalBox";
 import Link from "next/link";
-import { Location, MenuCategory, AddonCategory } from "@/typing/types";
+import { Location, MenuCategory, AddonCategory, Menu } from "@/typing/types";
 import CloseIcon from "@mui/icons-material/Close";
 
 const Menus = () => {
-  const { company, app, setApp } = React.useContext(BackOfficeContext);
+  const { company, app, setApp, selectedLocation } =
+    React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [selectedLocations, setSelectedLocations] = React.useState<string[]>(
     []
@@ -128,6 +129,16 @@ const Menus = () => {
     createMenu(formData);
   };
 
+  const filteredMenus = (locationId: number) => {
+    return app.menus.filter((menu) =>
+      menu.locationArr.find((item) => item.id === locationId)
+    );
+  };
+
+  const menuItems = selectedLocation.id
+    ? filteredMenus(selectedLocation.id)
+    : app.menus;
+
   const action = (
     <React.Fragment>
       <IconButton
@@ -146,19 +157,34 @@ const Menus = () => {
       <Typography mt={3} mb={2} variant="h4">
         Menus
       </Typography>
+      {selectedLocation.id ? (
+        <Typography
+          alignSelf={"left"}
+          variant="caption"
+          fontStyle={"italic"}
+          fontWeight={"bold"}
+          paddingBottom={"1rem"}
+        >
+          Location : {selectedLocation.name}
+        </Typography>
+      ) : (
+        ""
+      )}
       <Stack
         sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
         alignItems="center"
         direction="row"
         gap={1}
       >
-        <IconButton onClick={() => setOpen(true)}>
-          <AddCircleOutlineIcon />
-        </IconButton>
+        {!selectedLocation.id && (
+          <IconButton onClick={() => setOpen(true)}>
+            <AddCircleOutlineIcon />
+          </IconButton>
+        )}
         {app.status === "loading" ? (
           <div>Loading...</div>
         ) : app.status === "idle" && app.menus.length > 0 ? (
-          app.menus?.map((item) => (
+          menuItems.map((item) => (
             <Chip
               href={"/backoffice/menus/" + item.id}
               component={Link}
@@ -253,7 +279,9 @@ const Menus = () => {
             multiple
             freeSolo
             size="small"
-            options={app?.locations.map((item) => item.name)}
+            options={
+              [selectedLocation.name] || app?.locations.map((item) => item.name)
+            }
             disablePortal
             value={selectedLocations}
             onChange={(event: any, newValue: string[]) =>

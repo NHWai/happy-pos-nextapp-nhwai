@@ -12,7 +12,7 @@ interface Props {
 
 const ModalBox = ({ children, open, setOpen, heading }: Props) => {
   return (
-    <div>
+    <>
       <Modal
         open={open}
         onClose={() => setOpen(false)}
@@ -20,6 +20,7 @@ const ModalBox = ({ children, open, setOpen, heading }: Props) => {
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          overflow: "auto",
         }}
       >
         <ModalOverflow>
@@ -32,7 +33,7 @@ const ModalBox = ({ children, open, setOpen, heading }: Props) => {
           </ModalDialog>
         </ModalOverflow>
       </Modal>
-    </div>
+    </>
   );
 };
 

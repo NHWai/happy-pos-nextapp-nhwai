@@ -7,12 +7,14 @@ interface Props {
   children: React.ReactNode;
   handleDelete: () => void;
   handleEdit: () => void;
+  buttonDisabled?: boolean;
 }
 
 export default function OrderCard({
   children,
   handleDelete,
   handleEdit,
+  buttonDisabled,
 }: Props) {
   return (
     <Box
@@ -26,14 +28,24 @@ export default function OrderCard({
       <Box
         sx={{
           display: "flex",
-          justifyContent: "flex-end",
+          justifyContent: "space-between",
           marginBottom: "0.3rem",
         }}
       >
-        <IconButton onClick={handleEdit} color="primary" size="small">
+        <IconButton
+          disabled={buttonDisabled}
+          onClick={handleEdit}
+          color="primary"
+          size="small"
+        >
           <EditIcon />
         </IconButton>
-        <IconButton onClick={handleDelete} color="error" size="small">
+        <IconButton
+          disabled={buttonDisabled}
+          onClick={handleDelete}
+          color="error"
+          size="small"
+        >
           <CloseIcon />
         </IconButton>
       </Box>

@@ -16,7 +16,7 @@ import Modal from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Autocomplete from "@mui/material/Autocomplete";
-import { Location } from "@/typing/types";
+import { Location, Table } from "@/typing/types";
 import CloseIcon from "@mui/icons-material/Close";
 
 const initalTable = {
@@ -26,7 +26,7 @@ const initalTable = {
 };
 
 const Table = () => {
-  const { app, setApp } = React.useContext(BackOfficeContext);
+  const { app, setApp, selectedLocation } = React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
@@ -184,6 +184,13 @@ const Table = () => {
     }
   };
 
+  const filterdTables = (locationId: number): Table[] =>
+    app.tables.filter((item) => item.locations_id === locationId);
+
+  const tableItems = selectedLocation.name
+    ? filterdTables(selectedLocation.id)
+    : app.tables;
+
   const action = (
     <React.Fragment>
       <IconButton
@@ -202,6 +209,19 @@ const Table = () => {
       <Typography my={2} variant="h4">
         Tables
       </Typography>
+      {selectedLocation.id ? (
+        <Typography
+          alignSelf={"left"}
+          variant="caption"
+          fontStyle={"italic"}
+          fontWeight={"bold"}
+          paddingBottom={"1rem"}
+        >
+          Location : {selectedLocation.name}
+        </Typography>
+      ) : (
+        ""
+      )}
       <Stack
         sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
         alignItems="center"
@@ -220,7 +240,7 @@ const Table = () => {
           <div>Loading...</div>
         ) : app.tables.length > 0 ? (
           <>
-            {app.tables?.map((item) => (
+            {tableItems?.map((item) => (
               <Chip
                 key={item.name}
                 label={item.name}
@@ -278,7 +298,11 @@ const Table = () => {
               typeof newValue === "string" &&
                 setCurrTable((pre) => ({ ...pre, location: newValue }));
             }}
-            options={app.locations.map((item) => item.name)}
+            options={
+              selectedLocation.name
+                ? [selectedLocation.name]
+                : app.locations.map((item) => item.name)
+            }
             isOptionEqualToValue={(option, value) =>
               typeof option === typeof value
             }

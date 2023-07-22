@@ -1,3 +1,5 @@
+import type { OrderStatus } from "@prisma/client";
+
 interface BaseType {
   id: number;
   name: string;
@@ -78,4 +80,32 @@ export interface MenuCategoriesType extends ContextType {
 
 export interface MenusType extends ContextType {
   items: Menu[];
+}
+
+export interface OrderLineType {
+  id: number;
+  name: string;
+  price: number;
+  qty: number;
+  addons: string[];
+  formData: {};
+  orderStatus: OrderStatus;
+}
+
+export interface BackOfficeOrderlines {
+  orders_id: number;
+  tables_id: number;
+  is_paid: boolean;
+  price: number | null;
+  addons_id: number[];
+  menus_id: number;
+  order_status: OrderStatus;
+  locations_id: number;
+  quantity: number;
+}
+
+export interface BackofficeOrderlinesType {
+  items: BackOfficeOrderlines[];
+  status: Status;
+  error: string;
 }

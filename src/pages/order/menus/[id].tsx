@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import OrderContext from "@/contexts/OrderContext";
-import { Addon, AddonCategory, OrderMenu } from "@/typing/types";
+import { Addon, AddonCategory, OrderLineType, OrderMenu } from "@/typing/types";
 import AccordionComponent from "@/components/AccordionComponent";
 import CircularProgress from "@mui/material/CircularProgress";
 import AddIcon from "@mui/icons-material/Add";
@@ -43,6 +43,7 @@ export default function Menu() {
 
     setOpen(false);
   };
+  //
   const orderlineId = Number(router.query.orderlineidx);
   const hasOrderLineId = !isNaN(orderlineId) && typeof orderlineId === "number";
 
@@ -64,6 +65,10 @@ export default function Menu() {
       setQty(prevOrder.qty);
     }
   }, [router.query.id, app.location.id, router.query]);
+
+  // useEffect(() => {
+  //   console.log(orderLines);
+  // }, [orderLines.length]);
 
   function filteredMenuItem(id: string): OrderMenu {
     return app.menus.filter((item) => item.id === Number(id))[0];
@@ -108,21 +113,32 @@ export default function Menu() {
 
     const totalPrice = totalPriceForOne * qty;
     if (isValid) {
-      const order = {
+      const order: OrderLineType = {
         name: menuItem.name,
         price: totalPrice,
         qty,
         addons: totalAddons,
         formData,
+        id: 0,
+        orderStatus: "PENDING",
       };
 
       if (hasOrderLineId) {
+        //editing orderline element
         const preOrderLines = JSON.parse(JSON.stringify(orderLines));
         preOrderLines[orderlineId] = order;
         setOrderLines(preOrderLines);
+        localStorage.setItem("orderlists", JSON.stringify(preOrderLines));
       } else {
-        setOrderLines((pre) => [...pre, order]);
+        //adding new element to orderline
+        setOrderLines((pre) => {
+          const newOrder = [...pre, order];
+          localStorage.setItem("orderlists", JSON.stringify(newOrder));
+          return newOrder;
+        });
       }
+
+      //reseting states to initial state
       setFormData({});
       setQty(1);
       openSnackBar();

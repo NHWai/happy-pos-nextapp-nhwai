@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -18,6 +18,7 @@ import BackOfficeContext from "@/contexts/BackofficeContext";
 import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import CloseIcon from "@mui/icons-material/Close";
+import { Addon } from "@/typing/types";
 
 const initialAddon = {
   id: 0,
@@ -29,7 +30,8 @@ const initialAddon = {
 };
 
 const Addons = () => {
-  const { company, app, setApp } = React.useContext(BackOfficeContext);
+  const { company, app, setApp, selectedLocation } =
+    React.useContext(BackOfficeContext);
   const [open, setOpen] = React.useState<boolean>(false);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
@@ -190,6 +192,25 @@ const Addons = () => {
     }));
   };
 
+  const filteredAddons = (locationId: number): Addon[] => {
+    const filteredMenus = app.menus
+      .filter((item) => item.locationArr.find((loc) => loc.id === locationId))
+      .map((item) => item.addonCategoryArr)
+      .flat()
+      .map((item) => item.id)
+      .filter((item, idx, arr) => arr.indexOf(item) === idx);
+
+    return filteredMenus
+      .map((item) =>
+        app.addons.filter((addon) => addon.addon_categories_id === item)
+      )
+      .flat();
+  };
+
+  const addonItems = selectedLocation.id
+    ? filteredAddons(selectedLocation.id)
+    : app.addons;
+
   const action = (
     <React.Fragment>
       <IconButton
@@ -209,6 +230,20 @@ const Addons = () => {
         Addons
       </Typography>
 
+      {selectedLocation.id ? (
+        <Typography
+          alignSelf={"left"}
+          variant="caption"
+          fontStyle={"italic"}
+          fontWeight={"bold"}
+          paddingBottom={"1rem"}
+        >
+          Location : {selectedLocation.name}
+        </Typography>
+      ) : (
+        ""
+      )}
+
       <Stack
         sx={{
           maxWidth: "400px",
@@ -220,17 +255,19 @@ const Addons = () => {
         direction="row"
         gap={1}
       >
-        <IconButton
-          onClick={() => {
-            setOpen(true);
-            setCurrAddon(initialAddon);
-          }}
-        >
-          <AddCircleOutlineIcon />
-        </IconButton>
+        {!selectedLocation.id && (
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+              setCurrAddon(initialAddon);
+            }}
+          >
+            <AddCircleOutlineIcon />
+          </IconButton>
+        )}
         {app.addons.length > 0 ? (
           <>
-            {app.addons?.map((item) => (
+            {addonItems?.map((item) => (
               <Chip
                 key={item?.id}
                 sx={{
@@ -325,15 +362,17 @@ const Addons = () => {
             )}
           />
 
-          <label>
-            <input
-              name="is_available"
-              checked={currAddon.is_available}
-              type="checkbox"
-              onChange={handleChange}
-            />
-            <Typography variant="button"> is_available</Typography>
-          </label>
+          {!selectedLocation.id && (
+            <label>
+              <input
+                name="is_available"
+                checked={currAddon.is_available}
+                type="checkbox"
+                onChange={handleChange}
+              />
+              <Typography variant="button"> is_available</Typography>
+            </label>
+          )}
           {!currAddon.id ? (
             <Button
               disabled={app.status === "loading"}
@@ -343,28 +382,30 @@ const Addons = () => {
               Submit
             </Button>
           ) : (
-            <Stack
-              direction="row"
-              justifyContent={"space-between"}
-              width="100%"
-            >
-              <Button
-                color="error"
-                variant="outlined"
-                onClick={() => {
-                  setOpenConfirmation(true);
-                }}
+            !selectedLocation.id && (
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
               >
-                Delete
-              </Button>
-              <Button
-                disabled={app.status === "loading"}
-                variant="outlined"
-                type="submit"
-              >
-                Edit
-              </Button>
-            </Stack>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            )
           )}
         </Box>
       </ModalBox>
