@@ -283,6 +283,7 @@ export default function Home() {
       ) : (
         ""
       )}
+
       <TableContainer
         sx={{ marginY: "1rem", maxHeight: 440 }}
         component={Paper}
@@ -290,7 +291,17 @@ export default function Home() {
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
-              <TableCell />
+              <TableCell>
+                <Button
+                  onClick={() => {
+                    getOrders();
+                  }}
+                  variant="outlined"
+                  size="small"
+                >
+                  <small>Refresh</small>
+                </Button>
+              </TableCell>
               <TableCell>
                 <Button
                   onClick={() => {
@@ -358,6 +369,15 @@ export default function Home() {
           </TableBody>
         </Table>
       </TableContainer>
+      {!currOrderlines.length && (
+        <Typography
+          sx={{ fontStyle: "italic" }}
+          textAlign={"center"}
+          variant="body1"
+        >
+          No orders
+        </Typography>
+      )}
       <ModalBox
         open={openOrderStatus}
         setOpen={setOpenOrderStatus}
@@ -377,6 +397,9 @@ export default function Home() {
             <TextField {...params} label="Filter Order Status" />
           )}
         />
+        <Box sx={{ marginBottom: "1rem", border: "1px solid black" }}>
+          <Divider />
+        </Box>
         <Autocomplete
           multiple
           value={orderIdArr}
@@ -483,7 +506,9 @@ export default function Home() {
           onChange={(event: any, newValue: number | null) => {
             setFilter((pre) => ({ ...pre, tables_id: newValue }));
           }}
-          options={currOrderlines.map((item) => item.tables_id)}
+          options={currOrderlines
+            .map((item) => item.tables_id)
+            .filter((item, idx, arr) => arr.indexOf(item) === idx)}
           renderInput={(params) => (
             <TextField {...params} label="Filter TableId" />
           )}

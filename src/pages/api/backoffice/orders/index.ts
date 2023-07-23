@@ -24,13 +24,25 @@ export default async function handler(
 
     if (locationId) {
       orders = await prisma.orders.findMany({
-        where: { locations_id: locationId },
+        where: {
+          locations_id: locationId,
+          AND: {
+            is_paid: false,
+            order_status: { in: ["PENDING", "PREPARING", "COMPLETE"] },
+          },
+        },
         orderBy: {
           id: "asc",
         },
       });
     } else {
       orders = await prisma.orders.findMany({
+        where: {
+          AND: {
+            is_paid: false,
+            order_status: { in: ["PENDING", "PREPARING", "COMPLETE"] },
+          },
+        },
         orderBy: {
           id: "asc",
         },
