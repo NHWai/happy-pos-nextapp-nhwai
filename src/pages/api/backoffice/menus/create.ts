@@ -17,7 +17,7 @@ export const config = {
   },
 };
 
-function runMiddleware(
+export function runMiddleware(
   req: NextApiRequest & { [key: string]: any },
   res: NextApiResponse,
   fn: (...args: any[]) => void
@@ -25,7 +25,8 @@ function runMiddleware(
   return new Promise((resolve, reject) => {
     fn(req, res, (result: any) => {
       if (result instanceof Error) {
-        return reject(result);
+        reject(result);
+        return res.status(500).end();
       }
 
       return resolve(result);

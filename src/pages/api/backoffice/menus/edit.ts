@@ -4,6 +4,7 @@ import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
 import { upload } from "@/config/upload";
 import { Request, Response } from "express";
+import { runMiddleware } from "./create";
 
 // Create a custom type for the combined request
 type CustomRequest = NextApiRequest & Request & { files: any };
@@ -23,11 +24,8 @@ export default async function uploadHandler(
   const session = await getServerSession(req, res, authOptions);
 
   if (session && session?.user?.email) {
-    upload(req, res, async (err: any) => {
-      if (err) {
-        return res.status(400).json({ message: "Error uploading file" });
-      }
-
+    try {
+      await runMiddleware(req, res, upload);
       // File uploaded successfully
       const files = req.files as Express.MulterS3.File[];
 
@@ -170,7 +168,9 @@ export default async function uploadHandler(
         locationArr,
         addonCategoryArr,
       });
-    });
+    } catch (err) {
+      return res.status(500).end();
+    }
   } else {
     return res.status(401).end();
   }
