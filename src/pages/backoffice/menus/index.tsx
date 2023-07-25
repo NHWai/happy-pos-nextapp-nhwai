@@ -48,7 +48,6 @@ const Menus = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log({ newdata: data });
         setApp((pre) => ({
           ...pre,
           menus: [...pre.menus, data],
@@ -58,6 +57,7 @@ const Menus = () => {
         setOpen(false);
         setSelectedLocations([]);
         setSelectedMenuCategories([]);
+        setSelectedAddonCategories([]);
       } else {
         throw new Error("Failed to create a new menu-category");
       }
@@ -75,7 +75,6 @@ const Menus = () => {
 
     const formData = new FormData(e.target as HTMLFormElement);
 
-    console.log(formData.get("name"), formData.get("price"));
     const isInvalidInput =
       !selectedLocations.length ||
       !selectedMenuCategories.length ||
@@ -206,11 +205,12 @@ const Menus = () => {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            gap: 4,
+            gap: 2,
           }}
           encType="multipart/form-data"
         >
           <TextField
+            size="small"
             variant="standard"
             label="name"
             name="name"
@@ -218,6 +218,7 @@ const Menus = () => {
             required
           />
           <TextField
+            size="small"
             variant="standard"
             label="price"
             name="price"
@@ -245,11 +246,6 @@ const Menus = () => {
               setSelectedMenuCategories(newValue)
             }
             sx={{ width: 200 }}
-            renderTags={(value: readonly string[], getTagProps) =>
-              value.map((option: string, index: number) => (
-                <Chip label={option} {...getTagProps({ index })} />
-              ))
-            }
             renderInput={(params) => (
               <TextField {...params} label="Choose Menu Categories" />
             )}
@@ -265,11 +261,6 @@ const Menus = () => {
               setSelectedAddonCategories(newValue)
             }
             sx={{ width: 200 }}
-            renderTags={(value: readonly string[], getTagProps) =>
-              value.map((option: string, index: number) => (
-                <Chip label={option} {...getTagProps({ index })} />
-              ))
-            }
             renderInput={(params) => (
               <TextField {...params} label="Choose Addon Categories" />
             )}
@@ -280,7 +271,9 @@ const Menus = () => {
             freeSolo
             size="small"
             options={
-              [selectedLocation.name] || app?.locations.map((item) => item.name)
+              selectedLocation.name
+                ? [selectedLocation.name]
+                : app?.locations.map((item) => item.name)
             }
             disablePortal
             value={selectedLocations}
@@ -288,11 +281,6 @@ const Menus = () => {
               setSelectedLocations(newValue)
             }
             sx={{ width: 200 }}
-            renderTags={(value: readonly string[], getTagProps) =>
-              value.map((option: string, index: number) => (
-                <Chip label={option} {...getTagProps({ index })} />
-              ))
-            }
             renderInput={(params) => (
               <TextField
                 name="locations"
