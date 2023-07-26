@@ -12,7 +12,7 @@ import { OrderStatus } from "@prisma/client";
 // use as a utility to run once for updateStatus function in useEffect hook
 let count = 0;
 
-export default function myorder() {
+export default function Myorder() {
   const { orderLines, setOrderLines, app, getMenusByLocationId } =
     useContext(OrderContext);
   const router = useRouter();

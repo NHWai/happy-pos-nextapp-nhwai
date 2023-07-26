@@ -32,6 +32,7 @@ const MenuItem = ({ name, url }: Props) => (
         <img
           style={{ height: "100%", width: "100%", objectFit: "cover" }}
           src={url}
+          alt="menu-item-img"
         />
       )}
     </Box>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
@@ -26,13 +26,13 @@ import { AccountCircle } from "@mui/icons-material";
 import { Menu, MenuItem } from "@mui/material";
 import { getLocationId } from "@/config";
 import { useSession, signIn, signOut } from "next-auth/react";
+import TableBarIcon from "@mui/icons-material/TableBar";
 
 export default function Navbar() {
   const { data: session } = useSession();
   const router = useRouter();
   let { pathname } = router;
   const [isOpen, setIsOpen] = useState(false);
-  const locationId = getLocationId();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -64,7 +64,7 @@ export default function Navbar() {
     },
     {
       label: "Tables",
-      icon: <LocationOnIcon />,
+      icon: <TableBarIcon />,
       link: "tables",
     },
     { label: "Setting", icon: <SettingsIcon />, link: "setting" },
@@ -94,7 +94,7 @@ export default function Navbar() {
         sx={{ width: "250" }}
       >
         <List>
-          {drawerItems.slice(0, 6).map((item) => (
+          {drawerItems.slice(0, 7).map((item) => (
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}

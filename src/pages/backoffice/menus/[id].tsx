@@ -446,11 +446,6 @@ const MenuItem = () => {
                   setSelectedMenuCategories(newValue)
                 }
                 sx={{ width: 200 }}
-                renderTags={(value: readonly string[], getTagProps) =>
-                  value.map((option: string, index: number) => (
-                    <Chip label={option} {...getTagProps({ index })} />
-                  ))
-                }
                 renderInput={(params) => (
                   <TextField {...params} label="Choose Menu Categories" />
                 )}
@@ -467,11 +462,6 @@ const MenuItem = () => {
                   setSelectedAddonCategories(newValue)
                 }
                 sx={{ width: 200 }}
-                renderTags={(value: readonly string[], getTagProps) =>
-                  value.map((option: string, index: number) => (
-                    <Chip label={option} {...getTagProps({ index })} />
-                  ))
-                }
                 renderInput={(params) => (
                   <TextField {...params} label="Choose Addon Categories" />
                 )}
@@ -490,11 +480,6 @@ const MenuItem = () => {
                   setSelectedLocations(newValue)
                 }
                 sx={{ width: 200 }}
-                renderTags={(value: readonly string[], getTagProps) =>
-                  value.map((option: string, index: number) => (
-                    <Chip label={option} {...getTagProps({ index })} />
-                  ))
-                }
                 renderInput={(params) => (
                   <TextField {...params} label="Choose Locations" />
                 )}
