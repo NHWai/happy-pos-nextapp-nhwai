@@ -264,7 +264,10 @@ export default function Home() {
   }
 
   const currOrderlines = filteredOrders();
-
+  const totalAmount = currOrderlines
+    .filter((item) => !item.is_paid)
+    .map((item) => item.price as number)
+    .reduce((preVal: number, currVal: number) => preVal + currVal, 0);
   return (
     <BackofficeLayout>
       <Typography variant="h4" marginTop={"1rem"}>
@@ -284,6 +287,19 @@ export default function Home() {
         ""
       )}
 
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "flex-end",
+          width: "100%",
+          marginTop: "1rem",
+        }}
+      >
+        <Typography sx={{ paddingRight: "0.5rem" }}>Total :</Typography>
+        <Typography fontStyle={"italic"} fontWeight={"bold"}>
+          {totalAmount} MMK
+        </Typography>
+      </Box>
       <TableContainer
         sx={{ marginY: "1rem", maxHeight: 440 }}
         component={Paper}
