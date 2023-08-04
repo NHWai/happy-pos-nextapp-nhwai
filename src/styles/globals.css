@@ -10,3 +10,13 @@ body {
   overflow-x: hidden;
 } */
 
+html.sr .load-hidden {
+  visibility: hidden;
+ }
+
+ .services{
+  display: flex;
+  gap: 1rem;
+   flex-wrap: wrap;
+  justify-content: center;
+ }

@@ -6,6 +6,12 @@ import QrCode2Icon from "@mui/icons-material/QrCode2";
 import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 import CardMembershipIcon from "@mui/icons-material/CardMembership";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import { RevealList } from "next-reveal";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import FacebookIcon from "@mui/icons-material/Facebook";
+import InstagramIcon from "@mui/icons-material/Instagram";
+import LinkedInIcon from "@mui/icons-material/LinkedIn";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -60,18 +66,19 @@ export default function Home() {
             maxWidth: "900px",
             alignItems: "center",
             gap: "1.5rem",
+            marginBottom: "3rem",
           }}
         >
           <Typography fontSize={{ xs: "1.5rem", sm: "2.125rem" }}>
             Services We Provide
           </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              gap: "1rem",
-              flexWrap: "wrap",
-              justifyContent: "center",
-            }}
+
+          <RevealList
+            interval={200}
+            origin="bottom"
+            delay={500}
+            duration={1000}
+            className="services"
           >
             <Stack
               sx={{ maxWidth: "200px" }}
@@ -124,6 +131,62 @@ export default function Home() {
                 you.
               </Typography>
             </Stack>
+          </RevealList>
+        </Box>
+      </Box>
+      <Box
+        sx={{
+          backgroundColor: "#4682A9",
+          width: "100%",
+          padding: "3rem 0 3rem",
+          color: "#F6F4EB",
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "space-around",
+        }}
+      >
+        <Box sx={{ maxWidth: "200px" }}>
+          <Typography variant="h6" fontWeight={"bold"} marginBottom={"0.5rem"}>
+            Country A
+          </Typography>
+          <Stack gap="0.3rem">
+            <div>Street Address</div>
+            <div>Contact Name</div>
+            <p>+44 800 400 0000</p>
+            <p>blahblahblah@gmail.com</p>
+          </Stack>
+        </Box>
+        <Box sx={{ maxWidth: "200px" }}>
+          <Typography variant="h6" fontWeight={"bold"} marginBottom={"0.5rem"}>
+            Country B
+          </Typography>
+          <Stack gap="0.3rem">
+            <div>Street Address</div>
+            <div>Contact Name</div>
+            <p>+44 800 400 0000</p>
+            <p>blahblahblah@gmail.com</p>
+          </Stack>
+        </Box>
+        <Box sx={{ maxWidth: "200px" }}>
+          <Typography variant="h6" fontWeight={"bold"} marginBottom={"0.5rem"}>
+            About Us
+          </Typography>
+          <Typography variant="body2" sx={{ marginBottom: "0.5rem" }}>
+            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Id officia
+            excepturi dolore minus incidunt pariatur, ab ratione unde architecto
+            dicta.
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-around",
+              cursor: "pointer",
+            }}
+          >
+            <TwitterIcon />
+            <FacebookIcon />
+            <InstagramIcon />
+            <LinkedInIcon />
           </Box>
         </Box>
       </Box>
