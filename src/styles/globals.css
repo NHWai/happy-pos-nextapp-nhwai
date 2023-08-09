@@ -24,7 +24,3 @@ html.sr .load-hidden {
   z-index: -1; /* Place it behind other content */
 }
 
-.top-right{
-top:0;
-right:0;
-}

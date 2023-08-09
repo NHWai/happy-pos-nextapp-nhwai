@@ -2,8 +2,8 @@ import BackOfficeContext from "@/contexts/BackofficeContext";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import React, { useContext } from "react";
 
-import Modal from "@mui/material/Modal";
 import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
+import Modal from "@mui/material/Modal";
 
 interface Props {
   open: boolean;
@@ -20,7 +20,6 @@ const style = {
   maxWidth: "800px",
   display: "flex",
   flexDirection: "column",
-  // alignItems: "space-between",
 };
 
 const ConfirmationBox = ({ open, setOpen, heading, handleDelete }: Props) => {
