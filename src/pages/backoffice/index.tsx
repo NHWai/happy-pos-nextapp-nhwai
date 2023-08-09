@@ -20,6 +20,8 @@ import { BackOfficeOrderlines } from "@/typing/types";
 import { Autocomplete, Button, TextField } from "@mui/material";
 import ModalBox from "@/components/ModalBox";
 import Divider from "@mui/material/Divider";
+import FilterAltIcon from "@mui/icons-material/FilterAlt";
+import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 
 interface Props {
   orders_id: number;
@@ -320,6 +322,9 @@ export default function Home() {
               </TableCell>
               <TableCell>
                 <Button
+                  startIcon={
+                    filter.orders_id ? <FilterAltIcon /> : <FilterAltOffIcon />
+                  }
                   onClick={() => {
                     setOpenOrderId(true);
                   }}
@@ -331,6 +336,9 @@ export default function Home() {
               </TableCell>
               <TableCell>
                 <Button
+                  startIcon={
+                    filter.tables_id ? <FilterAltIcon /> : <FilterAltOffIcon />
+                  }
                   onClick={() => {
                     setOpenTableId(true);
                   }}
@@ -342,6 +350,9 @@ export default function Home() {
               </TableCell>
               <TableCell>
                 <Button
+                  startIcon={
+                    filter.is_paid ? <FilterAltIcon /> : <FilterAltOffIcon />
+                  }
                   onClick={() => {
                     setOpenIsPaid(true);
                     setOrderIdArr([]);
@@ -355,6 +366,13 @@ export default function Home() {
               </TableCell>
               <TableCell>
                 <Button
+                  startIcon={
+                    filter.order_status ? (
+                      <FilterAltIcon />
+                    ) : (
+                      <FilterAltOffIcon />
+                    )
+                  }
                   onClick={() => {
                     setOpenOrderStatus(true);
                     setOrderIdArr([]);
@@ -525,6 +543,7 @@ export default function Home() {
           options={currOrderlines
             .map((item) => item.tables_id)
             .filter((item, idx, arr) => arr.indexOf(item) === idx)}
+          getOptionLabel={(option: number) => String(option)}
           renderInput={(params) => (
             <TextField {...params} label="Filter TableId" />
           )}
@@ -542,6 +561,7 @@ export default function Home() {
             setFilter((pre) => ({ ...pre, orders_id: newValue }));
           }}
           options={currOrderlines.map((item) => item.orders_id)}
+          getOptionLabel={(option: number) => String(option)}
           renderInput={(params) => (
             <TextField {...params} label="Filter OrderId" />
           )}
