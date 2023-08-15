@@ -49,7 +49,7 @@ export interface Location extends BaseType {
 }
 
 export interface Table extends BaseType {
-  assetUrl: string;
+  asset_url: string;
   locations_id: number;
 }
 
@@ -89,6 +89,7 @@ export interface OrderLineType {
   qty: number;
   addons: string[];
   formData: {};
+  isConfirm: boolean;
   orderStatus: OrderStatus;
 }
 

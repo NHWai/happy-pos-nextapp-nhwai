@@ -11,6 +11,7 @@ import { OrderStatus } from "@prisma/client";
 
 // use as a utility to run once for updateStatus function in useEffect hook
 let count = 0;
+let timeoutId: any;
 
 export default function Myorder() {
   const { orderLines, setOrderLines, app, getMenusByLocationId } =
@@ -37,6 +38,7 @@ export default function Myorder() {
             item.orderStatus === "PENDING" || item.orderStatus === "PREPARING"
         )
         .map((item) => item.id);
+      console.log({ notCompleteOrderIdArr });
       if (notCompleteOrderIdArr.length > 0 && count === 0) {
         updateOrderStatus(notCompleteOrderIdArr);
       }
@@ -70,7 +72,9 @@ export default function Myorder() {
     app.addons.find((addon) => addon.name === name)?.id as number;
 
   const confirmOrder = async () => {
-    const orderlinesArr = orderLines.map((item) => ({
+    clearTimeout(timeoutId);
+    const confirmedOrders = orderLines.filter((item) => !item.isConfirm);
+    const orderlinesArr = confirmedOrders.map((item) => ({
       menuId: chgMenuNametoId(item.name),
       price: item.price,
       qty: item.qty,
@@ -86,13 +90,36 @@ export default function Myorder() {
       });
       if (response.status) {
         const data = await response.json();
-
-        const newOrderlines = orderLines.map((item, idx) => ({
+        const notConfirmedOrders = orderLines.filter((item) => !item.isConfirm);
+        const newOrderlines = notConfirmedOrders.map((item, idx) => ({
           ...item,
           id: data[idx].id,
+          isConfirm: true,
         }));
-        localStorage.setItem("orderlists", JSON.stringify(newOrderlines));
-        setOrderLines(newOrderlines);
+        const localStorageOrderlists = localStorage.getItem("orderlists");
+        if (localStorageOrderlists === null) return;
+
+        const oldOrderlists = JSON.parse(
+          localStorageOrderlists
+        ) as OrderLineType[];
+        const orderlists = oldOrderlists.filter((item) => item.isConfirm);
+        if (orderlists.length > 0) {
+          const newOrderlists = [...orderlists, ...newOrderlines];
+          localStorage.setItem("orderlists", JSON.stringify(newOrderlists));
+          setOrderLines(newOrderlists);
+          count = 0;
+          // const notCompleteOrderIdArr = newOrderlists
+          //   .filter(
+          //     (item) =>
+          //       item.orderStatus === "PENDING" ||
+          //       item.orderStatus === "PREPARING"
+          //   )
+          //   .map((item) => item.id);
+          // updateOrderStatus(notCompleteOrderIdArr);
+        } else {
+          localStorage.setItem("orderlists", JSON.stringify(newOrderlines));
+          setOrderLines((pre) => newOrderlines);
+        }
       } else {
         throw new Error("Order can't be confirmed");
       }
@@ -101,9 +128,10 @@ export default function Myorder() {
     }
   };
 
-  const updateOrderStatus = async (orderIdArr: number[]) => {
+  const updateOrderStatus = async (notCompleteOrderIdArr: number[]) => {
     count++;
-    const body = JSON.stringify(orderIdArr);
+
+    const body = JSON.stringify(notCompleteOrderIdArr);
 
     try {
       const response = await fetch(`${config.baseurl}/order`, {
@@ -126,7 +154,7 @@ export default function Myorder() {
               order_status: item.orderStatus,
             }))
         );
-
+        console.log({ oldData });
         //if there is updated orderstatus from backend, update orderstatus in frontend
         if (oldData !== JSON.stringify(data)) {
           const newData = data.map((item) => ({
@@ -135,7 +163,7 @@ export default function Myorder() {
             ) as OrderLineType),
             orderStatus: item.order_status,
           }));
-
+          console.log({ newData });
           localStorage.setItem("orderlists", JSON.stringify(newData));
           setOrderLines(newData);
         }
@@ -148,8 +176,12 @@ export default function Myorder() {
               item.order_status === "PREPARING"
           )
           .map((item) => item.id);
+        console.log({ notCompleteOrderIdArr });
         if (notCompleteOrderIdArr.length > 0) {
-          setTimeout(() => updateOrderStatus(notCompleteOrderIdArr), 1000 * 30);
+          timeoutId = setTimeout(
+            () => updateOrderStatus(notCompleteOrderIdArr),
+            1000 * 30
+          );
         } else {
           localStorage.removeItem("orderlists");
           return;
@@ -171,7 +203,12 @@ export default function Myorder() {
       >
         Go Back
       </Button>
-      <Typography variant="h4" align="center" sx={{ marginBottom: "2rem" }}>
+      <Typography
+        variant="h4"
+        align="center"
+        sx={{ marginBottom: "2rem" }}
+        color="secondary"
+      >
         My Orders
       </Typography>
       <Box
@@ -186,7 +223,7 @@ export default function Myorder() {
               key={idx}
               handleDelete={() => handleDelete(idx)}
               handleEdit={() => handleEdit(idx)}
-              buttonDisabled={!!orderLines[0].id}
+              buttonDisabled={!!orderLines[idx].id}
             >
               <Box sx={{ display: "flex", justifyContent: "space-between" }}>
                 <Typography variant="body1" fontWeight={"1rem"}>
@@ -273,7 +310,10 @@ export default function Myorder() {
           );
         })}
         {orderLines.length > 0 && (
-          <Button disabled={!!orderLines[0].id} onClick={confirmOrder}>
+          <Button
+            disabled={orderLines.every((item) => item.isConfirm)}
+            onClick={confirmOrder}
+          >
             Confirm
           </Button>
         )}
