@@ -121,6 +121,7 @@ export default function Menu() {
         formData,
         id: 0,
         orderStatus: "PENDING",
+        isConfirm: false,
       };
 
       if (hasOrderLineId) {
@@ -207,8 +208,10 @@ export default function Menu() {
                 marginBottom: "1rem",
               }}
             >
-              <Typography variant="h6">{menuItem.name}</Typography>
-              <Box>{menuItem.price} MMK</Box>
+              <Typography variant="h6" color="secondary">
+                {menuItem.name}
+              </Typography>
+              <Typography color="secondary">{menuItem.price} MMK</Typography>
             </Box>
             <form onSubmit={handleSubmit}>
               {filteredAddonCat().requiredCat.map((item) => {

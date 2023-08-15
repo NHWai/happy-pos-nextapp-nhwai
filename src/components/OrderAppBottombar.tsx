@@ -1,9 +1,7 @@
-import React from "react";
-import AppBar from "@mui/material/AppBar";
-import Typography from "@mui/material/Typography";
-import { Toolbar } from "@mui/material";
-import RouterLink from "next/link";
+import { Box } from "@mui/material";
 import { useRouter } from "next/router";
+import RouterLink from "next/link";
+import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 
 export default function OrderAppBottombar() {
   const { pathname } = useRouter();
@@ -13,18 +11,23 @@ export default function OrderAppBottombar() {
   }
 
   return (
-    <AppBar
+    <Box
       component={RouterLink}
       href="/order/myorder"
-      color="default"
-      position="fixed"
-      sx={{ top: "auto", bottom: 0, textDecoration: "none" }}
+      sx={{
+        position: "absolute",
+        right: "10%",
+        bottom: "10%",
+        backgroundColor: "info.main",
+        width: "50px",
+        height: "50px",
+        borderRadius: "50%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
     >
-      <Toolbar sx={{ display: "flex", justifyContent: "center" }}>
-        <Typography variant="h6" color="primary">
-          Check Your Order
-        </Typography>
-      </Toolbar>
-    </AppBar>
+      <AddShoppingCartIcon color="primary" />
+    </Box>
   );
 }

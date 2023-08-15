@@ -1,23 +1,24 @@
-import React, { useEffect, useState } from "react";
+import { config } from "@/config/config";
 import {
   Box,
   Button,
   Chip,
   IconButton,
+  Snackbar,
   Stack,
   TextField,
   Typography,
-  Snackbar,
 } from "@mui/material";
-import { config } from "@/config/config";
+import React, { useState } from "react";
 
 import BackofficeLayout from "@/components/BackofficeLayout";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import BackOfficeContext from "@/contexts/BackofficeContext";
-import ModalBox from "@/components/ModalBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
-import CloseIcon from "@mui/icons-material/Close";
+import LetterBox from "@/components/LetterBox";
+import ModalBox from "@/components/ModalBox";
+import BackOfficeContext from "@/contexts/BackofficeContext";
 import { AddonCategory } from "@/typing/types";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
 
 const initialAddonCategory = {
   id: 0,
@@ -223,7 +224,7 @@ const MenuCategories = () => {
 
   return (
     <BackofficeLayout>
-      <Typography mt={3} mb={2} variant="h4">
+      <Typography mt={3} mb={2} variant="h4" color="secondary">
         Addon Categories
       </Typography>
       {selectedLocation.id ? (
@@ -233,6 +234,7 @@ const MenuCategories = () => {
           fontStyle={"italic"}
           fontWeight={"bold"}
           paddingBottom={"1rem"}
+          color="secondary"
         >
           Location : {selectedLocation.name}
         </Typography>
@@ -257,7 +259,7 @@ const MenuCategories = () => {
               setCurrAddonCategory(initialAddonCategory);
             }}
           >
-            <AddCircleOutlineIcon />
+            <AddCircleOutlineIcon color="primary" />
           </IconButton>
         )}
         {app.addonCategories.length > 0 ? (
@@ -266,6 +268,9 @@ const MenuCategories = () => {
               <Chip
                 key={item?.id}
                 sx={{
+                  cursor: "pointer",
+                  color: "secondary.dark",
+                  backgroundColor: "info.main",
                   height: "auto",
                   "& .MuiChip-label": {
                     display: "block",
@@ -321,6 +326,7 @@ const MenuCategories = () => {
                 name: e.target.value,
               }))
             }
+            sx={{ input: { color: "secondary.main" } }}
             autoComplete="off"
             required
           />
@@ -338,10 +344,18 @@ const MenuCategories = () => {
                   }))
                 }
               />{" "}
-              is_required
+              <Typography variant="button" color="secondary">
+                is_required
+              </Typography>
             </label>
           )}
-          <Stack
+          <Box sx={{ marginLeft: "-5rem" }}>
+            <LetterBox
+              label="Addons"
+              value={showAddons(currAddonCategory.id).join(", ")}
+            />
+          </Box>
+          {/* <Stack
             sx={{ width: "75%" }}
             direction={"row"}
             justifyContent={"space-around"}
@@ -354,7 +368,7 @@ const MenuCategories = () => {
             <Typography width={"50%"} variant="caption">
               {showAddons(currAddonCategory.id).join(", ")}
             </Typography>
-          </Stack>
+          </Stack> */}
           {!currAddonCategory.id ? (
             <Button
               disabled={app.status === "loading"}

@@ -1,24 +1,24 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
 
+import ModalBox from "@/components/ModalBox";
+import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
+import { AddonCategory, Location, MenuCategory } from "@/typing/types";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Autocomplete,
   Box,
   Button,
   Chip,
   IconButton,
+  Snackbar,
   Stack,
   TextField,
   Typography,
-  Snackbar,
 } from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import React, { useEffect } from "react";
-import { config } from "@/config/config";
-import ModalBox from "@/components/ModalBox";
 import Link from "next/link";
-import { Location, MenuCategory, AddonCategory, Menu } from "@/typing/types";
-import CloseIcon from "@mui/icons-material/Close";
+import React from "react";
 
 const Menus = () => {
   const { company, app, setApp, selectedLocation } =
@@ -153,7 +153,7 @@ const Menus = () => {
 
   return (
     <BackofficeLayout>
-      <Typography mt={3} mb={2} variant="h4">
+      <Typography mt={3} mb={2} variant="h4" color="secondary">
         Menus
       </Typography>
       {selectedLocation.id ? (
@@ -163,6 +163,7 @@ const Menus = () => {
           fontStyle={"italic"}
           fontWeight={"bold"}
           paddingBottom={"1rem"}
+          color="secondary"
         >
           Location : {selectedLocation.name}
         </Typography>
@@ -177,7 +178,7 @@ const Menus = () => {
       >
         {!selectedLocation.id && (
           <IconButton onClick={() => setOpen(true)}>
-            <AddCircleOutlineIcon />
+            <AddCircleOutlineIcon color="primary" />
           </IconButton>
         )}
         {app.status === "loading" ? (
@@ -189,11 +190,17 @@ const Menus = () => {
               component={Link}
               key={item.name}
               label={item.name}
-              style={{ cursor: "pointer" }}
+              sx={{
+                cursor: "pointer",
+                color: "secondary.dark",
+                backgroundColor: "info.main",
+              }}
             />
           ))
         ) : app.status === "idle" && app.menus.length === 0 ? (
-          <div>No Menus</div>
+          <Typography color="secondary" variant="body1">
+            No Menus
+          </Typography>
         ) : null}
       </Stack>
       <ModalBox setOpen={setOpen} open={open} heading="Create Menu">

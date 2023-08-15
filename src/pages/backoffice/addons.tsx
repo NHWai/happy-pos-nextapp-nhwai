@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from "react";
+import BackofficeLayout from "@/components/BackofficeLayout";
+import ConfirmationBox from "@/components/ConfirmationBox";
+import ModalBox from "@/components/ModalBox";
+import { config } from "@/config/config";
+import BackOfficeContext from "@/contexts/BackofficeContext";
+import { Addon } from "@/typing/types";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
 import {
+  Autocomplete,
   Box,
   Button,
   Chip,
   IconButton,
+  InputAdornment,
+  Snackbar,
   Stack,
   TextField,
   Typography,
-  Autocomplete,
-  InputAdornment,
-  Snackbar,
 } from "@mui/material";
-import { config } from "@/config/config";
-import BackofficeLayout from "@/components/BackofficeLayout";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import BackOfficeContext from "@/contexts/BackofficeContext";
-import ModalBox from "@/components/ModalBox";
-import ConfirmationBox from "@/components/ConfirmationBox";
-import CloseIcon from "@mui/icons-material/Close";
-import { Addon } from "@/typing/types";
+import React, { useState } from "react";
 
 const initialAddon = {
   id: 0,
@@ -226,7 +226,7 @@ const Addons = () => {
 
   return (
     <BackofficeLayout>
-      <Typography mt={3} mb={2} variant="h4">
+      <Typography mt={3} mb={2} variant="h4" color="secondary">
         Addons
       </Typography>
 
@@ -237,6 +237,7 @@ const Addons = () => {
           fontStyle={"italic"}
           fontWeight={"bold"}
           paddingBottom={"1rem"}
+          color="secondary"
         >
           Location : {selectedLocation.name}
         </Typography>
@@ -262,7 +263,7 @@ const Addons = () => {
               setCurrAddon(initialAddon);
             }}
           >
-            <AddCircleOutlineIcon />
+            <AddCircleOutlineIcon color="primary" />
           </IconButton>
         )}
         {app.addons.length > 0 ? (
@@ -271,6 +272,9 @@ const Addons = () => {
               <Chip
                 key={item?.id}
                 sx={{
+                  cursor: "pointer",
+                  color: "secondary.dark",
+                  backgroundColor: "info.main",
                   height: "auto",
                   "& .MuiChip-label": {
                     display: "block",
@@ -324,8 +328,10 @@ const Addons = () => {
             value={currAddon.name}
             name="name"
             onChange={handleChange}
+            color="secondary"
             autoComplete="off"
             required
+            sx={{ input: { color: "secondary.main" } }}
           />
           <TextField
             variant="standard"
@@ -337,6 +343,7 @@ const Addons = () => {
             InputProps={{
               endAdornment: <InputAdornment position="end">MMK</InputAdornment>,
             }}
+            sx={{ input: { color: "secondary.main" } }}
             autoComplete="off"
             required
           />
@@ -358,7 +365,12 @@ const Addons = () => {
             }
             sx={{ width: "100%" }}
             renderInput={(params) => (
-              <TextField {...params} label="Choose Addon Categories" required />
+              <TextField
+                {...params}
+                label="Choose Addon Categories"
+                required
+                sx={{ input: { color: "secondary.main" } }}
+              />
             )}
           />
 
@@ -370,7 +382,10 @@ const Addons = () => {
                 type="checkbox"
                 onChange={handleChange}
               />
-              <Typography variant="button"> is_available</Typography>
+              <Typography variant="button" color="secondary">
+                {" "}
+                is_available
+              </Typography>
             </label>
           )}
           {!currAddon.id ? (

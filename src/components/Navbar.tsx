@@ -1,32 +1,31 @@
-import React, { useState } from "react";
+import { AccountCircle } from "@mui/icons-material";
+import CategoryIcon from "@mui/icons-material/Category";
+import ClassIcon from "@mui/icons-material/Class";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import LocalDiningIcon from "@mui/icons-material/LocalDining";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import LunchDiningIcon from "@mui/icons-material/LunchDining";
+import MenuIcon from "@mui/icons-material/Menu";
+import SettingsIcon from "@mui/icons-material/Settings";
+import TableBarIcon from "@mui/icons-material/TableBar";
+import { Menu, MenuItem } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import { useRouter } from "next/router";
-import RouterLink from "next/link";
+import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import CategoryIcon from "@mui/icons-material/Category";
-import ClassIcon from "@mui/icons-material/Class";
-import LocalDiningIcon from "@mui/icons-material/LocalDining";
-import LunchDiningIcon from "@mui/icons-material/LunchDining";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LocationOnIcon from "@mui/icons-material/LocationOn";
-import ListAltIcon from "@mui/icons-material/ListAlt";
-import Divider from "@mui/material/Divider";
-import { AccountCircle } from "@mui/icons-material";
-import { Menu, MenuItem } from "@mui/material";
-import { getLocationId } from "@/config";
-import { useSession, signIn, signOut } from "next-auth/react";
-import TableBarIcon from "@mui/icons-material/TableBar";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { signIn, signOut, useSession } from "next-auth/react";
+import RouterLink from "next/link";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -44,34 +43,50 @@ export default function Navbar() {
   };
 
   const drawerItems = [
-    { label: "Orders", icon: <ListAltIcon />, link: "" },
-    { label: "Menus", icon: <LocalDiningIcon />, link: "menus" },
+    {
+      label: "Orders",
+      icon: <ListAltIcon color="primary" />,
+      link: "",
+    },
+    {
+      label: "Menus",
+      icon: <LocalDiningIcon color="primary" />,
+      link: "menus",
+    },
     {
       label: "Menu Categories",
-      icon: <CategoryIcon />,
+      icon: <CategoryIcon color="primary" />,
       link: "menu-categories",
     },
-    { label: "Addons", icon: <LunchDiningIcon />, link: "addons" },
+    {
+      label: "Addons",
+      icon: <LunchDiningIcon color="primary" />,
+      link: "addons",
+    },
     {
       label: "Addon Categories",
-      icon: <ClassIcon />,
+      icon: <ClassIcon color="primary" />,
       link: "addon-categories",
     },
     {
       label: "Locations",
-      icon: <LocationOnIcon />,
+      icon: <LocationOnIcon color="primary" />,
       link: "locations",
     },
     {
       label: "Tables",
-      icon: <TableBarIcon />,
+      icon: <TableBarIcon color="primary" />,
       link: "tables",
     },
-    { label: "Setting", icon: <SettingsIcon />, link: "setting" },
+    {
+      label: "Setting",
+      icon: <SettingsIcon color="primary" />,
+      link: "setting",
+    },
   ];
   const pageLabel =
     drawerItems[drawerItems.findIndex((el) => el.link === pathname.slice(1))]
-      ?.label || "HappyPos";
+      ?.label || "Food4Life";
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -101,7 +116,10 @@ export default function Navbar() {
                 href={`/backoffice/${item.link}`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemText
+                  sx={{ color: "secondary.main" }}
+                  primary={item.label}
+                />
               </ListItemButton>
             </ListItem>
           ))}
@@ -113,7 +131,10 @@ export default function Navbar() {
                 href={`/backoffice/${item.link}`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemText
+                  sx={{ color: "secondary.main" }}
+                  primary={item.label}
+                />
               </ListItemButton>
             </ListItem>
           ))}

@@ -54,8 +54,15 @@ export function OrderContextProvider({ children }: Props) {
   const [app, setApp] = useState<AppContextType>(initialApp);
   const [orderLines, setOrderLines] = useState<OrderLineType[]>([]);
 
+  useEffect(() => {
+    const orderlists = localStorage.getItem("orderlists");
+    if (orderlists) {
+      const orderlistsArr = JSON.parse(orderlists);
+      setOrderLines(orderlistsArr);
+    }
+  }, []);
+
   async function getMenusByLocationId(locationId: number) {
-    console.log("fetch order app with location ", locationId);
     setApp((pre) => ({
       ...pre,
       status: "loading",

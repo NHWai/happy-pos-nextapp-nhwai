@@ -1,28 +1,26 @@
-import React, { useContext, useEffect } from "react";
 import OrderLayout from "@/components/OrderLayout";
+import OrderContext from "@/contexts/OrderContext";
 import {
   Box,
   Divider,
-  IconButton,
   List,
   ListItem,
   ListItemText,
   Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
-import { useRouter } from "next/router";
+import Image from "next/image";
 import RouterLink from "next/link";
-import OrderContext from "@/contexts/OrderContext";
+import { useRouter } from "next/router";
+import { useContext, useEffect } from "react";
+import mypic from "../../assets/logo-no-background.png";
 
 const style = {
   width: "100%",
   maxWidth: 360,
-  bgcolor: "background.paper",
   textAlign: "center",
   marginTop: "2rem",
 };
-
-const categoryList = ["main course", "popular", "dessert", "soup", "appetizer"];
 
 function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
@@ -57,9 +55,16 @@ const OrderApp = () => {
           display: "flex",
           flexDirection: "column",
           marginTop: "1rem",
+          alignItems: "center",
         }}
       >
-        <Typography variant="h5" align="center">
+        <Image src={mypic} alt="Picture of the author" width={80} height={80} />
+        <Typography
+          variant="h4"
+          align="center"
+          color="secondary"
+          marginTop={"1rem"}
+        >
           Make Your Orders Here!!
         </Typography>
 
@@ -77,10 +82,10 @@ const OrderApp = () => {
                   >
                     <ListItemText
                       primary={capitalize(el.name)}
-                      sx={{ textAlign: "center" }}
+                      sx={{ textAlign: "center", color: "secondary.main" }}
                     />
                   </ListItem>
-                  {categoryList.length - 1 !== idx && <Divider />}
+                  {app.menuCategories.length - 1 !== idx && <Divider />}
                 </div>
               ))}
             </>

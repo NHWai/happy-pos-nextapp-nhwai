@@ -1,9 +1,9 @@
 import { MainLayout } from "@/components/MainLayout";
 import OrderAppNavbar from "@/components/OrderAppNavbar";
 import { Box } from "@mui/material";
-
 import React from "react";
 import OrderAppBottombar from "./OrderAppBottombar";
+import OrderContext from "@/contexts/OrderContext";
 
 interface Props {
   children: React.ReactNode;
@@ -11,6 +11,8 @@ interface Props {
 }
 
 const OrderApp = ({ children, height }: Props) => {
+  const { orderLines } = React.useContext(OrderContext);
+
   return (
     <MainLayout>
       <OrderAppNavbar />
@@ -30,7 +32,7 @@ const OrderApp = ({ children, height }: Props) => {
       >
         {children}
       </Box>
-      <OrderAppBottombar />
+      {orderLines.length > 0 && <OrderAppBottombar />}
     </MainLayout>
   );
 };

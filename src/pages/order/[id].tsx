@@ -37,8 +37,8 @@ export default function MenuItem() {
       >
         Go Back
       </Button>
-      <Typography sx={{ margin: "1rem 0 2rem" }} variant="h4">
-        {router.query.id}
+      <Typography sx={{ margin: "1rem 0 2rem" }} variant="h4" color="secondary">
+        {(router.query.id as String).toUpperCase()}
       </Typography>
       <Box
         sx={{

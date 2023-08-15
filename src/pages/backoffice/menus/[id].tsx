@@ -1,28 +1,28 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
+import ConfirmationBox from "@/components/ConfirmationBox";
+import LetterBox from "@/components/LetterBox";
+import ModalBox from "@/components/ModalBox";
+import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
-import {
-  Typography,
-  Box,
-  Stack,
-  IconButton,
-  Autocomplete,
-  Button,
-  Chip,
-  Snackbar,
-  TextField,
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
+import { Location, Menu, MenuCategory } from "@/typing/types";
+import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
+import {
+  Autocomplete,
+  Box,
+  Button,
+  IconButton,
+  Snackbar,
+  Stack,
+  TextField,
+  Typography,
+} from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
-import Link from "next/link";
-import ModalBox from "@/components/ModalBox";
-import { Location, MenuCategory, Menu } from "@/typing/types";
-import { config } from "@/config/config";
-import CircularProgress from "@mui/material/CircularProgress";
-import ConfirmationBox from "@/components/ConfirmationBox";
-import CloseIcon from "@mui/icons-material/Close";
-import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 
 const MenuItem = () => {
   const { company, app, setApp, selectedLocation } =
@@ -292,106 +292,94 @@ const MenuItem = () => {
         </Box>
       ) : app.status === "idle" && app.menus.length > 0 && menuItem.id ? (
         <>
-          {" "}
           <Box
             sx={{
-              mt: 3,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              width: "70%",
+              mt: 2,
+              width: "100%",
+              minWidth: "270px",
+              maxWidth: "350px",
+              paddingBottom: "2rem",
             }}
           >
             <Box
-              sx={{ textDecoration: "none" }}
-              component={Link}
-              href="/backoffice/menus"
+              sx={{
+                display: "flex",
+                mb: 2,
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
             >
-              <KeyboardBackspaceIcon />
-            </Box>
-            <Stack direction={"row"}>
-              <IconButton
-                onClick={() => {
-                  setOpen(true);
-                  setSelectedMenuCategories(
-                    filteredNames(menuItem.menuCategoryArr, app.menuCategories)
-                  );
-                  setSelectedLocations(
-                    filteredNames(menuItem.locationArr, app.locations)
-                  );
-                  setSelectedAddonCategories(
-                    filteredNames(
-                      menuItem.addonCategoryArr,
-                      app.addonCategories
-                    )
-                  );
-                }}
+              <Box
+                sx={{ textDecoration: "none" }}
+                component={Link}
+                href="/backoffice/menus"
               >
-                <EditIcon />
-              </IconButton>
-              {!selectedLocation.id && (
-                <IconButton onClick={() => setOpenConfirmation(true)}>
-                  <DeleteIcon />
+                <KeyboardBackspaceIcon color="secondary" />
+              </Box>
+              <Stack direction={"row"}>
+                <IconButton
+                  onClick={() => {
+                    setOpen(true);
+                    setSelectedMenuCategories(
+                      filteredNames(
+                        menuItem.menuCategoryArr,
+                        app.menuCategories
+                      )
+                    );
+                    setSelectedLocations(
+                      filteredNames(menuItem.locationArr, app.locations)
+                    );
+                    setSelectedAddonCategories(
+                      filteredNames(
+                        menuItem.addonCategoryArr,
+                        app.addonCategories
+                      )
+                    );
+                  }}
+                >
+                  <EditIcon color="secondary" />
                 </IconButton>
-              )}
-            </Stack>
-          </Box>
-          <Box sx={{ mt: 2, maxWidth: 350, paddingBottom: "2rem" }}>
-            <Typography align="center" variant="h3">
+                {!selectedLocation.id && (
+                  <IconButton onClick={() => setOpenConfirmation(true)}>
+                    <DeleteIcon color="error" />
+                  </IconButton>
+                )}
+              </Stack>
+            </Box>
+            <Typography align="center" variant="h3" color="secondary">
               {menuItem.name}
             </Typography>
             <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
               <img width={200} height={150} src={menuItem.asset_url} />
             </Box>
-            <Stack flexDirection={"row"} alignItems="baseline">
-              <Typography textAlign={"end"} width={140} variant="body1">
-                Price:
-              </Typography>
-              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
-                {menuItem.price}MMK
-              </Typography>
-            </Stack>
-            <Stack flexDirection={"row"} alignItems="baseline">
-              <Typography textAlign={"end"} width={140} variant="body1">
-                Menu Categories:
-              </Typography>
-              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
-                {filteredNames(
-                  menuItem.menuCategoryArr,
-                  app.menuCategories
-                ).join(", ")}
-              </Typography>
-            </Stack>
-            <Stack flexDirection={"row"} alignItems="baseline">
-              <Typography textAlign={"end"} width={140} variant="body1">
-                Addon Categories:
-              </Typography>
-              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
-                {filteredNames(
-                  menuItem.addonCategoryArr,
-                  app.addonCategories
-                ).join(", ")}
-              </Typography>
-            </Stack>
-            <Stack flexDirection={"row"} alignItems="baseline">
-              <Typography textAlign={"end"} width={140} variant="body1">
-                All Locations :
-              </Typography>
-              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
-                {filteredNames(menuItem.locationArr, app.locations).join(", ")}
-              </Typography>
-            </Stack>
-            <Stack flexDirection={"row"} alignItems="baseline">
-              <Typography textAlign={"end"} width={140} variant="body1">
-                Ava Locations :
-              </Typography>
-              <Typography width={200} fontStyle={"italic"} fontWeight={"bold"}>
-                {filteredAvailableLocations(
-                  menuItem.locationArr,
-                  app.locations
-                ).join(", ")}
-              </Typography>
-            </Stack>
+            <LetterBox label="Price" value={`${menuItem.price}MMK`} />
+            <LetterBox
+              label="Menu Categories"
+              value={filteredNames(
+                menuItem.menuCategoryArr,
+                app.menuCategories
+              ).join(", ")}
+            />
+            <LetterBox
+              label="Addon Categories"
+              value={filteredNames(
+                menuItem.addonCategoryArr,
+                app.addonCategories
+              ).join(", ")}
+            />
+            <LetterBox
+              label=" All Locations"
+              value={filteredNames(menuItem.locationArr, app.locations).join(
+                ", "
+              )}
+            />
+            <LetterBox
+              label=" Ava Locations"
+              value={filteredAvailableLocations(
+                menuItem.locationArr,
+                app.locations
+              ).join(", ")}
+            />
           </Box>
           <ModalBox setOpen={setOpen} open={open} heading="Edit Menu">
             <Box

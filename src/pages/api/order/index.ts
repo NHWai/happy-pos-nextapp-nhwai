@@ -73,11 +73,13 @@ export default async function handler(
     try {
       //getOrders
       const orders = await prisma.orders.findMany({
-        where: { id: { in: reqBody } },
+        where: {
+          id: { in: reqBody },
+        },
         select: { id: true, order_status: true },
         orderBy: { id: "asc" },
       });
-
+      console.log({ orders });
       res.status(200).json(orders);
     } catch (error) {
       res.status(500).end();

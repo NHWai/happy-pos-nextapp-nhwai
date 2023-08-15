@@ -7,7 +7,12 @@ import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import FilterAltOffIcon from "@mui/icons-material/FilterAltOff";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { Autocomplete, Button, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  Button,
+  CircularProgress,
+  TextField,
+} from "@mui/material";
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
 import Divider from "@mui/material/Divider";
@@ -272,7 +277,7 @@ export default function Home() {
     .reduce((preVal: number, currVal: number) => preVal + currVal, 0);
   return (
     <BackofficeLayout>
-      <Typography variant="h4" marginTop={"1rem"}>
+      <Typography variant="h4" marginTop={"1rem"} color="secondary">
         Orders
       </Typography>
       {selectedLocation.id ? (
@@ -297,8 +302,10 @@ export default function Home() {
           marginTop: "1rem",
         }}
       >
-        <Typography sx={{ paddingRight: "0.5rem" }}>Total :</Typography>
-        <Typography fontStyle={"italic"} fontWeight={"bold"}>
+        <Typography color="secondary" sx={{ paddingRight: "0.5rem" }}>
+          Total :
+        </Typography>
+        <Typography color="secondary" fontStyle={"italic"} fontWeight={"bold"}>
           {totalAmount} MMK
         </Typography>
       </Box>
@@ -386,28 +393,42 @@ export default function Home() {
               </TableCell>
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {currOrderlines.map((orderline) => (
-              <Row
-                key={orderline.orders_id}
-                orders_id={orderline.orders_id}
-                is_paid={orderline.is_paid}
-                order_status={orderline.order_status}
-                tables_id={orderline.tables_id}
-                price={orderline.price}
-                menu={chgMenuIdToName(orderline.menus_id)}
-                addons={chgAddonsIdToName(orderline.addons_id)}
-                quantity={orderline.quantity}
-              />
-            ))}
+            {backofficeOrderlines.status === "idle" &&
+              currOrderlines.length > 0 &&
+              currOrderlines.map((orderline) => (
+                <Row
+                  key={orderline.orders_id}
+                  orders_id={orderline.orders_id}
+                  is_paid={orderline.is_paid}
+                  order_status={orderline.order_status}
+                  tables_id={orderline.tables_id}
+                  price={orderline.price}
+                  menu={chgMenuIdToName(orderline.menus_id)}
+                  addons={chgAddonsIdToName(orderline.addons_id)}
+                  quantity={orderline.quantity}
+                />
+              ))}
           </TableBody>
         </Table>
       </TableContainer>
-      {!currOrderlines.length && (
+      {backofficeOrderlines.status === "loading" && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
+      {backofficeOrderlines.status === "idle" && !currOrderlines.length && (
         <Typography
           sx={{ fontStyle: "italic" }}
           textAlign={"center"}
           variant="body1"
+          color="secondary"
         >
           No orders
         </Typography>

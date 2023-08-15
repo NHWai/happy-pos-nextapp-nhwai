@@ -1,21 +1,22 @@
-import React, { useState } from "react";
+import BackofficeLayout from "@/components/BackofficeLayout";
+import ConfirmationBox from "@/components/ConfirmationBox";
+import LetterBox from "@/components/LetterBox";
+import ModalBox from "@/components/ModalBox";
+import { config } from "@/config/config";
+import BackOfficeContext from "@/contexts/BackofficeContext";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
   Chip,
   IconButton,
+  Snackbar,
   Stack,
   TextField,
   Typography,
-  Snackbar,
 } from "@mui/material";
-import { config } from "@/config/config";
-import BackofficeLayout from "@/components/BackofficeLayout";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import BackOfficeContext from "@/contexts/BackofficeContext";
-import ModalBox from "@/components/ModalBox";
-import ConfirmationBox from "@/components/ConfirmationBox";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState } from "react";
 
 const initialMenuCategory = { id: 0, name: "" };
 
@@ -198,7 +199,7 @@ const MenuCategories = () => {
 
   return (
     <BackofficeLayout>
-      <Typography mt={3} mb={2} variant="h4">
+      <Typography mt={3} mb={2} variant="h4" color="secondary">
         MenuCategories
       </Typography>
       {selectedLocation.id ? (
@@ -208,6 +209,7 @@ const MenuCategories = () => {
           fontStyle={"italic"}
           fontWeight={"bold"}
           paddingBottom={"1rem"}
+          color="secondary"
         >
           Location : {selectedLocation.name}
         </Typography>
@@ -232,7 +234,7 @@ const MenuCategories = () => {
               setCurrMenuCategory(initialMenuCategory);
             }}
           >
-            <AddCircleOutlineIcon />
+            <AddCircleOutlineIcon color="primary" />
           </IconButton>
         )}
         {app.status === "loading" ? (
@@ -243,6 +245,9 @@ const MenuCategories = () => {
               <Chip
                 key={item?.id}
                 sx={{
+                  cursor: "pointer",
+                  color: "secondary.dark",
+                  backgroundColor: "info.main",
                   height: "auto",
                   "& .MuiChip-label": {
                     display: "block",
@@ -294,22 +299,15 @@ const MenuCategories = () => {
               setCurrMenuCategory((pre) => ({ ...pre, name: e.target.value }))
             }
             autoComplete="off"
+            sx={{ input: { color: "secondary.main" } }}
             required
           />
-          <Stack
-            sx={{ width: "75%" }}
-            direction={"row"}
-            justifyContent={"space-around"}
-            flexWrap={"wrap"}
-          >
-            <Typography variant="body2" align="left">
-              {" "}
-              Menus :
-            </Typography>
-            <Typography width={"50%"} variant="caption">
-              {showMenus(currMenuCategory.id).join(", ")}
-            </Typography>
-          </Stack>
+          <Box sx={{ marginLeft: "-5rem" }}>
+            <LetterBox
+              label="Menus"
+              value={showMenus(currMenuCategory.id).join(", ")}
+            />
+          </Box>
 
           {!currMenuCategory.id ? (
             <Button

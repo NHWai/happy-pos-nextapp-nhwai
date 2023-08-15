@@ -1,21 +1,21 @@
-import React, { useState } from "react";
+import BackofficeLayout from "@/components/BackofficeLayout";
+import ConfirmationBox from "@/components/ConfirmationBox";
+import Modal from "@/components/ModalBox";
+import { config } from "@/config/config";
+import BackOfficeContext from "@/contexts/BackofficeContext";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
   Chip,
   IconButton,
+  Snackbar,
   Stack,
   TextField,
   Typography,
-  Snackbar,
 } from "@mui/material";
-import BackOfficeContext from "@/contexts/BackofficeContext";
-import { config } from "@/config/config";
-import BackofficeLayout from "@/components/BackofficeLayout";
-import Modal from "@/components/ModalBox";
-import ConfirmationBox from "@/components/ConfirmationBox";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState } from "react";
 
 const initialLocation = {
   id: 0,
@@ -194,7 +194,7 @@ const Location = () => {
 
   return (
     <BackofficeLayout>
-      <Typography my={2} variant="h4">
+      <Typography my={2} variant="h4" color="secondary">
         Locations
       </Typography>
       <Stack
@@ -210,7 +210,7 @@ const Location = () => {
               setCurrLocation(initialLocation);
             }}
           >
-            <AddCircleOutlineIcon />
+            <AddCircleOutlineIcon color="primary" />
           </IconButton>
         )}
         {app.status === "loading" ? (
@@ -221,7 +221,11 @@ const Location = () => {
               <Chip
                 key={item.id}
                 label={item.name}
-                style={{ cursor: "pointer" }}
+                sx={{
+                  cursor: "pointer",
+                  color: "secondary.dark",
+                  backgroundColor: "info.main",
+                }}
                 onClick={() => {
                   setOpen(true);
                   setCurrLocation({

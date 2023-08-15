@@ -22,13 +22,14 @@ export default function MenuCard({ name, url, href, price }: Props) {
     >
       <CardActionArea>
         <CardMedia component="img" height="140" image={url} />
-        <CardContent>
+        <CardContent sx={{ backgroundColor: "info.main" }}>
           <Typography
             gutterBottom
             variant="caption"
             align="center"
             component="div"
             fontWeight={"bold"}
+            color="secondary"
           >
             {name}
           </Typography>
@@ -38,6 +39,7 @@ export default function MenuCard({ name, url, href, price }: Props) {
             align="center"
             component="div"
             fontWeight={"bold"}
+            color="secondary"
           >
             {price + " MMK"}
           </Typography>

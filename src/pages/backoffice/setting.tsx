@@ -1,8 +1,9 @@
-import React from "react";
-import { Autocomplete, Chip, TextField, Typography } from "@mui/material";
-import BackOfficeContext from "@/contexts/BackofficeContext";
 import PageLayout from "@/components/BackofficeLayout";
-import { initialLocation } from "@/contexts/BackofficeContext";
+import BackOfficeContext, {
+  initialLocation,
+} from "@/contexts/BackofficeContext";
+import { Autocomplete, TextField, Typography } from "@mui/material";
+import React from "react";
 
 const Setting = () => {
   const { app, selectedLocation, setSelectedLocation, getOrders } =
@@ -10,7 +11,7 @@ const Setting = () => {
 
   return (
     <PageLayout>
-      <Typography my={2} variant="h4">
+      <Typography my={2} variant="h4" color="secondary">
         Choose Locations
       </Typography>
       <Autocomplete

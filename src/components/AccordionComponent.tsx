@@ -24,10 +24,15 @@ export default function AccordionComponent({
         expandIcon={<ExpandMoreIcon />}
         aria-controls="panel1a-content"
         id="panel1a-header"
+        sx={{ backgroundColor: "info.main", color: "secondary.main" }}
       >
         <Typography>{name}</Typography>
       </AccordionSummary>
-      <AccordionDetails>{children}</AccordionDetails>
+      <AccordionDetails
+        sx={{ backgroundColor: "info.main", color: "secondary.main" }}
+      >
+        {children}
+      </AccordionDetails>
     </Accordion>
   );
 }

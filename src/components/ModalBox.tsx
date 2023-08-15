@@ -1,8 +1,6 @@
-// import { ModalClose, ModalDialog, ModalOverflow } from "@mui/joy";
-// import Modal from "@mui/joy/Modal";
+import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 import { Box, Modal, Typography } from "@mui/material";
 import React from "react";
-import CancelPresentationIcon from "@mui/icons-material/CancelPresentation";
 
 interface Props {
   children: React.ReactNode;
@@ -44,8 +42,9 @@ const ModalBox = ({ children, open, setOpen, heading }: Props) => {
           onClick={() => setOpen(false)}
           color="error"
           sx={{
+            width: "fit-content",
             padding: "0px !important",
-            margin: "0px !important",
+            marginLeft: "auto",
             display: "inline-flex",
             justifyContent: "right",
             cursor: "pointer",
@@ -53,7 +52,7 @@ const ModalBox = ({ children, open, setOpen, heading }: Props) => {
         >
           <CancelPresentationIcon />
         </Typography>
-        <Typography my={2} align="center" variant="h5">
+        <Typography my={2} align="center" color="secondary" variant="h5">
           {heading}
         </Typography>
         {children}

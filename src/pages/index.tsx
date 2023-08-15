@@ -1,19 +1,18 @@
 import { MainLayout } from "@/components/MainLayout";
-import { Box, Button, Paper, Stack, Typography } from "@mui/material";
-import RouterLink from "next/link";
-import MenuBookIcon from "@mui/icons-material/MenuBook";
-import QrCode2Icon from "@mui/icons-material/QrCode2";
 import AddLocationAltIcon from "@mui/icons-material/AddLocationAlt";
 import CardMembershipIcon from "@mui/icons-material/CardMembership";
-import SupportAgentIcon from "@mui/icons-material/SupportAgent";
-import { RevealList } from "next-reveal";
-import TwitterIcon from "@mui/icons-material/Twitter";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import mypic from "../assets/logo.png";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import QrCode2Icon from "@mui/icons-material/QrCode2";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import TwitterIcon from "@mui/icons-material/Twitter";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import { RevealList } from "next-reveal";
 import Image from "next/image";
-import { Translate } from "@mui/icons-material";
+import RouterLink from "next/link";
+import mypic from "../assets/logo-no-background.png";
 
 export default function Home() {
   return (
@@ -29,16 +28,8 @@ export default function Home() {
         <Image
           src={mypic}
           alt="Picture of the author"
-          width={120}
-          height={120}
-          style={{
-            // border: "1px solid red",
-            borderRadius: "50%",
-            transform: "translate(-20%, -20%)",
-            position: "absolute",
-            top: 0,
-            left: 0,
-          }}
+          width={100}
+          height={100}
         />
         <Typography
           fontSize={{ xs: "2.125rem", sm: "3rem" }}
