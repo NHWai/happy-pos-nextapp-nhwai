@@ -1,28 +1,29 @@
-import React, { useState } from "react";
+import BackofficeLayout from "@/components/BackofficeLayout";
+import ConfirmationBox from "@/components/ConfirmationBox";
+import Modal from "@/components/ModalBox";
+import { config } from "@/config/config";
+import BackOfficeContext from "@/contexts/BackofficeContext";
+import { Location, Table } from "@/typing/types";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Button,
   Chip,
   IconButton,
+  Snackbar,
   Stack,
   TextField,
   Typography,
-  Snackbar,
 } from "@mui/material";
-import BackOfficeContext from "@/contexts/BackofficeContext";
-import { config } from "@/config/config";
-import BackofficeLayout from "@/components/BackofficeLayout";
-import Modal from "@/components/ModalBox";
-import ConfirmationBox from "@/components/ConfirmationBox";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import Autocomplete from "@mui/material/Autocomplete";
-import { Location, Table } from "@/typing/types";
-import CloseIcon from "@mui/icons-material/Close";
+import React, { useState } from "react";
 
 const initalTable = {
   id: 0,
   name: "",
   location: "",
+  asset_url: "",
 };
 
 const Table = () => {
@@ -71,7 +72,6 @@ const Table = () => {
 
       if (response.ok) {
         const data = await response.json();
-
         setApp((pre) => ({
           ...pre,
           tables: [...pre.tables, data],
@@ -206,7 +206,7 @@ const Table = () => {
 
   return (
     <BackofficeLayout>
-      <Typography my={2} variant="h4">
+      <Typography my={2} variant="h4" color="secondary">
         Tables
       </Typography>
       {selectedLocation.id ? (
@@ -216,6 +216,7 @@ const Table = () => {
           fontStyle={"italic"}
           fontWeight={"bold"}
           paddingBottom={"1rem"}
+          color="secondary"
         >
           Location : {selectedLocation.name}
         </Typography>
@@ -231,10 +232,10 @@ const Table = () => {
         <IconButton
           onClick={() => {
             setOpen(true);
-            setCurrTable({ id: 0, name: "", location: "" });
+            setCurrTable({ id: 0, name: "", location: "", asset_url: "" });
           }}
         >
-          <AddCircleOutlineIcon />
+          <AddCircleOutlineIcon color="primary" />
         </IconButton>
         {app.status === "loading" ? (
           <div>Loading...</div>
@@ -244,7 +245,11 @@ const Table = () => {
               <Chip
                 key={item.name}
                 label={item.name}
-                style={{ cursor: "pointer" }}
+                sx={{
+                  cursor: "pointer",
+                  color: "secondary.dark",
+                  backgroundColor: "info.main",
+                }}
                 onClick={() => {
                   setOpen(true);
                   setCurrTable({
@@ -254,6 +259,7 @@ const Table = () => {
                       item.locations_id,
                       app.locations
                     ),
+                    asset_url: item.asset_url,
                   });
                 }}
               />
@@ -323,28 +329,39 @@ const Table = () => {
               Submit
             </Button>
           ) : (
-            <Stack
-              direction="row"
-              justifyContent={"space-between"}
-              width="100%"
-            >
-              <Button
-                color="error"
-                variant="outlined"
-                onClick={() => {
-                  setOpenConfirmation(true);
-                }}
+            <>
+              <Box>
+                <img
+                  src={currTable.asset_url}
+                  alt="QR code picture"
+                  width={100}
+                  height={100}
+                />
+              </Box>
+
+              <Stack
+                direction="row"
+                justifyContent={"space-between"}
+                width="100%"
               >
-                Delete
-              </Button>
-              <Button
-                disabled={app.status === "loading"}
-                variant="outlined"
-                type="submit"
-              >
-                Edit
-              </Button>
-            </Stack>
+                <Button
+                  color="error"
+                  variant="outlined"
+                  onClick={() => {
+                    setOpenConfirmation(true);
+                  }}
+                >
+                  Delete
+                </Button>
+                <Button
+                  disabled={app.status === "loading"}
+                  variant="outlined"
+                  type="submit"
+                >
+                  Edit
+                </Button>
+              </Stack>
+            </>
           )}
         </Box>
       </Modal>
