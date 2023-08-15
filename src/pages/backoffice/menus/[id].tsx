@@ -50,7 +50,7 @@ const MenuItem = () => {
     name: "",
     price: 0,
   });
-  console.log(menuItem.asset_url);
+
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
 
