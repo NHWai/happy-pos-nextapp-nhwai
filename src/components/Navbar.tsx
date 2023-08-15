@@ -23,9 +23,11 @@ import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Image from "next/image";
 import RouterLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import mypic from "../assets/logo-no-background.png";
 
 export default function Navbar() {
   const { data: session } = useSession();
@@ -84,9 +86,22 @@ export default function Navbar() {
       link: "setting",
     },
   ];
-  const pageLabel =
-    drawerItems[drawerItems.findIndex((el) => el.link === pathname.slice(1))]
-      ?.label || "Food4Life";
+  // const pageLabel =
+  //   drawerItems[drawerItems.findIndex((el) => el.link === pathname.slice(1))]
+  //     ?.label || "Food4Live";
+
+  const pageLabel = (
+    <>
+      <Box sx={{ position: "absolute", left: 0, top: "-40%" }}>
+        <Image
+          src={mypic}
+          alt="Picture of the author"
+          width={100}
+          height={100}
+        />
+      </Box>
+    </>
+  );
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -144,7 +159,11 @@ export default function Navbar() {
   };
   return (
     <Box sx={{ backgroundColor: "primary" }}>
-      <AppBar color="primary" position="static" sx={{ width: "100%" }}>
+      <AppBar
+        color="primary"
+        position="static"
+        sx={{ width: "100%", overflow: "hidden" }}
+      >
         <Toolbar>
           {session &&
             pathname !== "/backoffice/company" &&
