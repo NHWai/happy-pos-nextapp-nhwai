@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import Link from "next/link";
 import React from "react";
+import { FileWithPath, useDropzone } from "react-dropzone";
 
 const Menus = () => {
   const { company, app, setApp, selectedLocation } =
@@ -36,6 +37,22 @@ const Menus = () => {
   >([]);
 
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
+  const [dropZoneFiles, setDropZoneFiles] = React.useState<File[]>([]);
+
+  const onDrop = React.useCallback((acceptedFiles: File[]) => {
+    setDropZoneFiles(acceptedFiles);
+  }, []);
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+    accept: {
+      "image/png": [".png", ".jpg", ".jfif"],
+    },
+  });
+
+  const files = dropZoneFiles.map((file: FileWithPath) => (
+    <div key={file.path}>{file.path}</div>
+  ));
 
   const createMenu = async (formData: FormData) => {
     try {
@@ -106,6 +123,7 @@ const Menus = () => {
       .filter((item): item is AddonCategory => item !== undefined)
       .map((el) => ({ name: el.name, id: el.id }));
 
+    formData.append("menuImg", dropZoneFiles[0]);
     formData.append("selectedLocations", JSON.stringify(locationObjArr));
     formData.append(
       "selectedMenuCategories",
@@ -177,7 +195,12 @@ const Menus = () => {
         gap={1}
       >
         {!selectedLocation.id && (
-          <IconButton onClick={() => setOpen(true)}>
+          <IconButton
+            onClick={() => {
+              setOpen(true);
+              setDropZoneFiles([]);
+            }}
+          >
             <AddCircleOutlineIcon color="primary" />
           </IconButton>
         )}
@@ -234,14 +257,25 @@ const Menus = () => {
             type="number"
           />
 
-          <input
-            style={{
-              maxWidth: "180px",
+          <Box
+            sx={{
+              width: "180px",
+              backgroundColor: "info.main",
+              color: "secondary.main",
+              padding: "1rem",
+              borderRadius: "1rem",
+              cursor: "pointer",
+              border: " dashed #41644A",
             }}
-            name="menuImg"
-            type="file"
-            accept="image/png, image/jpeg"
-          />
+            {...getRootProps()}
+          >
+            <input {...getInputProps()} />
+            {dropZoneFiles.length > 0 ? (
+              <Typography variant="body2">{files}</Typography>
+            ) : (
+              <p>Drag 'n' drop some files here, or click to select files</p>
+            )}
+          </Box>
 
           <Autocomplete
             multiple

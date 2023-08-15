@@ -23,6 +23,10 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
+import { FileWithPath, useDropzone } from "react-dropzone";
+
+const defaultUrl =
+  "https://msquarefdc.sgp1.digitaloceanspaces.com/happy-pos/nhwai/1687062252572_default.jfif";
 
 const MenuItem = () => {
   const { company, app, setApp, selectedLocation } =
@@ -46,10 +50,28 @@ const MenuItem = () => {
     name: "",
     price: 0,
   });
+  console.log(menuItem.asset_url);
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
 
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
+
+  const [dropZoneFiles, setDropZoneFiles] = React.useState<File[]>([]);
+
+  const onDrop = React.useCallback((acceptedFiles: File[]) => {
+    setDropZoneFiles(acceptedFiles);
+  }, []);
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    maxFiles: 1,
+    accept: {
+      "image/png": [".png", ".jpg", ".jfif"],
+    },
+  });
+
+  const files = dropZoneFiles.map((file: FileWithPath) => (
+    <div key={file.path}>{file.path}</div>
+  ));
 
   useEffect(() => {
     if (app.error) {
@@ -218,7 +240,7 @@ const MenuItem = () => {
       .filter((item) => selectedAddonCategories.find((el) => el === item.name))
       .map((item) => item.id);
 
-    // formData.append("sameItems", JSON.stringify(sameItems));
+    dropZoneFiles.length > 0 && formData.append("menuImg", dropZoneFiles[0]);
     formData.append("removeItems", JSON.stringify(removeItems));
     formData.append("addItems", JSON.stringify(addItems));
     formData.append("companyId", String(company.id));
@@ -335,6 +357,7 @@ const MenuItem = () => {
                         app.addonCategories
                       )
                     );
+                    setDropZoneFiles([]);
                   }}
                 >
                   <EditIcon color="secondary" />
@@ -414,15 +437,27 @@ const MenuItem = () => {
                 inputProps={{ readOnly: !!selectedLocation.id }}
               />
 
-              <input
-                style={{
-                  maxWidth: "180px",
+              <Box
+                sx={{
+                  width: "180px",
+                  backgroundColor: "info.main",
+                  color: "secondary.main",
+                  padding: "1rem",
+                  borderRadius: "1rem",
+                  cursor: "pointer",
+                  border: " dashed #41644A",
                 }}
-                name="menuImg"
-                type="file"
-                accept="image/png, image/jpeg"
-                disabled={!!selectedLocation.id}
-              />
+                {...getRootProps()}
+              >
+                <input {...getInputProps()} />
+                {dropZoneFiles.length > 0 ? (
+                  <Typography variant="body2">{files}</Typography>
+                ) : menuItem.asset_url === defaultUrl ? (
+                  <Typography>Default Image</Typography>
+                ) : (
+                  <p>{`${menuItem.name.toLowerCase().replace(" ", "")}.jpg`}</p>
+                )}
+              </Box>
 
               <Autocomplete
                 multiple
