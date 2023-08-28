@@ -23,13 +23,15 @@ import ListItemText from "@mui/material/ListItemText";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { signIn, signOut, useSession } from "next-auth/react";
-import Image from "next/image";
 import RouterLink from "next/link";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import mypic from "../assets/logo-no-background.png";
+import Image from "next/image";
+import BackOfficeContext from "@/contexts/BackofficeContext";
 
 export default function Navbar() {
+  const { company } = React.useContext(BackOfficeContext);
   const { data: session } = useSession();
   const router = useRouter();
   let { pathname } = router;
@@ -92,7 +94,13 @@ export default function Navbar() {
 
   const pageLabel = (
     <>
-      <Box sx={{ position: "absolute", left: 0, top: "-40%" }}>
+      <Box
+        sx={{
+          position: "absolute",
+          left: company.id ? 50 : 0, //if company id is null logo is at the leftmost part of navabr if not make some room for MENU ICON
+          top: "-40%",
+        }}
+      >
         <Image
           src={mypic}
           alt="Picture of the author"
@@ -165,7 +173,7 @@ export default function Navbar() {
         sx={{ width: "100%", overflow: "hidden" }}
       >
         <Toolbar>
-          {session &&
+          {company.id !== 0 &&
             pathname !== "/backoffice/company" &&
             pathname !== "/order" && (
               <>
@@ -189,6 +197,7 @@ export default function Navbar() {
                 </Drawer>
               </>
             )}
+
           <Typography
             component={RouterLink}
             href="/backoffice"
@@ -196,7 +205,7 @@ export default function Navbar() {
             color="white"
             sx={{ flexGrow: 1, textDecoration: "none" }}
           >
-            {session ? pageLabel : "Happy Pos Login Page"}
+            {session ? pageLabel : "Food4Life Login Page"}
           </Typography>
 
           {pathname !== "/login" &&
