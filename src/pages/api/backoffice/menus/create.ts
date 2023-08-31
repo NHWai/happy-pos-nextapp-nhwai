@@ -34,15 +34,6 @@ export const config = {
 //   });
 // }
 
-interface Fields {
-  name: string[];
-  price: string[];
-  selectedLocations: string[];
-  selectedMenuCategories: string[];
-  selectedAddonCategories?: string[] | undefined;
-  companyId: string[];
-}
-
 export default async function uploadHandler(
   req: NextApiRequest,
   res: NextApiResponse
@@ -55,7 +46,7 @@ export default async function uploadHandler(
     try {
       const form = formidable({ allowEmptyFiles: true, minFileSize: 0 });
 
-      let fields: Fields, file;
+      let fields, file;
       let menuUrl =
         "https://res.cloudinary.com/dddpq79jt/image/upload/v1693467218/nextjs-uploads/jyumli1sfg9t4b4qcyck.jpg";
 
@@ -92,11 +83,15 @@ export default async function uploadHandler(
         selectedMenuCategories: { name: string; id: number }[];
         selectedAddonCategories: { name: string; id: number }[];
       } = {
-        name: fields.name[0],
-        price: parseInt(fields.price[0], 10),
-        selectedLocations: JSON.parse(fields.selectedLocations[0]),
-        selectedMenuCategories: JSON.parse(fields.selectedMenuCategories[0]),
-        companyId: parseInt(fields.companyId[0], 10),
+        name: fields.name ? fields.name[0] : "",
+        price: parseInt(fields.price ? fields.price[0] : "", 10),
+        selectedLocations: JSON.parse(
+          fields.selectedLocations ? fields.selectedLocations[0] : ""
+        ),
+        selectedMenuCategories: JSON.parse(
+          fields.selectedMenuCategories ? fields.selectedMenuCategories[0] : ""
+        ),
+        companyId: parseInt(fields.companyId ? fields.companyId[0] : "", 10),
         selectedAddonCategories: JSON.parse(
           fields.selectedAddonCategories
             ? fields.selectedAddonCategories[0]
