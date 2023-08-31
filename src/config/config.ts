@@ -8,6 +8,9 @@ interface Config {
   accessKeyId: string;
   secretKeyId: string;
   digitalOceanEndPoint: string;
+  cloudinaryCloudName: string;
+  cloudinaryApiKey: string;
+  cloudinaryApiSecret: string;
 }
 
 export const config: Config = {
@@ -20,4 +23,7 @@ export const config: Config = {
   accessKeyId: process.env.ACCESS_KEY_ID || "",
   secretKeyId: process.env.SECRET_ACCESS_KEY || "",
   digitalOceanEndPoint: process.env.DG_ENDPOINT || "",
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || "",
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || "",
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || "",
 };

@@ -2,13 +2,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
-import { upload } from "@/config/upload";
-import { Request, Response } from "express";
-import { runMiddleware } from "./create";
+import formidable from "formidable";
+import cloudinary from "@/config/cloudinary";
 
 // Create a custom type for the combined request
-type CustomRequest = NextApiRequest & Request & { files: any };
-type CustomResponse = NextApiResponse & Response;
+// type CustomRequest = NextApiRequest & Request & { files: any };
+// type CustomResponse = NextApiResponse & Response;
 
 // disable body parser
 export const config = {
@@ -18,16 +17,30 @@ export const config = {
 };
 
 export default async function uploadHandler(
-  req: CustomRequest,
-  res: CustomResponse
+  req: NextApiRequest,
+  res: NextApiResponse
 ) {
   const session = await getServerSession(req, res, authOptions);
 
   if (session && session?.user?.email) {
     try {
-      await runMiddleware(req, res, upload);
-      // File uploaded successfully
-      const files = req.files as Express.MulterS3.File[];
+      const form = formidable({ allowEmptyFiles: true, minFileSize: 0 });
+      let fields, file, menuUrl;
+      try {
+        [fields, file] = await form.parse(req);
+
+        if (file.menuImg && file.menuImg[0].size > 0) {
+          const filePath = file.menuImg[0].filepath;
+          const data = await cloudinary.uploader.upload(filePath as string, {
+            upload_preset: "nextjs-upload-preset",
+          });
+          menuUrl = data.secure_url;
+        }
+      } catch (error) {
+        console.error(error);
+        res.status(400).end();
+        return;
+      }
 
       const reqBody: {
         name: string;
@@ -48,13 +61,17 @@ export default async function uploadHandler(
         }[];
         addonCategoryIds: number[];
       } = {
-        name: req.body.name,
-        price: parseInt(req.body.price, 10),
-        menuId: parseInt(req.body.menuId, 10),
-        removeItems: JSON.parse(req.body.removeItems),
-        addItems: JSON.parse(req.body.addItems),
-        companyId: parseInt(req.body.companyId, 10),
-        addonCategoryIds: JSON.parse(req.body.addonCategoryIds),
+        name: fields.name ? fields.name[0] : "",
+        price: parseInt(fields.price ? fields.price[0] : "", 10),
+        menuId: parseInt(fields.menuId ? fields.menuId[0] : "", 10),
+        removeItems: JSON.parse(
+          fields.removeItems ? fields.removeItems[0] : ""
+        ),
+        addItems: JSON.parse(fields.addItems ? fields.addItems[0] : ""),
+        companyId: parseInt(fields.companyId ? fields.companyId[0] : "", 10),
+        addonCategoryIds: JSON.parse(
+          fields.addonCategoryIds ? fields.addonCategoryIds[0] : ""
+        ),
       };
 
       const menusAddonCategories = reqBody.addonCategoryIds.map((item) => ({
@@ -131,9 +148,7 @@ export default async function uploadHandler(
         .filter((item, idx, arr) => arr.indexOf(item) === idx)
         .map((item) => JSON.parse(item));
 
-      if (files.length > 0) {
-        const file = files[0];
-        const menuUrl = file.location;
+      if (menuUrl) {
         //update a new menu uploading new image
         const updateMenu = await prisma.menus.update({
           where: {

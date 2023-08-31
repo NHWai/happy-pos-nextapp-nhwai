@@ -134,7 +134,7 @@ const MenuItem = () => {
         setSelectedLocations([]);
         setSelectedMenuCategories([]);
       } else {
-        throw new Error("Failed to create a new menu-category");
+        throw new Error("Failed to update the menu-category");
       }
     } catch (error) {
       setApp((pre) => ({
