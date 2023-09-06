@@ -9,8 +9,8 @@ export const MainLayout = ({ children }: Props) => {
     <Box
       sx={{
         maxWidth: "1280px",
-        marginX: "auto",
         minHeight: "100vh",
+        marginX: "auto",
       }}
     >
       {children}

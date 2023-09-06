@@ -1,34 +1,41 @@
-import React, { useState } from "react";
+import { AccountCircle } from "@mui/icons-material";
+import CategoryIcon from "@mui/icons-material/Category";
+import ClassIcon from "@mui/icons-material/Class";
+import ListAltIcon from "@mui/icons-material/ListAlt";
+import LocalDiningIcon from "@mui/icons-material/LocalDining";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
+import LunchDiningIcon from "@mui/icons-material/LunchDining";
+import MenuIcon from "@mui/icons-material/Menu";
+import SettingsIcon from "@mui/icons-material/Settings";
+import TableBarIcon from "@mui/icons-material/TableBar";
+import { Menu, MenuItem } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import { useRouter } from "next/router";
-import RouterLink from "next/link";
+import Divider from "@mui/material/Divider";
 import Drawer from "@mui/material/Drawer";
+import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import CategoryIcon from "@mui/icons-material/Category";
-import ClassIcon from "@mui/icons-material/Class";
-import LocalDiningIcon from "@mui/icons-material/LocalDining";
-import LunchDiningIcon from "@mui/icons-material/LunchDining";
-import SettingsIcon from "@mui/icons-material/Settings";
-import Divider from "@mui/material/Divider";
-import { AccountCircle } from "@mui/icons-material";
-import { Menu, MenuItem } from "@mui/material";
-import { getAccessToken, getLocationId } from "@/config";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import { signIn, signOut, useSession } from "next-auth/react";
+import RouterLink from "next/link";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
+import mypic from "../assets/logo-no-background.png";
+import Image from "next/image";
+import BackOfficeContext from "@/contexts/BackofficeContext";
 
 export default function Navbar() {
+  const { company } = React.useContext(BackOfficeContext);
+  const { data: session } = useSession();
   const router = useRouter();
   let { pathname } = router;
   const [isOpen, setIsOpen] = useState(false);
-  const locationId = getLocationId();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
 
   const handleMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -39,30 +46,70 @@ export default function Navbar() {
     setAnchorEl(null);
   };
 
-  const handleLogOut = () => {
-    localStorage.removeItem("exp");
-    localStorage.removeItem("token");
-    router.push("/logout");
-  };
-
   const drawerItems = [
-    { label: "Menus", icon: <LocalDiningIcon />, link: "menus" },
+    {
+      label: "Orders",
+      icon: <ListAltIcon color="primary" />,
+      link: "",
+    },
+    {
+      label: "Menus",
+      icon: <LocalDiningIcon color="primary" />,
+      link: "menus",
+    },
     {
       label: "Menu Categories",
-      icon: <CategoryIcon />,
+      icon: <CategoryIcon color="primary" />,
       link: "menu-categories",
     },
-    { label: "Addons", icon: <LunchDiningIcon />, link: "addons" },
+    {
+      label: "Addons",
+      icon: <LunchDiningIcon color="primary" />,
+      link: "addons",
+    },
     {
       label: "Addon Categories",
-      icon: <ClassIcon />,
+      icon: <ClassIcon color="primary" />,
       link: "addon-categories",
     },
-    { label: "Setting", icon: <SettingsIcon />, link: "setting" },
+    {
+      label: "Locations",
+      icon: <LocationOnIcon color="primary" />,
+      link: "locations",
+    },
+    {
+      label: "Tables",
+      icon: <TableBarIcon color="primary" />,
+      link: "tables",
+    },
+    {
+      label: "Setting",
+      icon: <SettingsIcon color="primary" />,
+      link: "setting",
+    },
   ];
-  const pageLabel =
-    drawerItems[drawerItems.findIndex((el) => el.link === pathname.slice(1))]
-      ?.label || "Home";
+  // const pageLabel =
+  //   drawerItems[drawerItems.findIndex((el) => el.link === pathname.slice(1))]
+  //     ?.label || "Food4Live";
+
+  const pageLabel = (
+    <>
+      <Box
+        sx={{
+          position: "absolute",
+          left: company.id ? 50 : 0, //if company id is null logo is at the leftmost part of navabr if not make some room for MENU ICON
+          top: "-40%",
+        }}
+      >
+        <Image
+          src={mypic}
+          alt="Picture of the author"
+          width={100}
+          height={100}
+        />
+      </Box>
+    </>
+  );
 
   const toggleDrawer =
     (open: boolean) => (event: React.KeyboardEvent | React.MouseEvent) => {
@@ -85,14 +132,17 @@ export default function Navbar() {
         sx={{ width: "250" }}
       >
         <List>
-          {drawerItems.slice(0, 4).map((item) => (
+          {drawerItems.slice(0, 7).map((item) => (
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}
-                href={"/" + item.link + "?location=" + locationId}
+                href={`/backoffice/${item.link}`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemText
+                  sx={{ color: "secondary.main" }}
+                  primary={item.label}
+                />
               </ListItemButton>
             </ListItem>
           ))}
@@ -101,10 +151,13 @@ export default function Navbar() {
             <ListItem key={item.label}>
               <ListItemButton
                 component={RouterLink}
-                href={"/" + item.link + "?location=" + locationId}
+                href={`/backoffice/${item.link}`}
               >
                 <ListItemIcon>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} />
+                <ListItemText
+                  sx={{ color: "secondary.main" }}
+                  primary={item.label}
+                />
               </ListItemButton>
             </ListItem>
           ))}
@@ -113,29 +166,57 @@ export default function Navbar() {
     );
   };
   return (
-    <Box sx={{ flexGrow: 1, backgroundColor: "primary" }}>
-      <AppBar color="primary" position="static">
+    <Box sx={{ backgroundColor: "primary" }}>
+      <AppBar
+        color="primary"
+        position="static"
+        sx={{ width: "100%", overflow: "hidden" }}
+      >
         <Toolbar>
-          <IconButton
-            size="large"
-            edge="start"
-            color="inherit"
-            aria-label="menu"
-            sx={{ mr: 2 }}
-            onClick={toggleDrawer(true)}
+          {company.id !== 0 &&
+            pathname !== "/backoffice/company" &&
+            pathname !== "/order" && (
+              <>
+                <IconButton
+                  size="large"
+                  edge="start"
+                  color="inherit"
+                  aria-label="menu"
+                  sx={{ mr: 2 }}
+                  onClick={toggleDrawer(true)}
+                >
+                  <MenuIcon />
+                </IconButton>
+
+                <Drawer
+                  anchor="left"
+                  open={isOpen}
+                  onClose={toggleDrawer(false)}
+                >
+                  {list()}
+                </Drawer>
+              </>
+            )}
+
+          <Typography
+            component={RouterLink}
+            href="/backoffice"
+            variant="h6"
+            color="white"
+            sx={{ flexGrow: 1, textDecoration: "none" }}
           >
-            <MenuIcon />
-          </IconButton>
-          <Drawer anchor="left" open={isOpen} onClose={toggleDrawer(false)}>
-            {list()}
-          </Drawer>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {pageLabel}
+            {session ? pageLabel : "Food4Life Login Page"}
           </Typography>
+
           {pathname !== "/login" &&
-            (!getAccessToken() ? (
-              <Button component={RouterLink} href={"/login"} color="inherit">
-                Login
+            (!session ? (
+              <Button
+                onClick={() =>
+                  signIn("google", { callbackUrl: "/backoffice/" })
+                }
+                color="inherit"
+              >
+                Sign In
               </Button>
             ) : (
               <div>
@@ -163,7 +244,14 @@ export default function Navbar() {
                   open={Boolean(anchorEl)}
                   onClose={handleClose}
                 >
-                  <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      signOut();
+                      localStorage.removeItem("company");
+                    }}
+                  >
+                    SignOut
+                  </MenuItem>
                 </Menu>
               </div>
             ))}

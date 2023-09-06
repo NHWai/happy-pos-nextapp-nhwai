@@ -4,9 +4,23 @@
   margin: 0;
 }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
+html.sr .load-hidden {
+  visibility: hidden;
+ }
+
+ .services{
+  display: flex;
+  gap: 1rem;
+   flex-wrap: wrap;
+  justify-content: center;
+ }
+
+ .blob-background {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Place it behind other content */
 }
 
