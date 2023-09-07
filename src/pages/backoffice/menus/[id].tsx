@@ -1,5 +1,6 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import DropFileBox from "@/components/DropFileBox";
 import LetterBox from "@/components/LetterBox";
 import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
@@ -437,27 +438,20 @@ const MenuItem = () => {
                 inputProps={{ readOnly: !!selectedLocation.id }}
               />
 
-              <Box
-                sx={{
-                  width: "180px",
-                  backgroundColor: "info.main",
-                  color: "secondary.main",
-                  padding: "1rem",
-                  borderRadius: "1rem",
-                  cursor: "pointer",
-                  border: " dashed #41644A",
-                }}
-                {...getRootProps()}
-              >
-                <input {...getInputProps()} />
-                {dropZoneFiles.length > 0 ? (
-                  <Typography variant="body2">{files}</Typography>
-                ) : menuItem.asset_url === defaultUrl ? (
-                  <Typography>Default Image</Typography>
-                ) : (
-                  <p>{`${menuItem.name.toLowerCase().replace(" ", "")}.jpg`}</p>
-                )}
-              </Box>
+              <DropFileBox>
+                <Box {...getRootProps()}>
+                  <input {...getInputProps()} />
+                  {dropZoneFiles.length > 0 ? (
+                    <Typography variant="body2">{files}</Typography>
+                  ) : menuItem.asset_url === defaultUrl ? (
+                    <Typography>Default Image</Typography>
+                  ) : (
+                    <p>{`${menuItem.name
+                      .toLowerCase()
+                      .replace(" ", "")}.jpg`}</p>
+                  )}
+                </Box>
+              </DropFileBox>
 
               <Autocomplete
                 multiple
