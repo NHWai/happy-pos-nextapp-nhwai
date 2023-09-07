@@ -1,4 +1,5 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
+import DropFileBox from "@/components/DropFileBox";
 
 import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
@@ -257,25 +258,16 @@ const Menus = () => {
             type="number"
           />
 
-          <Box
-            sx={{
-              width: "180px",
-              backgroundColor: "info.main",
-              color: "secondary.main",
-              padding: "1rem",
-              borderRadius: "1rem",
-              cursor: "pointer",
-              border: " dashed #41644A",
-            }}
-            {...getRootProps()}
-          >
-            <input {...getInputProps()} />
-            {dropZoneFiles.length > 0 ? (
-              <Typography variant="body2">{files}</Typography>
-            ) : (
-              <p>Drag 'n' drop some files here, or click to select files</p>
-            )}
-          </Box>
+          <DropFileBox>
+            <Box {...getRootProps()}>
+              <input {...getInputProps()} />
+              {dropZoneFiles.length > 0 ? (
+                <Typography variant="body2">{files}</Typography>
+              ) : (
+                <p>Drag 'n' drop some files here, or click to select files</p>
+              )}
+            </Box>
+          </DropFileBox>
 
           <Autocomplete
             multiple
