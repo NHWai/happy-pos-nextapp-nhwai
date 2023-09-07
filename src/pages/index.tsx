@@ -8,11 +8,12 @@ import MenuBookIcon from "@mui/icons-material/MenuBook";
 import QrCode2Icon from "@mui/icons-material/QrCode2";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import TwitterIcon from "@mui/icons-material/Twitter";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Grid, Stack, Typography } from "@mui/material";
 import { RevealList } from "next-reveal";
 import Image from "next/image";
 import RouterLink from "next/link";
 import mypic from "../assets/logo-no-background.png";
+import AddressItem from "@/components/AddressItem";
 
 export default function Home() {
   return (
@@ -180,59 +181,51 @@ export default function Home() {
       <Box
         sx={{
           backgroundColor: "secondary.light",
-          width: "100%",
-          padding: "3rem 0 3rem",
-          color: "#F6F4EB",
-          display: "flex",
-          flexWrap: "wrap",
-          justifyContent: "space-around",
+          color: "#f6f4eb",
+          paddingBottom: 5,
         }}
       >
-        <Box sx={{ maxWidth: "200px" }}>
-          <Typography variant="h6" fontWeight={"bold"} marginBottom={"0.5rem"}>
-            Country A
-          </Typography>
-          <Stack gap="0.3rem">
-            <div>Street Address</div>
-            <div>Contact Name</div>
-            <p>+44 800 400 0000</p>
-            <p>blahblahblah@gmail.com</p>
-          </Stack>
-        </Box>
-        <Box sx={{ maxWidth: "200px" }}>
-          <Typography variant="h6" fontWeight={"bold"} marginBottom={"0.5rem"}>
-            Country B
-          </Typography>
-          <Stack gap="0.3rem">
-            <div>Street Address</div>
-            <div>Contact Name</div>
-            <p>+44 800 400 0000</p>
-            <p>blahblahblah@gmail.com</p>
-          </Stack>
-        </Box>
-        <Box sx={{ maxWidth: "200px" }}>
-          <Typography variant="h6" fontWeight={"bold"} marginBottom={"0.5rem"}>
-            About Us
-          </Typography>
-          <Typography variant="body2" sx={{ marginBottom: "0.5rem" }}>
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Id officia
-            excepturi dolore minus incidunt pariatur, ab ratione unde architecto
-            dicta.
-          </Typography>
-          <Box
-            sx={{
-              display: "flex",
-              justifyContent: "space-around",
-              cursor: "pointer",
-            }}
-          >
-            <TwitterIcon />
-            <FacebookIcon />
-            <InstagramIcon />
-            <LinkedInIcon />
-          </Box>
-        </Box>
+        <Grid container spacing={2}>
+          <Grid item xs={12} sm={4}>
+            <AddressItem title={"CountryA"}>
+              <div>Street Address</div>
+              <div>Contact Name</div>
+              <p>+44 800 400 0000</p>
+              <p>blahblahblah@gmail.com</p>
+            </AddressItem>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <AddressItem title={"CountryB"}>
+              <div>Street Address</div>
+              <div>Contact Name</div>
+              <p>+44 800 400 0000</p>
+              <p>blahblahblah@gmail.com</p>
+            </AddressItem>
+          </Grid>
+          <Grid item xs={12} sm={4}>
+            <AddressItem title={"About Us"}>
+              <Typography variant="body2" sx={{ marginBottom: "0.5rem" }}>
+                Lorem ipsum dolor, sit amet consectetur adipisicing elit. Id
+                officia excepturi dolore minus incidunt pariatur, ab ratione
+                unde architecto dicta.
+              </Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "space-around",
+                  cursor: "pointer",
+                }}
+              >
+                <TwitterIcon />
+                <FacebookIcon />
+                <InstagramIcon />
+                <LinkedInIcon />
+              </Box>
+            </AddressItem>
+          </Grid>
+        </Grid>
       </Box>
+
       <svg
         className="blob-background"
         viewBox=" 0 0 200 200"
