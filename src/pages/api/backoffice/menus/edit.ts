@@ -37,7 +37,6 @@ export default async function uploadHandler(
           menuUrl = data.secure_url;
         }
       } catch (error) {
-        console.error(error);
         res.status(400).end();
         return;
       }
@@ -149,6 +148,19 @@ export default async function uploadHandler(
         .map((item) => JSON.parse(item));
 
       if (menuUrl) {
+        //getMenuImage
+        const menuToDel = await prisma.menus.findUnique({
+          where: { id: reqBody.menuId },
+        });
+        const imgToDel = menuToDel?.asset_url || "";
+        let publicId = imgToDel.split("nextjs-uploads/").pop()?.split(".")[0];
+        publicId = "nextjs-uploads/" + publicId;
+        const defaultImg = "nextjs-uploads/jyumli1sfg9t4b4qcyck";
+        if (publicId && defaultImg !== publicId) {
+          const resCloudinary = await cloudinary.uploader.destroy(publicId);
+          if (resCloudinary.result !== "ok") return res.status(400).end();
+        }
+
         //update a new menu uploading new image
         const updateMenu = await prisma.menus.update({
           where: {

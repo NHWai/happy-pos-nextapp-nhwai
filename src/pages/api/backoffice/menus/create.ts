@@ -61,7 +61,6 @@ export default async function uploadHandler(
           menuUrl = data.secure_url;
         }
       } catch (error) {
-        console.error(error);
         res.status(400).end();
         return;
       }
