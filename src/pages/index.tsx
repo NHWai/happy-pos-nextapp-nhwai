@@ -61,7 +61,7 @@ export default function Home() {
             textAlign={"center"}
             color="secondary.light"
           >
-            Manage your menu catalogue easily with Happy POS and entice your
+            Manage your menu catalogue easily with Food4Life POS and entice your
             customers with QR code ordering system.
           </Typography>
           <Button component={RouterLink} href="/backoffice" variant="contained">

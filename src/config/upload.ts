@@ -17,9 +17,11 @@ const s3 = new S3Client({
 export const qrcodeUpload = async (locationId: number, tableId: number) => {
   //
   try {
-    const qrImageData = await QRCode.toDataURL(
+    const qrImageDataBase64Uri = await QRCode.toDataURL(
       `${config.orderAppUrl}?locationId=${locationId}&tableId=${tableId}`
     );
+    return qrImageDataBase64Uri;
+    /*
     const input = {
       Bucket: "msquarefdc",
       Key: `happy-pos/qrcode/nhwai/locationId-${locationId}-tableId-${tableId}.png`,
@@ -31,6 +33,7 @@ export const qrcodeUpload = async (locationId: number, tableId: number) => {
     };
     const command = new PutObjectCommand(input);
     await s3.send(command);
+    */
   } catch (error) {
     console.log(error);
   }

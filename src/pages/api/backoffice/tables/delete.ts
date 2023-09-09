@@ -17,14 +17,14 @@ export default async function handler(
       return res.status(400).end();
     }
 
-    //delete location
-    const delMenuCatgory = await prisma.tables.delete({
+    //delete table
+    const delTable = await prisma.tables.update({
       where: { id },
-      select: {
-        id: true,
+      data: {
+        is_archived: true,
       },
     });
-    if (!delMenuCatgory.id) return res.status(500).end();
+    if (!delTable.id) return res.status(500).end();
 
     res.status(200).end();
   } else {

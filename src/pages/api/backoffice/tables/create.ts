@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "../../auth/[...nextauth]";
 import prisma from "@/config/client";
 import { qrcodeUpload, getQrCodeUrl } from "@/config/upload";
+import cloudinary from "@/config/cloudinary";
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,15 +27,22 @@ export default async function handler(
     if (!newTable.id) return res.status(500).end();
 
     //upload the qr image and get url of that qr
-    await qrcodeUpload(newTable.locations_id, newTable.id);
+    const qrImageDataBase64Uri = await qrcodeUpload(
+      newTable.locations_id,
+      newTable.id
+    );
 
-    const qrUrl = getQrCodeUrl(newTable.locations_id, newTable.id);
+    // upload to cloudinary
+    const qrImg = await cloudinary.uploader.upload(
+      qrImageDataBase64Uri as string,
+      { folder: "food4LifeQr" }
+    );
 
     //update the assetUrl of the table
 
     const updatedTable = await prisma.tables.update({
       where: { id: newTable.id },
-      data: { asset_url: qrUrl },
+      data: { asset_url: qrImg.secure_url },
     });
 
     if (!updatedTable) return res.status(500).end();
