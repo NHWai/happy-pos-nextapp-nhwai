@@ -1,5 +1,7 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
+import ButtonBox from "@/components/ButtonBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import CreateBtn from "@/components/CreateBtn";
 import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
@@ -8,7 +10,6 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
-  Button,
   Chip,
   IconButton,
   Snackbar,
@@ -273,7 +274,7 @@ const Table = () => {
       <ModalBox
         setOpen={setOpen}
         open={open}
-        heading={` ${!currTable.name ? "Create" : "Edit"} Table`}
+        heading={` ${!currTable.id ? "Create" : "Edit"} Table`}
       >
         <Box
           onSubmit={handleSubmit}
@@ -320,14 +321,7 @@ const Table = () => {
           />
 
           {!currTable.id ? (
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+            <CreateBtn createBtnDisabled={app.status === "loading"} />
           ) : (
             <>
               <Box>
@@ -338,27 +332,10 @@ const Table = () => {
                   height={100}
                 />
               </Box>
-
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => setOpenConfirmation(true)}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
+              <ButtonBox
+                delBtnClick={() => setOpenConfirmation(true)}
+                editBtnDisabled={app.status === "loading"}
+              />
             </>
           )}
         </Box>

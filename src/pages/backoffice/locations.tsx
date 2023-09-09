@@ -1,6 +1,8 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
+import ButtonBox from "@/components/ButtonBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
-import Modal from "@/components/ModalBox";
+import CreateBtn from "@/components/CreateBtn";
+import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -242,10 +244,10 @@ const Location = () => {
         )}
       </Stack>
 
-      <Modal
+      <ModalBox
         setOpen={setOpen}
         open={open}
-        heading={` ${!currLocation.name ? "Create" : "Edit"} Location`}
+        heading={` ${!currLocation.id ? "Create" : "Edit"} Location`}
       >
         <Box
           onSubmit={handleSubmit}
@@ -277,42 +279,17 @@ const Location = () => {
             required
           />
           {!currLocation.id ? (
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-              sx={{ alignSelf: "end" }}
-            >
-              Submit
-            </Button>
+            <CreateBtn createBtnDisabled={app.status === "loading"} />
           ) : (
             !selectedLocation.id && (
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
+              <ButtonBox
+                delBtnClick={() => setOpenConfirmation(true)}
+                editBtnDisabled={app.status === "loading"}
+              />
             )
           )}
         </Box>
-      </Modal>
+      </ModalBox>
       <ConfirmationBox
         handleDelete={() => handleDelete(currLocation.id)}
         open={openConfirmation}

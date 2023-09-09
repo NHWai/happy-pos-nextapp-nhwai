@@ -1,6 +1,7 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
 import ConfirmationBox from "@/components/ConfirmationBox";
 import DropFileBox from "@/components/DropFileBox";
+import EditBtn from "@/components/EditBtn";
 import LetterBox from "@/components/LetterBox";
 import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
@@ -524,15 +525,9 @@ const MenuItem = () => {
                   </label>
                 ))}
               </Box>
-
-              <Button
-                // disabled={menus.status === "loading"}
-                variant="contained"
-                type="submit"
-                sx={{ alignSelf: "end" }}
-              >
-                Submit
-              </Button>
+              <Box sx={{ marginLeft: "auto" }}>
+                <EditBtn editBtnDisabled={false} />
+              </Box>
             </Box>
           </ModalBox>{" "}
         </>
