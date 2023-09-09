@@ -1,6 +1,6 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
 import ConfirmationBox from "@/components/ConfirmationBox";
-import Modal from "@/components/ModalBox";
+import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
 import { Location, Table } from "@/typing/types";
@@ -270,7 +270,7 @@ const Table = () => {
         )}
       </Stack>
 
-      <Modal
+      <ModalBox
         setOpen={setOpen}
         open={open}
         heading={` ${!currTable.name ? "Create" : "Edit"} Table`}
@@ -347,9 +347,7 @@ const Table = () => {
                 <Button
                   color="error"
                   variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
+                  onClick={() => setOpenConfirmation(true)}
                 >
                   Delete
                 </Button>
@@ -364,7 +362,7 @@ const Table = () => {
             </>
           )}
         </Box>
-      </Modal>
+      </ModalBox>
       <ConfirmationBox
         handleDelete={() => handleDelete(currTable.id)}
         open={openConfirmation}
