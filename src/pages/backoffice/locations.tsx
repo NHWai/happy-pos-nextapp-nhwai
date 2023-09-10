@@ -5,9 +5,11 @@ import CreateBtn from "@/components/CreateBtn";
 import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
+import { Location } from "@/typing/types";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import {
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -32,6 +34,7 @@ const Location = () => {
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
   const [currLocation, setCurrLocation] = useState(initialLocation);
+  const [searchLocation, setSearchLocation] = useState<Location | null>(null);
   const [openSnackBar, setOpenSnackBar] = useState(false);
 
   React.useEffect(() => {
@@ -40,6 +43,12 @@ const Location = () => {
       setApp((pre) => ({ ...pre, status: "idle", error: "" }));
     }
   }, [app.error]);
+
+  React.useEffect(() => {
+    if (!open && searchLocation) {
+      setSearchLocation(null);
+    }
+  }, [open]);
 
   const createLocation = async () => {
     const body = {
@@ -199,6 +208,25 @@ const Location = () => {
       <Typography my={2} variant="h4" color="secondary">
         Locations
       </Typography>
+      <Autocomplete
+        size="small"
+        options={app.locations}
+        getOptionLabel={(option: Location) => option.name}
+        onChange={(event: any, newValue) => {
+          if (newValue) {
+            setSearchLocation(newValue);
+            setOpen(true);
+            setCurrLocation(newValue);
+          }
+        }}
+        disablePortal
+        value={searchLocation}
+        sx={{ width: 200, marginBottom: "1rem" }}
+        isOptionEqualToValue={(option, value) =>
+          typeof option.name === typeof value.name
+        }
+        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+      />
       <Stack
         sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
         alignItems="center"

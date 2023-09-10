@@ -12,6 +12,8 @@ interface Props {
 const style1 = {
   backgroundColor: "white",
   padding: "1rem",
+  border: "none",
+  outline: "none",
   borderRadius: "1rem",
   width: "fit-content",
   minWidth: "240px",

@@ -1,5 +1,6 @@
 import { config } from "@/config/config";
 import {
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -38,7 +39,19 @@ const MenuCategories = () => {
   const [currAddonCategory, setCurrAddonCategory] =
     useState(initialAddonCategory);
 
+  const [searchAddonCategory, setSearchAddonCategory] = useState<{
+    name: string;
+    id: number;
+    is_required: boolean;
+  } | null>(null);
+
   const [openSnackBar, setOpenSnackBar] = useState(false);
+
+  React.useEffect(() => {
+    if (!open && searchAddonCategory) {
+      setSearchAddonCategory(null);
+    }
+  }, [open]);
 
   //to change menuCategoryArr to addonCategoryArr
   function showAddons(currId: number) {
@@ -229,6 +242,33 @@ const MenuCategories = () => {
       <Typography mt={3} mb={2} variant="h4" color="secondary">
         Addon Categories
       </Typography>
+      <Autocomplete
+        size="small"
+        options={addonCategoryItems.map((item) => ({
+          name: item.name,
+          id: item.id,
+          is_required: item.is_required,
+        }))}
+        getOptionLabel={(option: {
+          name: string;
+          id: number;
+          is_required: boolean;
+        }) => option.name}
+        onChange={(event: any, newValue) => {
+          if (newValue) {
+            setSearchAddonCategory(newValue);
+            setOpen(true);
+            setCurrAddonCategory(newValue);
+          }
+        }}
+        disablePortal
+        value={searchAddonCategory}
+        sx={{ width: 200, marginBottom: "1rem" }}
+        isOptionEqualToValue={(option, value) =>
+          typeof option.name === typeof value.name
+        }
+        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+      />
       {selectedLocation.id ? (
         <Typography
           alignSelf={"left"}

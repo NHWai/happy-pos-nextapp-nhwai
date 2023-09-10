@@ -10,7 +10,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import {
   Autocomplete,
   Box,
-  Button,
   Chip,
   IconButton,
   Snackbar,
@@ -30,9 +29,6 @@ const Menus = () => {
   const [selectedLocations, setSelectedLocations] = React.useState<string[]>(
     []
   );
-  const [selectedMenuItem, setSelectedMenuItem] = React.useState<
-    string | null
-  >();
   const [selectedMenuCategories, setSelectedMenuCategories] = React.useState<
     string[]
   >([]);
@@ -193,7 +189,6 @@ const Menus = () => {
           }
         }}
         sx={{ width: 200, marginBottom: "1rem" }}
-        // isOptionEqualToValue={()}
         renderInput={(params) => <TextField {...params} label="Search Menus" />}
       />
       {selectedLocation.id ? (
