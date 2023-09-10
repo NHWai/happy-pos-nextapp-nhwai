@@ -27,7 +27,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
 
 const defaultUrl =
-  "https://msquarefdc.sgp1.digitaloceanspaces.com/happy-pos/nhwai/1687062252572_default.jfif";
+  "https://res.cloudinary.com/dddpq79jt/image/upload/v1693467218/nextjs-uploads/jyumli1sfg9t4b4qcyck.jpg";
 
 const MenuItem = () => {
   const { company, app, setApp, selectedLocation } =

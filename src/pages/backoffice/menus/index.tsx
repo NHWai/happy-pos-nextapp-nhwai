@@ -1,7 +1,6 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
 import CreateBtn from "@/components/CreateBtn";
 import DropFileBox from "@/components/DropFileBox";
-
 import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
@@ -22,6 +21,7 @@ import {
 import Link from "next/link";
 import React from "react";
 import { FileWithPath, useDropzone } from "react-dropzone";
+import { useRouter } from "next/router";
 
 const Menus = () => {
   const { company, app, setApp, selectedLocation } =
@@ -30,6 +30,9 @@ const Menus = () => {
   const [selectedLocations, setSelectedLocations] = React.useState<string[]>(
     []
   );
+  const [selectedMenuItem, setSelectedMenuItem] = React.useState<
+    string | null
+  >();
   const [selectedMenuCategories, setSelectedMenuCategories] = React.useState<
     string[]
   >([]);
@@ -40,7 +43,7 @@ const Menus = () => {
 
   const [openSnackBar, setOpenSnackBar] = React.useState(false);
   const [dropZoneFiles, setDropZoneFiles] = React.useState<File[]>([]);
-
+  const router = useRouter();
   const onDrop = React.useCallback((acceptedFiles: File[]) => {
     setDropZoneFiles(acceptedFiles);
   }, []);
@@ -176,6 +179,23 @@ const Menus = () => {
       <Typography mt={3} mb={2} variant="h4" color="secondary">
         Menus
       </Typography>
+      <Autocomplete
+        size="small"
+        options={menuItems.map((item) => ({ label: item.name, id: item.id }))}
+        disablePortal
+        onChange={(
+          event: any,
+          newValue: { label: string; id: number } | null
+        ) => {
+          if (newValue) {
+            const newUrl = "/menus/" + newValue.id;
+            router.push(newUrl);
+          }
+        }}
+        sx={{ width: 200, marginBottom: "1rem" }}
+        // isOptionEqualToValue={()}
+        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+      />
       {selectedLocation.id ? (
         <Typography
           alignSelf={"left"}
