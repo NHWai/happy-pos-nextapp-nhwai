@@ -18,6 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
+import Image from "next/image";
 import React, { useState } from "react";
 
 const initalTable = {
@@ -359,7 +360,7 @@ const Table = () => {
           ) : (
             <>
               <Box>
-                <img
+                <Image
                   src={currTable.asset_url}
                   alt="QR code picture"
                   width={100}
