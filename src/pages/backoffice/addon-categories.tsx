@@ -267,7 +267,7 @@ const MenuCategories = () => {
         isOptionEqualToValue={(option, value) =>
           typeof option.name === typeof value.name
         }
-        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+        renderInput={(params) => <TextField {...params} label="Search" />}
       />
       {selectedLocation.id ? (
         <Typography

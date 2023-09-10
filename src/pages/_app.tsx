@@ -5,6 +5,7 @@ import { BackOfficeContextProvider } from "@/contexts/BackofficeContext";
 import { OrderContextProvider } from "@/contexts/OrderContext";
 import { ThemeProvider } from "@mui/material/styles";
 import theme from "@/config/theme";
+import { Instrument_Serif } from "@next/font/google";
 
 export default function App({ Component, pageProps }: AppProps) {
   return (

@@ -236,7 +236,7 @@ const MenuCategories = () => {
           typeof option.label === typeof value.label
         }
         sx={{ width: 200, marginBottom: "1rem" }}
-        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+        renderInput={(params) => <TextField {...params} label="Search" />}
       />
       {selectedLocation.id ? (
         <Typography
