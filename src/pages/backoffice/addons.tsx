@@ -40,6 +40,7 @@ const Addons = () => {
   const [openSnackBar, setOpenSnackBar] = useState(false);
 
   const [currAddon, setCurrAddon] = useState(initialAddon);
+  const [searchAddon, setSearchAddon] = useState<Addon | null>(null);
 
   React.useEffect(() => {
     if (app.error) {
@@ -47,6 +48,12 @@ const Addons = () => {
       setApp((pre) => ({ ...pre, status: "idle", error: "" }));
     }
   }, [app.error]);
+
+  React.useEffect(() => {
+    if (!open && searchAddon) {
+      setSearchAddon(null);
+    }
+  }, [open]);
 
   const createAddonCategory = async () => {
     const body = {
@@ -231,7 +238,30 @@ const Addons = () => {
       <Typography mt={3} mb={2} variant="h4" color="secondary">
         Addons
       </Typography>
-
+      <Autocomplete
+        size="small"
+        options={addonItems}
+        getOptionLabel={(option: Addon) => option.name}
+        disablePortal
+        value={searchAddon}
+        onChange={(event, newValue) => {
+          if (newValue) {
+            setSearchAddon(newValue);
+            setOpen(true);
+            setCurrAddon({
+              ...newValue,
+              addonCategory: chgAddonCategoryIdtoName(
+                newValue.addon_categories_id
+              ),
+            });
+          }
+        }}
+        isOptionEqualToValue={(option, value) =>
+          typeof option.name === typeof value.name
+        }
+        sx={{ width: 200, marginBottom: "1rem" }}
+        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+      />
       {selectedLocation.id ? (
         <Typography
           alignSelf={"left"}

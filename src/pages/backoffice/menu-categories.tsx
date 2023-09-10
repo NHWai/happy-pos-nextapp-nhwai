@@ -9,6 +9,7 @@ import BackOfficeContext from "@/contexts/BackofficeContext";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 import {
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -33,6 +34,10 @@ const MenuCategories = () => {
   >("");
   const [currMenuCategory, setCurrMenuCategory] = useState(initialMenuCategory);
   const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [searchMenuCategory, setSearchMenuCategory] = useState<{
+    label: string;
+    id: number;
+  } | null>(null);
 
   function showMenus(currId: number) {
     return app.menus
@@ -46,6 +51,12 @@ const MenuCategories = () => {
       setApp((pre) => ({ ...pre, status: "idle", error: "" }));
     }
   }, [app.error]);
+
+  React.useEffect(() => {
+    if (!open && searchMenuCategory) {
+      setSearchMenuCategory(null);
+    }
+  }, [open]);
 
   const createMenuCategory = async () => {
     const body = {
@@ -100,7 +111,6 @@ const MenuCategories = () => {
       );
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         setApp((pre) => ({
           ...pre,
           menuCategories: pre.menuCategories.map((item) =>
@@ -204,6 +214,30 @@ const MenuCategories = () => {
       <Typography mt={3} mb={2} variant="h4" color="secondary">
         MenuCategories
       </Typography>
+      <Autocomplete
+        size="small"
+        options={app.menuCategories?.map((item) => ({
+          label: item.name,
+          id: item.id,
+        }))}
+        disablePortal
+        value={searchMenuCategory}
+        onChange={(
+          event: any,
+          newValue: { label: string; id: number } | null
+        ) => {
+          if (newValue) {
+            setSearchMenuCategory(newValue);
+            setOpen(true);
+            setCurrMenuCategory({ id: newValue.id, name: newValue.label });
+          }
+        }}
+        isOptionEqualToValue={(option, value) =>
+          typeof option.label === typeof value.label
+        }
+        sx={{ width: 200, marginBottom: "1rem" }}
+        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+      />
       {selectedLocation.id ? (
         <Typography
           alignSelf={"left"}

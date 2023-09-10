@@ -89,10 +89,10 @@ export default function Home() {
           </Typography>
 
           <RevealList
-            interval={200}
+            interval={100}
             origin="bottom"
-            delay={100}
-            duration={1000}
+            delay={5}
+            duration={800}
             className="services"
           >
             <Stack

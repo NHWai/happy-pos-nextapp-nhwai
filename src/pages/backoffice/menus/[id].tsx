@@ -21,6 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
@@ -374,7 +375,12 @@ const MenuItem = () => {
               {menuItem.name}
             </Typography>
             <Box sx={{ display: "flex", justifyContent: "center", my: 5 }}>
-              <img width={200} height={150} src={menuItem.asset_url} />
+              <Image
+                src={menuItem.asset_url as string}
+                alt="menuItem Image"
+                width={200}
+                height={150}
+              />
             </Box>
             <LetterBox label="Price" value={`${menuItem.price}MMK`} />
             <LetterBox

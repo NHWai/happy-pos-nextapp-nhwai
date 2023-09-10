@@ -18,6 +18,7 @@ import {
   Typography,
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
+import Image from "next/image";
 import React, { useState } from "react";
 
 const initalTable = {
@@ -33,6 +34,7 @@ const Table = () => {
   const [openConfirmation, setOpenConfirmation] =
     React.useState<boolean>(false);
   const [currTable, setCurrTable] = useState(initalTable);
+  const [searchTable, setSearchTable] = useState<Table | null>(null);
   const [openSnackBar, setOpenSnackBar] = useState(false);
 
   const chgLocationNametoId = (
@@ -55,6 +57,12 @@ const Table = () => {
       setApp((pre) => ({ ...pre, status: "idle", error: "" }));
     }
   }, [app.error]);
+
+  React.useEffect(() => {
+    if (!open && searchTable) {
+      setSearchTable(null);
+    }
+  }, [open]);
 
   const createLocation = async () => {
     const body = {
@@ -210,6 +218,33 @@ const Table = () => {
       <Typography my={2} variant="h4" color="secondary">
         Tables
       </Typography>
+      <Autocomplete
+        size="small"
+        options={tableItems}
+        getOptionLabel={(option: Table) => option.name}
+        onChange={(event: any, newValue) => {
+          if (newValue) {
+            setSearchTable(newValue);
+            setOpen(true);
+            setCurrTable({
+              asset_url: newValue.asset_url,
+              id: newValue.id,
+              location: chgLocationIdtoName(
+                newValue.locations_id,
+                app.locations
+              ),
+              name: newValue.name,
+            });
+          }
+        }}
+        disablePortal
+        value={searchTable}
+        sx={{ width: 200, marginBottom: "1rem" }}
+        isOptionEqualToValue={(option, value) =>
+          typeof option.name === typeof value.name
+        }
+        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+      />
       {selectedLocation.id ? (
         <Typography
           alignSelf={"left"}
@@ -325,7 +360,7 @@ const Table = () => {
           ) : (
             <>
               <Box>
-                <img
+                <Image
                   src={currTable.asset_url}
                   alt="QR code picture"
                   width={100}
