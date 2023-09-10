@@ -188,7 +188,7 @@ const Menus = () => {
           newValue: { label: string; id: number } | null
         ) => {
           if (newValue) {
-            const newUrl = "/menus/" + newValue.id;
+            const newUrl = "menus/" + newValue.id;
             router.push(newUrl);
           }
         }}
