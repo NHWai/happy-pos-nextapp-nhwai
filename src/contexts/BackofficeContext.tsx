@@ -102,7 +102,7 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       if (parsedCompany.id !== company.id) {
         setCompany({ ...parsedCompany });
         fetchApp(parsedCompany.id);
-        console.log("fetch from frontend", company.id);
+        // console.log("fetch from frontend", company.id);
       }
     }
   }, [company.id]);
