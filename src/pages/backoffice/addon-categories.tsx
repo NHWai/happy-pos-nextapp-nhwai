@@ -19,6 +19,8 @@ import BackOfficeContext from "@/contexts/BackofficeContext";
 import { AddonCategory } from "@/typing/types";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
+import CreateBtn from "@/components/CreateBtn";
+import ButtonBox from "@/components/ButtonBox";
 
 const initialAddonCategory = {
   id: 0,
@@ -355,52 +357,15 @@ const MenuCategories = () => {
               value={showAddons(currAddonCategory.id).join(", ")}
             />
           </Box>
-          {/* <Stack
-            sx={{ width: "75%" }}
-            direction={"row"}
-            justifyContent={"space-around"}
-            flexWrap={"wrap"}
-          >
-            <Typography variant="body2" align="left">
-              {" "}
-              Addons :
-            </Typography>
-            <Typography width={"50%"} variant="caption">
-              {showAddons(currAddonCategory.id).join(", ")}
-            </Typography>
-          </Stack> */}
+
           {!currAddonCategory.id ? (
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-            >
-              Submit
-            </Button>
+            <CreateBtn createBtnDisabled={app.status === "loading"} />
           ) : (
             !selectedLocation.id && (
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
+              <ButtonBox
+                delBtnClick={() => setOpenConfirmation(true)}
+                editBtnDisabled={app.status === "loading"}
+              />
             )
           )}
         </Box>

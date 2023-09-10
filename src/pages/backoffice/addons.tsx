@@ -1,5 +1,7 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
+import ButtonBox from "@/components/ButtonBox";
 import ConfirmationBox from "@/components/ConfirmationBox";
+import CreateBtn from "@/components/CreateBtn";
 import ModalBox from "@/components/ModalBox";
 import { config } from "@/config/config";
 import BackOfficeContext from "@/contexts/BackofficeContext";
@@ -389,37 +391,13 @@ const Addons = () => {
             </label>
           )}
           {!currAddon.id ? (
-            <Button
-              disabled={app.status === "loading"}
-              variant="contained"
-              type="submit"
-            >
-              Submit
-            </Button>
+            <CreateBtn createBtnDisabled={app.status === "loading"} />
           ) : (
             !selectedLocation.id && (
-              <Stack
-                direction="row"
-                justifyContent={"space-between"}
-                width="100%"
-              >
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={() => {
-                    setOpenConfirmation(true);
-                  }}
-                >
-                  Delete
-                </Button>
-                <Button
-                  disabled={app.status === "loading"}
-                  variant="outlined"
-                  type="submit"
-                >
-                  Edit
-                </Button>
-              </Stack>
+              <ButtonBox
+                delBtnClick={() => setOpenConfirmation(true)}
+                editBtnDisabled={app.status === "loading"}
+              />
             )
           )}
         </Box>

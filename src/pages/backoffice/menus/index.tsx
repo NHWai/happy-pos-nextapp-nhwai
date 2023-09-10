@@ -1,4 +1,5 @@
 import BackofficeLayout from "@/components/BackofficeLayout";
+import CreateBtn from "@/components/CreateBtn";
 import DropFileBox from "@/components/DropFileBox";
 
 import ModalBox from "@/components/ModalBox";
@@ -332,15 +333,7 @@ const Menus = () => {
               </label>
             ))}
           </Box>
-
-          <Button
-            disabled={app.status === "loading"}
-            variant="contained"
-            type="submit"
-            sx={{ alignSelf: "end" }}
-          >
-            Submit
-          </Button>
+          <CreateBtn createBtnDisabled={app.status === "loading"} />
         </Box>
       </ModalBox>
       <Snackbar

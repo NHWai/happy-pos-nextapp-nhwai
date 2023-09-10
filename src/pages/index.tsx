@@ -67,12 +67,8 @@ export default function Home() {
           <Button component={RouterLink} href="/backoffice" variant="contained">
             BackOffice App
           </Button>
-          <Button
-            component={RouterLink}
-            href="/order?locationId=5&tableId=6"
-            variant="contained"
-          >
-            Order App
+          <Button component={RouterLink} href="/userguide" variant="contained">
+            User Guide
           </Button>
         </Box>
         <Box
