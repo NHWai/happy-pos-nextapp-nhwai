@@ -1,4 +1,4 @@
-import Stack from "@mui/material/Stack/Stack";
+import Stack from "@mui/material/Stack";
 import React from "react";
 import EditBtn from "./EditBtn";
 import DelBtn from "./DelBtn";
