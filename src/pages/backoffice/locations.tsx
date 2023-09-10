@@ -225,7 +225,7 @@ const Location = () => {
         isOptionEqualToValue={(option, value) =>
           typeof option.name === typeof value.name
         }
-        renderInput={(params) => <TextField {...params} label="Search Menus" />}
+        renderInput={(params) => <TextField {...params} label="Search" />}
       />
       <Stack
         sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
