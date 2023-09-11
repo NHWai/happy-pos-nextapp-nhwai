@@ -5,13 +5,16 @@ import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import KeyboardDoubleArrowRightIcon from "@mui/icons-material/KeyboardDoubleArrowRight";
 import Link from "next/link";
 import React from "react";
+import { useRouter } from "next/router";
 
 export default function UserGuide() {
+  const router = useRouter();
   return (
     <MainLayout>
       <Box sx={{ padding: "1rem" }}>
-        <Box sx={{ textDecoration: "none" }} component={Link} href="/">
+        <Box sx={{ textDecoration: "none" }}>
           <Button
+            onClick={() => router.back()}
             color="secondary"
             startIcon={<KeyboardBackspaceIcon color="secondary" />}
           >
@@ -23,7 +26,7 @@ export default function UserGuide() {
           color="primary.dark"
           sx={{ margin: "1rem 0 1rem" }}
         >
-          User Manual
+          User Guide
         </Typography>
         <ul style={{ marginLeft: "2rem" }}>
           <UsrManualList content="First create your account in our POS system by signing in with your Google Account." />

@@ -88,9 +88,6 @@ export default function Navbar() {
       link: "setting",
     },
   ];
-  // const pageLabel =
-  //   drawerItems[drawerItems.findIndex((el) => el.link === pathname.slice(1))]
-  //     ?.label || "Food4Live";
 
   const pageLabel = (
     <>
@@ -231,6 +228,11 @@ export default function Navbar() {
                   <AccountCircle />
                 </IconButton>
                 <Menu
+                  PaperProps={{
+                    style: {
+                      width: 100,
+                    },
+                  }}
                   anchorEl={anchorEl}
                   anchorOrigin={{
                     vertical: "bottom",
@@ -250,7 +252,13 @@ export default function Navbar() {
                       localStorage.removeItem("company");
                     }}
                   >
-                    SignOut
+                    <Typography variant="caption">Sign Out</Typography>
+                  </MenuItem>
+                  <MenuItem component={RouterLink} href="/userguide">
+                    <Typography variant="caption">User Guide</Typography>
+                  </MenuItem>
+                  <MenuItem component={RouterLink} href="/setting">
+                    <Typography variant="caption">Setting</Typography>
                   </MenuItem>
                 </Menu>
               </div>

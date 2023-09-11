@@ -211,8 +211,14 @@ const MenuCategories = () => {
 
   return (
     <BackofficeLayout>
-      <Typography mt={3} mb={2} variant="h4" color="secondary">
-        MenuCategories
+      <Typography
+        mt={3}
+        mb={2}
+        variant="h4"
+        color="secondary"
+        textAlign={"center"}
+      >
+        Menu Categories
       </Typography>
       <Autocomplete
         size="small"

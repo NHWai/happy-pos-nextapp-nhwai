@@ -206,7 +206,7 @@ const Menus = () => {
         ""
       )}
       <Stack
-        sx={{ maxWidth: "400px", mx: "auto", px: 3, flexWrap: "wrap" }}
+        sx={{ maxWidth: "400px", mx: "auto", flexWrap: "wrap" }}
         alignItems="center"
         direction="row"
         gap={1}
