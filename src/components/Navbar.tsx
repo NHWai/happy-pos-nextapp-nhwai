@@ -257,7 +257,7 @@ export default function Navbar() {
                   <MenuItem component={RouterLink} href="/userguide">
                     <Typography variant="caption">User Guide</Typography>
                   </MenuItem>
-                  <MenuItem component={RouterLink} href="/setting">
+                  <MenuItem component={RouterLink} href="backoffice/setting">
                     <Typography variant="caption">Setting</Typography>
                   </MenuItem>
                 </Menu>

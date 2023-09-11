@@ -280,7 +280,10 @@ const Menus = () => {
               {dropZoneFiles.length > 0 ? (
                 <Typography variant="body2">{files}</Typography>
               ) : (
-                <p>Drag 'n' drop some files here, or click to select files</p>
+                <p>
+                  Drag 'n' drop your image here, or click to select files.
+                  Supported Format ".png", ".jpg", ".jfif"
+                </p>
               )}
             </Box>
           </DropFileBox>
