@@ -11,7 +11,7 @@ export default function LetterBox({ label, value }: Props) {
       sx={{
         display: "flex",
         alignItems: "baseline",
-        minWidth: "240px",
+        minWidth: "260px",
         maxWidth: "300px",
       }}
     >
@@ -25,9 +25,9 @@ export default function LetterBox({ label, value }: Props) {
       </Typography>
       <Typography
         fontWeight="bold"
-        color="secondary"
+        color="primary"
         textAlign={"center"}
-        width="5%"
+        width="10%"
       >
         :
       </Typography>
