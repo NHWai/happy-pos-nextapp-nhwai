@@ -341,7 +341,7 @@ export default function Menu() {
         open={open}
         autoHideDuration={6000}
         onClose={closeSnackBar}
-        message="Added to card"
+        message="Added to cart"
         action={action}
       />
     </OrderLayout>

@@ -1,19 +1,13 @@
 import OrderLayout from "@/components/OrderLayout";
 import OrderContext from "@/contexts/OrderContext";
-import {
-  Box,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
-  Typography,
-} from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import Image from "next/image";
 import RouterLink from "next/link";
 import { useRouter } from "next/router";
 import { useContext, useEffect } from "react";
 import mypic from "../../assets/logo-no-background.png";
+import { RevealList } from "next-reveal";
 
 const style = {
   width: "100%",
@@ -21,10 +15,6 @@ const style = {
   textAlign: "center",
   marginTop: "2rem",
 };
-
-function capitalize(str: string) {
-  return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-}
 
 const OrderApp = () => {
   const { app, getMenusByLocationId } = useContext(OrderContext);
@@ -68,29 +58,34 @@ const OrderApp = () => {
           Make Your Orders Here!!
         </Typography>
 
-        <List sx={style} component="nav" aria-label="mailbox folders">
+        <Box sx={style}>
           {app.status === "loading" ? (
             <CircularProgress />
           ) : (
-            <>
-              {app.menuCategories.map((el, idx) => (
+            <RevealList
+              interval={300}
+              origin="bottom"
+              delay={100}
+              duration={1000}
+              className="menuCategories"
+            >
+              {app.menuCategories.map((el) => (
                 <div key={el.name}>
-                  <ListItem
-                    button
+                  <Button
                     component={RouterLink}
                     href={`/order/${el.name}`}
+                    color="info"
+                    size="medium"
+                    variant="contained"
+                    sx={{ width: "200px", color: "primary.main" }}
                   >
-                    <ListItemText
-                      primary={capitalize(el.name)}
-                      sx={{ textAlign: "center", color: "secondary.main" }}
-                    />
-                  </ListItem>
-                  {app.menuCategories.length - 1 !== idx && <Divider />}
+                    {el.name}
+                  </Button>
                 </div>
               ))}
-            </>
+            </RevealList>
           )}
-        </List>
+        </Box>
       </Box>
     </OrderLayout>
   );

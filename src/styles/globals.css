@@ -15,6 +15,13 @@ html.sr .load-hidden {
   justify-content: center;
  }
 
+ .menuCategories{
+  display: flex;
+  flex-direction: column;
+  gap:1rem;
+  visibility: hidden;
+ }
+
  .blob-background {
   position: fixed;
   top: 0;
