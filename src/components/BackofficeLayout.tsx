@@ -23,6 +23,7 @@ const BackofficeLayout = ({ children }: Props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
+          paddingBottom: "1rem",
         }}
       >
         {company.id ? <> {children}</> : <Company />}
