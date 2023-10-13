@@ -63,6 +63,7 @@ export interface MenusMenuCategoriesLocations {
 export interface Company extends BaseType {
   address: string;
   error: string;
+  status: Status;
 }
 
 export interface ContextType {
