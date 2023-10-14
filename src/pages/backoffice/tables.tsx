@@ -11,6 +11,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import {
   Box,
   Chip,
+  CircularProgress,
   IconButton,
   Snackbar,
   Stack,
@@ -19,7 +20,9 @@ import {
 } from "@mui/material";
 import Autocomplete from "@mui/material/Autocomplete";
 import Image from "next/image";
-import React, { useState } from "react";
+import Link from "next/link";
+import qrcodeParser from "qrcode-parser";
+import React, { useEffect, useState } from "react";
 
 const initalTable = {
   id: 0,
@@ -36,6 +39,11 @@ const Table = () => {
   const [currTable, setCurrTable] = useState(initalTable);
   const [searchTable, setSearchTable] = useState<Table | null>(null);
   const [openSnackBar, setOpenSnackBar] = useState(false);
+  const [tableUrl, setTableUrl] = React.useState("");
+
+  useEffect(() => {
+    qrcodeParser(currTable.asset_url).then((url) => setTableUrl(url));
+  }, [currTable.asset_url]);
 
   const chgLocationNametoId = (
     locationName: string,
@@ -274,7 +282,14 @@ const Table = () => {
           <AddCircleOutlineIcon color="primary" />
         </IconButton>
         {app.status === "loading" ? (
-          <div>Loading...</div>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
         ) : app.tables.length > 0 ? (
           <>
             {tableItems?.map((item) => (
@@ -367,6 +382,9 @@ const Table = () => {
                   height={100}
                 />
               </Box>
+              <Link href={tableUrl} target="_blank">
+                Make Orders Here &#62;&#62;
+              </Link>
               <ButtonBox
                 delBtnClick={() => setOpenConfirmation(true)}
                 editBtnDisabled={app.status === "loading"}

@@ -11,6 +11,7 @@ import {
   Autocomplete,
   Box,
   Chip,
+  CircularProgress,
   IconButton,
   Snackbar,
   Stack,
@@ -216,13 +217,23 @@ const Menus = () => {
             onClick={() => {
               setOpen(true);
               setDropZoneFiles([]);
+              setSelectedAddonCategories([]);
+              setSelectedMenuCategories([]);
+              setSelectedLocations([]);
             }}
           >
             <AddCircleOutlineIcon color="primary" />
           </IconButton>
         )}
         {app.status === "loading" ? (
-          <div>Loading...</div>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
         ) : app.status === "idle" && app.menus.length > 0 ? (
           menuItems.map((item) => (
             <Chip
