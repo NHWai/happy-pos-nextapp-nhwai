@@ -18,7 +18,7 @@ const Company = () => {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    fetchCompany(companyName);
+    fetchCompany(companyName.trim());
   };
 
   const handleClose = (
