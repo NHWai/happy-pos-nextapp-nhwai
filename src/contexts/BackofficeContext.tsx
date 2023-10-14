@@ -13,7 +13,7 @@ import {
 
 import { createContext, ReactNode, useEffect, useState } from "react";
 
-interface AppType {
+export interface AppType {
   locations: Location[];
   menus: Menu[];
   menuCategories: MenuCategory[];
