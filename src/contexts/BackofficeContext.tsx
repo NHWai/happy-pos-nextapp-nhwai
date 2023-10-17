@@ -13,7 +13,7 @@ import {
 
 import { createContext, ReactNode, useEffect, useState } from "react";
 
-interface AppType {
+export interface AppType {
   locations: Location[];
   menus: Menu[];
   menuCategories: MenuCategory[];
@@ -62,6 +62,14 @@ const initialBackOfficeOrderlines: BackofficeOrderlinesType = {
   status: "idle",
 };
 
+const initialCompany: Company = {
+  id: 0,
+  address: "",
+  name: "",
+  error: "",
+  status: "idle",
+};
+
 //
 const BackOfficeContext = createContext<BackOfficeContextType>({
   app: initialApp,
@@ -72,7 +80,7 @@ const BackOfficeContext = createContext<BackOfficeContextType>({
   setBackofficeOrderlines: () => [],
   getOrders: (locationId?: number) => {},
   fetchCompany: (companyName: string) => {},
-  company: { id: 0, address: "", name: "", error: "" },
+  company: initialCompany,
 });
 
 interface Props {
@@ -82,12 +90,7 @@ interface Props {
 export const BackOfficeContextProvider = ({ children }: Props) => {
   const [app, setApp] = useState<AppType>(initialApp);
 
-  const [company, setCompany] = useState<Company>({
-    id: 0,
-    address: "",
-    name: "",
-    error: "",
-  });
+  const [company, setCompany] = useState<Company>(initialCompany);
 
   const [selectedLocation, setSelectedLocation] =
     useState<Location>(initialLocation);
@@ -108,6 +111,7 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
   }, [company.id]);
 
   const fetchCompany = async (companyName: string) => {
+    setCompany((pre) => ({ ...pre, status: "loading", error: "" }));
     try {
       const response = await fetch(`${config.baseurl}/backoffice/companies`, {
         method: "POST",
@@ -115,15 +119,18 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       });
       if (response.ok) {
         const data = await response.json();
-        console.log(data);
         localStorage.setItem("company", JSON.stringify(data));
-        setCompany({ ...data, error: "" });
+        setCompany({ ...data, error: "", status: "idle" });
         fetchApp(data.id);
       } else {
         throw new Error("Fail to fetch company id");
       }
     } catch (error) {
-      setCompany((pre) => ({ ...pre, error: error as string }));
+      setCompany((pre) => ({
+        ...pre,
+        error: error as string,
+        status: "failed",
+      }));
     }
   };
 
@@ -136,6 +143,7 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       );
       if (response.status) {
         const data = await response.json();
+        console.log(data);
         setBackofficeOrderlines((pre) => ({
           items: data,
           status: "idle",
@@ -154,6 +162,7 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
   };
 
   const fetchApp = async (companyId: string) => {
+    setApp((pre) => ({ ...pre, status: "loading" }));
     try {
       const res = await fetch(
         `${config.baseurl}/backoffice/app?companyId=${companyId}`

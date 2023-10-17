@@ -27,7 +27,6 @@ const BackofficeLayout = ({ children }: Props) => {
         }}
       >
         {company.id ? <> {children}</> : <Company />}
-        {/* {children} */}
       </Box>
     </MainLayout>
   );

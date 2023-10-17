@@ -7,7 +7,7 @@ export default async function handler(
 ) {
   const locationId = Number(req.query.locationId);
   if (!locationId) {
-    res.status(400).end();
+    return res.status(400).end();
   }
 
   const location = await prisma.locations.findUnique({

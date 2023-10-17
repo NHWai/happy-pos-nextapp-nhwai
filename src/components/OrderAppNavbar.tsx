@@ -5,16 +5,28 @@ import Image from "next/image";
 import { useEffect, useState } from "react";
 import mypic from "../assets/logo-no-background.png";
 import RouterLink from "next/link";
+import { useRouter } from "next/router";
 
 export default function OrderAppNavbar() {
   const [locationTable, setLocationTable] = useState({
     locationId: "",
     tableId: "",
   });
+  const router = useRouter();
+  const locationIdQueryParams = router.query.locationId as string;
+  const tableIdQueryParams = router.query.tableId as string;
   useEffect(() => {
     const locationId = localStorage.getItem("OrderlocationId");
     const tableId = localStorage.getItem("OrdertableId");
-    if (locationId && tableId) {
+
+    if (locationIdQueryParams && tableIdQueryParams) {
+      setLocationTable({
+        locationId: locationIdQueryParams,
+        tableId: tableIdQueryParams,
+      });
+      localStorage.setItem("OrderlocationId", locationIdQueryParams);
+      localStorage.setItem("OrdertableId", tableIdQueryParams);
+    } else if (locationId && tableId) {
       setLocationTable({ locationId, tableId });
     }
   }, []);

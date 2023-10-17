@@ -13,6 +13,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   IconButton,
   Snackbar,
   Stack,
@@ -244,7 +245,14 @@ const Location = () => {
           </IconButton>
         )}
         {app.status === "loading" ? (
-          <div>Loading...</div>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
         ) : app.locations.length > 0 ? (
           <>
             {app.locations?.map((item) => (

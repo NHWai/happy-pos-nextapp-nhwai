@@ -1,49 +1,20 @@
 import React, { createContext, useEffect, useState } from "react";
 import { config } from "@/config/config";
-import {
-  Addon,
-  AddonCategory,
-  OrderMenu,
-  MenuCategory,
-  Status,
-  Location,
-  OrderLineType,
-} from "@/typing/types";
+import { OrderLineType } from "@/typing/types";
 
-interface AppContextType {
-  menus: OrderMenu[];
-  menuCategories: MenuCategory[];
-  addons: Addon[];
-  addonCategories: AddonCategory[];
-  location: Location;
-  tableId: number;
-  status: Status;
-  error: string;
+export interface TotalOrderLineType {
+  confirmed: OrderLineType[];
+  unconfirmed: OrderLineType[];
 }
 
 interface OrderContextType {
-  app: AppContextType;
-  orderLines: OrderLineType[];
-  setOrderLines: React.Dispatch<React.SetStateAction<OrderLineType[]>>;
-  getMenusByLocationId: (locationId: number) => void;
+  orderLines: TotalOrderLineType;
+  setOrderLines: React.Dispatch<React.SetStateAction<TotalOrderLineType>>;
 }
 
-const initialApp: AppContextType = {
-  menus: [],
-  menuCategories: [],
-  addons: [],
-  addonCategories: [],
-  location: { id: 0, name: "", address: "", companies_id: 0 },
-  tableId: 0,
-  status: "idle",
-  error: "",
-};
-
 const OrderContext = createContext<OrderContextType>({
-  app: initialApp,
-  orderLines: [],
+  orderLines: { confirmed: [], unconfirmed: [] },
   setOrderLines: () => {},
-  getMenusByLocationId: (locationId: number) => {},
 });
 
 interface Props {
@@ -51,8 +22,10 @@ interface Props {
 }
 
 export function OrderContextProvider({ children }: Props) {
-  const [app, setApp] = useState<AppContextType>(initialApp);
-  const [orderLines, setOrderLines] = useState<OrderLineType[]>([]);
+  const [orderLines, setOrderLines] = useState<TotalOrderLineType>({
+    confirmed: [],
+    unconfirmed: [],
+  });
 
   useEffect(() => {
     const orderlists = localStorage.getItem("orderlists");
@@ -62,40 +35,26 @@ export function OrderContextProvider({ children }: Props) {
     }
   }, []);
 
-  async function getMenusByLocationId(locationId: number) {
-    setApp((pre) => ({
-      ...pre,
-      status: "loading",
-    }));
-    try {
-      const response = await fetch(
-        `${config.baseurl}/order/app?locationId=${locationId}`
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch menus by location id");
-      }
-
-      const data = await response.json();
-      setApp({
-        ...data,
-        error: "",
-        status: "idle",
-        tableId: Number(localStorage.getItem("OrdertableId")),
-      });
-    } catch (error) {
-      setApp((pre) => ({
-        ...pre,
-        status: "failed",
-        error: error as string,
-      }));
+  useEffect(() => {
+    if (orderLines.confirmed.length || orderLines.unconfirmed.length) {
+      localStorage.setItem("orderlists", JSON.stringify(orderLines));
     }
-  }
+    if (orderLines.confirmed.length > 0) {
+      const preparingAndPendingIds = orderLines.confirmed
+        .filter(
+          (item) =>
+            item.orderStatus === "PREPARING" || item.orderStatus === "PENDING"
+        )
+        .map((item) => item.id);
+      localStorage.setItem(
+        "PendingAndPreparingOrderIds",
+        JSON.stringify(preparingAndPendingIds)
+      );
+    }
+  }, [orderLines]);
 
   return (
-    <OrderContext.Provider
-      value={{ app, getMenusByLocationId, orderLines, setOrderLines }}
-    >
+    <OrderContext.Provider value={{ orderLines, setOrderLines }}>
       {children}
     </OrderContext.Provider>
   );

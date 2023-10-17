@@ -105,7 +105,6 @@ export default async function handler(
       locations,
       tables,
     };
-    console.log("request from frontend");
     res.status(200).json(response);
   } else {
     return res.status(404).end();

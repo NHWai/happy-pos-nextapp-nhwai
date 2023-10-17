@@ -13,6 +13,7 @@ import {
   Box,
   Button,
   Chip,
+  CircularProgress,
   IconButton,
   Snackbar,
   Stack,
@@ -280,7 +281,14 @@ const MenuCategories = () => {
           </IconButton>
         )}
         {app.status === "loading" ? (
-          <div>Loading</div>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+            }}
+          >
+            <CircularProgress />
+          </Box>
         ) : app.status === "idle" && app.menuCategories?.length > 0 ? (
           <>
             {app.menuCategories?.map((item) => (
