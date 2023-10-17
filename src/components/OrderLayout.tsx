@@ -32,7 +32,8 @@ const OrderApp = ({ children, height }: Props) => {
       >
         {children}
       </Box>
-      {orderLines.length > 0 && <OrderAppBottombar />}
+      {(orderLines.unconfirmed.length > 0 ||
+        orderLines.confirmed.length > 0) && <OrderAppBottombar />}
     </MainLayout>
   );
 };

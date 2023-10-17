@@ -3,31 +3,34 @@ import { Box, Button, IconButton, Snackbar, Typography } from "@mui/material";
 import { useRouter } from "next/router";
 import React, { useContext, useEffect, useState } from "react";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
-import OrderContext from "@/contexts/OrderContext";
-import { Addon, AddonCategory, OrderLineType, OrderMenu } from "@/typing/types";
+import OrderContext, { TotalOrderLineType } from "@/contexts/OrderContext";
 import AccordionComponent from "@/components/AccordionComponent";
-import CircularProgress from "@mui/material/CircularProgress";
+
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  FetchOrderMenusByIdType,
+  fetchOrderMenusById,
+} from "@/config/orderDataFetching";
+import { GetServerSideProps, GetServerSidePropsContext } from "next/types";
+import { OrderLineType } from "@/typing/types";
 
-const initialMenuItem: OrderMenu = {
-  addonCategoryArr: [],
-  id: 0,
-  menuCategoryArr: [],
-  name: "",
-  price: 0,
+type ServerSideProps = {
+  data: FetchOrderMenusByIdType;
 };
 
-export default function Menu() {
-  const { app, setOrderLines, orderLines, getMenusByLocationId } =
-    useContext(OrderContext);
+export default function Menu({ data }: ServerSideProps) {
+  const { setOrderLines, orderLines } = useContext(OrderContext);
   const router = useRouter();
-  const [menuItem, setMenuItem] = useState<OrderMenu>(initialMenuItem);
   const [qty, setQty] = useState(1);
   const [formData, setFormData] = useState<any>({});
 
   const [open, setOpen] = React.useState(false);
+
+  // useEffect(() => {
+  //   console.log(orderLines);
+  // }, [orderLines]);
 
   const openSnackBar = () => {
     setOpen(true);
@@ -48,103 +51,86 @@ export default function Menu() {
   const hasOrderLineId = !isNaN(orderlineId) && typeof orderlineId === "number";
 
   useEffect(() => {
-    if (!app.location.id) {
-      const locationId = localStorage.getItem("OrderlocationId");
-      getMenusByLocationId(Number(locationId));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (typeof router.query.id === "string" && app.location.id) {
-      setMenuItem(filteredMenuItem(router.query.id));
-    }
     if (hasOrderLineId) {
-      const prevOrder = orderLines[orderlineId];
-      const addonData = orderLines[orderlineId]?.formData;
+      const prevOrder = orderLines.unconfirmed[orderlineId];
+      const addonData = orderLines.unconfirmed[orderlineId]?.formData;
       setFormData(addonData);
       setQty(prevOrder.qty);
     }
-  }, [router.query.id, app.location.id, router.query]);
+  }, [router.query.id, router.query]);
 
-  // useEffect(() => {
-  //   console.log(orderLines);
-  // }, [orderLines.length]);
+  const requiredAddons = data.totalAddonCategories.required.map(
+    (item) => item.addons
+  );
+  const optionalAddons = data.totalAddonCategories.optional.map(
+    (item) => item.addons
+  );
+  const totalAddons = [...requiredAddons, ...optionalAddons].flat();
 
-  function filteredMenuItem(id: string): OrderMenu {
-    return app.menus.filter((item) => item.id === Number(id))[0];
-  }
+  const requiredAddonCategories = data.totalAddonCategories.required.map(
+    (item) => item.name
+  );
 
-  const filteredAddonCat = (): {
-    requiredCat: AddonCategory[];
-    optionalCat: AddonCategory[];
-  } => {
-    let requiredCat, optionalCat;
-
-    const totalCat = app.addonCategories.filter((item) =>
-      menuItem.addonCategoryArr.find((el) => el.id === item.id)
-    );
-    requiredCat = totalCat.filter((item) => item.is_required);
-    optionalCat = totalCat.filter((item) => !item.is_required);
-    return {
-      requiredCat,
-      optionalCat,
-    };
-  };
-
-  const filteredAddons = (addonCatId: number): Addon[] => {
-    return app.addons.filter((item) => item.addon_categories_id === addonCatId);
-  };
+  const formDataAddonCategory = Object.keys(formData);
+  const checkRequiredAddonCategory = requiredAddonCategories.every(
+    (item) => formDataAddonCategory.indexOf(item) >= 0
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formDataAddonCat = Object.keys(formData);
-    const requiredAddonCat = filteredAddonCat().requiredCat;
-    const isValid = requiredAddonCat.every((item) =>
-      formDataAddonCat.includes(item.name)
-    );
-    const totalAddons = Object.values(formData) as string[];
-    const totalAddonPrice: number[] = totalAddons.map(
-      (item) => app.addons.find((addon) => addon.name === item)?.price as number
-    );
-    const totalPriceForOne = [...totalAddonPrice, menuItem.price].reduce(
-      (acc, curr) => acc + curr,
-      0
-    );
 
-    const totalPrice = totalPriceForOne * qty;
-    if (isValid) {
-      const order: OrderLineType = {
-        name: menuItem.name,
-        price: totalPrice,
-        qty,
-        addons: totalAddons,
-        formData,
-        id: 0,
-        orderStatus: "PENDING",
-        isConfirm: false,
-      };
+    const formDataAddons = Object.values(formData);
 
-      if (hasOrderLineId) {
-        //editing orderline element
-        const preOrderLines = JSON.parse(JSON.stringify(orderLines));
-        preOrderLines[orderlineId] = order;
-        setOrderLines(preOrderLines);
-        localStorage.setItem("orderlists", JSON.stringify(preOrderLines));
-      } else {
-        //adding new element to orderline
-        setOrderLines((pre) => {
-          const newOrder = [...pre, order];
-          localStorage.setItem("orderlists", JSON.stringify(newOrder));
-          return newOrder;
-        });
+    let totalAddonPriceForOne = 0;
+    totalAddons.forEach((addon) => {
+      if (formDataAddons.some((item) => item === addon.name)) {
+        totalAddonPriceForOne += addon.price;
       }
+    });
+    const priceForOneItem = totalAddonPriceForOne + data.menu.price;
 
-      //reseting states to initial state
-      setFormData({});
-      setQty(1);
-      openSnackBar();
+    const totalPrice = priceForOneItem * qty;
+
+    const order: OrderLineType = {
+      menu: data.menu,
+      qty,
+      price: totalPrice,
+      addons: totalAddons.filter((item) =>
+        formDataAddons.some((el) => el === item.name)
+      ),
+      id: 0,
+      formData,
+      orderStatus: "PENDING",
+      isConfirm: false,
+    };
+
+    if (hasOrderLineId) {
+      //editing orderline element
+
+      setOrderLines((pre) => {
+        return {
+          ...pre,
+          unconfirmed: [
+            ...pre.unconfirmed.slice(0, orderlineId),
+            order,
+            ...pre.unconfirmed.slice(orderlineId + 1),
+          ],
+        };
+      });
+    } else {
+      //adding new element to orderline
+
+      setOrderLines((pre) => {
+        return {
+          ...pre,
+          unconfirmed: [...pre.unconfirmed, order],
+        };
+      });
     }
-    return;
+    //reseting states to initial state
+    setFormData({});
+    setQty(1);
+    openSnackBar();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -182,160 +168,148 @@ export default function Menu() {
       >
         Go Back
       </Button>
-      {!menuItem?.id ? (
+
+      <Box
+        sx={{
+          width: "100%",
+          maxWidth: "300px",
+        }}
+      >
         <Box
           sx={{
-            marginTop: "5rem",
             display: "flex",
-            justifyContent: "center",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "1rem",
           }}
         >
-          <CircularProgress />
+          <Typography variant="h6" color="secondary">
+            {data.menu.name}
+          </Typography>
+          <Typography color="secondary">{data.menu.price} MMK</Typography>
         </Box>
-      ) : (
-        <>
-          <Box
-            sx={{
-              width: "100%",
-              maxWidth: "300px",
-            }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "1rem",
-              }}
-            >
-              <Typography variant="h6" color="secondary">
-                {menuItem.name}
-              </Typography>
-              <Typography color="secondary">{menuItem.price} MMK</Typography>
-            </Box>
-            <form onSubmit={handleSubmit}>
-              {filteredAddonCat().requiredCat.map((item) => {
-                return (
-                  <AccordionComponent
-                    name={item.name + "(required)"}
-                    key={item.id}
-                    isExpanded={true}
-                  >
+        <form onSubmit={handleSubmit}>
+          {data.totalAddonCategories.required.map((item) => {
+            return (
+              <AccordionComponent
+                name={item.name + "(required)"}
+                key={item.id}
+                isExpanded={true}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 1,
+                  }}
+                >
+                  {item.addons.map((addon) => {
+                    return (
+                      <Box
+                        key={addon.id}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                        }}
+                      >
+                        <label>
+                          <input
+                            type="radio"
+                            name={item.name}
+                            value={addon.name}
+                            checked={formData[item.name] === addon.name}
+                            onChange={handleChange}
+                          />
+                          {" " + addon.name}
+                        </label>
+                        <Box>
+                          {addon.price === 0 ? "Free" : addon.price + " MMK"}
+                        </Box>
+                      </Box>
+                    );
+                  })}
+                </Box>
+              </AccordionComponent>
+            );
+          })}
+          {data.totalAddonCategories.optional.map((item) => {
+            return (
+              <AccordionComponent name={item.name + "(optional)"} key={item.id}>
+                {item.addons.map((addon) => {
+                  return (
                     <Box
+                      key={addon.id}
                       sx={{
                         display: "flex",
-                        flexDirection: "column",
-                        gap: 1,
+                        justifyContent: "space-between",
                       }}
                     >
-                      {filteredAddons(item.id).map((addon) => {
-                        return (
-                          <Box
-                            key={addon.id}
-                            sx={{
-                              display: "flex",
-                              justifyContent: "space-between",
-                            }}
-                          >
-                            <label>
-                              <input
-                                type="radio"
-                                name={item.name}
-                                value={addon.name}
-                                checked={formData[item.name] === addon.name}
-                                onChange={handleChange}
-                              />
-                              {" " + addon.name}
-                            </label>
-                            <Box>
-                              {addon.price === 0
-                                ? "Free"
-                                : addon.price + " MMK"}
-                            </Box>
-                          </Box>
-                        );
-                      })}
+                      <label>
+                        <input
+                          type="radio"
+                          name={item.name}
+                          value={addon.name}
+                          onChange={handleChange}
+                          checked={formData[item.name] === addon.name}
+                        />
+                        {" " + addon.name}
+                      </label>
+                      <Box>
+                        {addon.price === 0 ? "Free" : addon.price + " MMK"}
+                      </Box>
                     </Box>
-                  </AccordionComponent>
-                );
-              })}
-              {filteredAddonCat().optionalCat.map((item) => {
-                return (
-                  <AccordionComponent
-                    name={item.name + "(optional)"}
-                    key={item.id}
+                  );
+                })}
+                {item.name in formData && (
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    color="error"
+                    sx={{ marginTop: "1rem" }}
+                    onClick={() => handleClear(item.name)}
                   >
-                    {filteredAddons(item.id).map((addon) => {
-                      return (
-                        <Box
-                          key={addon.id}
-                          sx={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                          }}
-                        >
-                          <label>
-                            <input
-                              type="radio"
-                              name={item.name}
-                              value={addon.name}
-                              onChange={handleChange}
-                              checked={formData[item.name] === addon.name}
-                            />
-                            {" " + addon.name}
-                          </label>
-                          <Box>
-                            {addon.price === 0 ? "Free" : addon.price + " MMK"}
-                          </Box>
-                        </Box>
-                      );
-                    })}
-                    {item.name in formData && (
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        color="error"
-                        sx={{ marginTop: "1rem" }}
-                        onClick={() => handleClear(item.name)}
-                      >
-                        Clear
-                      </Button>
-                    )}
-                  </AccordionComponent>
-                );
-              })}
+                    Clear
+                  </Button>
+                )}
+              </AccordionComponent>
+            );
+          })}
 
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-evenly",
-                  alignItems: "center",
-                  marginY: "1rem",
-                }}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-evenly",
+              alignItems: "center",
+              marginY: "1rem",
+            }}
+          >
+            <Box sx={{ display: "flex", alignItems: "center" }}>
+              <IconButton
+                onClick={() => setQty((pre) => (pre > 1 ? pre - 1 : pre))}
+                color="primary"
               >
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <IconButton
-                    onClick={() => setQty((pre) => (pre > 1 ? pre - 1 : pre))}
-                    color="primary"
-                  >
-                    <RemoveIcon />
-                  </IconButton>
-                  <Typography variant="body1">{qty}</Typography>
-                  <IconButton
-                    onClick={() => setQty((pre) => pre + 1)}
-                    color="primary"
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-                <Button variant="contained" size="small" type="submit">
-                  {hasOrderLineId ? "Edit Order" : "Add to Cart"}
-                </Button>
-              </Box>
-            </form>
+                <RemoveIcon />
+              </IconButton>
+              <Typography variant="body1">{qty}</Typography>
+              <IconButton
+                onClick={() => setQty((pre) => pre + 1)}
+                color="primary"
+              >
+                <AddIcon />
+              </IconButton>
+            </Box>
+            <Button
+              variant="contained"
+              size="small"
+              type="submit"
+              disabled={!checkRequiredAddonCategory}
+            >
+              {hasOrderLineId ? "Edit Order" : "Add to Cart"}
+            </Button>
           </Box>
-        </>
-      )}
+        </form>
+      </Box>
+
       {/* <Button onClick={handleClick}>Open simple snackbar</Button> */}
       <Snackbar
         open={open}
@@ -347,3 +321,21 @@ export default function Menu() {
     </OrderLayout>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context: GetServerSidePropsContext
+) => {
+  try {
+    const menuId = context.query.id as string;
+
+    const data = await fetchOrderMenusById(menuId);
+    return {
+      props: { data },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+    return {
+      notFound: true, // Handle errors as not found or customize your error handling
+    };
+  }
+};

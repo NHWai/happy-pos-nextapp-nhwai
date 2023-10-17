@@ -1,13 +1,15 @@
 import OrderLayout from "@/components/OrderLayout";
-import OrderContext from "@/contexts/OrderContext";
-import { Box, Button, Stack, Typography } from "@mui/material";
-import CircularProgress from "@mui/material/CircularProgress";
+import { Box, Button, Typography } from "@mui/material";
 import Image from "next/image";
 import RouterLink from "next/link";
 import { useRouter } from "next/router";
-import { useContext, useEffect } from "react";
 import mypic from "../../assets/logo-no-background.png";
 import { RevealList } from "next-reveal";
+import { GetServerSideProps, GetServerSidePropsContext } from "next";
+import {
+  fetchOrderMenuCategories,
+  OrderMenuCategoryItemType,
+} from "@/config/orderDataFetching";
 
 const style = {
   width: "100%",
@@ -16,24 +18,13 @@ const style = {
   marginTop: "2rem",
 };
 
-const OrderApp = () => {
-  const { app, getMenusByLocationId } = useContext(OrderContext);
+type ServerSideProps = {
+  data: OrderMenuCategoryItemType[];
+};
+
+const OrderApp = ({ data }: ServerSideProps) => {
   const { query } = useRouter();
-
-  useEffect(() => {
-    if (query.locationId) {
-      localStorage.setItem("OrderlocationId", query.locationId as string);
-      localStorage.setItem("OrdertableId", query.tableId as string);
-    }
-    const locationId = Number(query.locationId);
-    if (locationId && locationId !== app.location.id) {
-      getMenusByLocationId(locationId);
-    }
-  }, [query.locationId]);
-
-  useEffect(() => {
-    if (app.status === "failed") alert("Failed to load data from server");
-  }, [app.status]);
+  const { locationId, tableId } = query;
 
   return (
     <OrderLayout height={`calc(100vh - 64px)`}>
@@ -59,36 +50,49 @@ const OrderApp = () => {
         </Typography>
 
         <Box sx={style}>
-          {app.status === "loading" ? (
-            <CircularProgress />
-          ) : (
-            <RevealList
-              interval={300}
-              origin="bottom"
-              delay={100}
-              duration={1000}
-              className="menuCategories"
-            >
-              {app.menuCategories.map((el) => (
-                <div key={el.name}>
-                  <Button
-                    component={RouterLink}
-                    href={`/order/${el.name}`}
-                    color="info"
-                    size="medium"
-                    variant="contained"
-                    sx={{ width: "200px", color: "primary.main" }}
-                  >
-                    {el.name}
-                  </Button>
-                </div>
-              ))}
-            </RevealList>
-          )}
+          <RevealList
+            interval={300}
+            origin="bottom"
+            delay={100}
+            duration={1000}
+            className="menuCategories"
+          >
+            {data.map((el) => (
+              <div key={el.name}>
+                <Button
+                  component={RouterLink}
+                  href={`/order/menus/?locationId=${locationId}&menuCategoryId=${el.id}`}
+                  color="info"
+                  size="medium"
+                  variant="contained"
+                  sx={{ width: "200px", color: "primary.main" }}
+                >
+                  {el.name}
+                </Button>
+              </div>
+            ))}
+          </RevealList>
         </Box>
       </Box>
     </OrderLayout>
   );
 };
 
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async (
+  context: GetServerSidePropsContext
+) => {
+  try {
+    const locationId = context.query.locationId as string;
+    // Fetch data based on the context (request parameters)
+    const data = await fetchOrderMenuCategories(locationId);
+    return {
+      props: { data },
+    };
+  } catch (error) {
+    console.error("Error in getServerSideProps:", error);
+    return {
+      notFound: true, // Handle errors as not found or customize your error handling
+    };
+  }
+};
 export default OrderApp;

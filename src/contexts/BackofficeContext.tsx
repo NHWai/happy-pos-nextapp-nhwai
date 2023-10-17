@@ -143,6 +143,7 @@ export const BackOfficeContextProvider = ({ children }: Props) => {
       );
       if (response.status) {
         const data = await response.json();
+        console.log(data);
         setBackofficeOrderlines((pre) => ({
           items: data,
           status: "idle",

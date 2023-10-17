@@ -85,10 +85,18 @@ export interface MenusType extends ContextType {
 
 export interface OrderLineType {
   id: number;
-  name: string;
+  menu: {
+    id: number;
+    name: string;
+    price: number;
+  };
   price: number;
   qty: number;
-  addons: string[];
+  addons: {
+    id: number;
+    name: string;
+    price: number;
+  }[];
   formData: {};
   isConfirm: boolean;
   orderStatus: OrderStatus;

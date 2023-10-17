@@ -14,6 +14,30 @@ export default async function handler(
   res: NextApiResponse
 ) {
   const method = req.method;
+
+  if (method === "GET") {
+    //getorderIds
+    const orderIds = req.query.orderids as string;
+    const orderIdArray = orderIds.split(",").map((item) => Number(item));
+    console.log(orderIdArray);
+    if (orderIdArray.length === 0) {
+      return res.send(400);
+    }
+
+    const orders = await prisma.orders.findMany({
+      where: {
+        id: { in: orderIdArray },
+      },
+      select: {
+        id: true,
+        order_status: true,
+      },
+    });
+    console.log(orders);
+
+    return res.status(200).json(orders);
+  }
+
   if (method === "POST") {
     try {
       const reqBody: {
@@ -64,25 +88,6 @@ export default async function handler(
       return res.status(201).json(orders);
     } catch (error) {
       return res.status(500).end();
-    }
-  }
-
-  if (req.method === "PUT") {
-    let reqBody = req.body;
-    reqBody = JSON.parse(reqBody);
-    try {
-      //getOrders
-      const orders = await prisma.orders.findMany({
-        where: {
-          id: { in: reqBody },
-        },
-        select: { id: true, order_status: true },
-        orderBy: { id: "asc" },
-      });
-      console.log({ orders });
-      res.status(200).json(orders);
-    } catch (error) {
-      res.status(500).end();
     }
   }
 }
